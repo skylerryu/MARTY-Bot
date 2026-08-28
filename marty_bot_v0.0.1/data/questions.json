@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1,
+        "category": "cpr_airway",
+        "question": "What is an acceptable chest compression rate for adult CPR? **include units in your answer**",
+        "answer": "100-120 compressions per minute",
+        "explanation": "Adult CPR chest compressions should be performed at a rate of 100-120 compressions per minute.",
+        "active": true
+    },
+    {
+        "id": 2,
+        "category": "cardiac",
+        "question": "What is the primary therapeutic effect of aspirin when administered to a patient with suspected acute coronary syndrome?",
+        "answer": "It inhibits platelet aggregation",
+        "explanation": "Aspirin inhibits platelet aggregation, reducing further clot formation in a coronary artery. It does not directly dissolve an existing clot.",
+        "active": true
+    },
+    {
+        "id": 3,
+        "category": "cpr_airway",
+        "question": "What is an acceptable chest compressions to ventillations for pediatric CPR in a one responder scenario?",
+        "answer": "30 chest compressions to 2 breaths",
+        "explanation": "Pediatric cardiac arrests are more likely than adults to be respiratory driven. Therefore, we want to focus on providing high quality ventilliations. Thus, for two responder pediatric CPR, we want to provide 15 chest compressions for every 2 breaths. However, for one responder pediatric CPR, we keep it at 15 chest compressions for every 2 breaths as it is difficult to manage both tasks of chest compressions and ventillations at high quality. Thus, for one responder pediatic CPR, the AHA recommends 30 chest compressions for every 2 breaths.",
+        "active": true
+    }
+]
