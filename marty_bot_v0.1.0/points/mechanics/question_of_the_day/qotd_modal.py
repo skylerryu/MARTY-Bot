@@ -4,6 +4,11 @@ from points.time_helpers import (
     get_current_chicago_date,
 )
 
+from points.points_operations.add_points import (
+    set_point_notification_context,
+    reset_point_notification_context,
+)
+
 from points.mechanics.question_of_the_day.qotd import (
     submit_qotd_answer,
 )
@@ -27,14 +32,6 @@ from points.mechanics.question_of_the_day.qotd_display import (
     build_qotd_completed_embed,
     build_qotd_expired_embed,
     build_qotd_unavailable_embed,
-)
-
-from points.progressions.levels.level_up_display import (
-    build_level_up_embed,
-)
-
-from points.progressions.ranks.rank_up_display import (
-    build_rank_up_embed,
 )
 
 
@@ -61,12 +58,20 @@ class QotdAnswerModal(
 
         self.qotd_id = qotd_id
 
-        self.answer_input = discord.ui.TextInput(
-            label="Your Answer",
-            placeholder="Enter your answer here...",
-            style=discord.TextStyle.paragraph,
-            required=True,
-            max_length=QOTD_ANSWER_MAX_LENGTH,
+        self.answer_input = (
+            discord.ui.TextInput(
+                label="Your Answer",
+                placeholder=(
+                    "Enter your answer here..."
+                ),
+                style=(
+                    discord.TextStyle.paragraph
+                ),
+                required=True,
+                max_length=(
+                    QOTD_ANSWER_MAX_LENGTH
+                ),
+            )
         )
 
         self.add_item(
@@ -107,53 +112,62 @@ class QotdAnswerModal(
 
 
         # ==================================================
-        # SUBMITTED ANSWER
+        # POINT NOTIFICATION CONTEXT
         # ==================================================
 
-
-        submitted_answer = str(
-            self.answer_input.value
+        notification_token = (
+            set_point_notification_context(
+                user=interaction.user,
+                channel=interaction.channel,
+            )
         )
-
-
-        # ==================================================
-        # PROCESS ANSWER
-        # ==================================================
 
 
         try:
 
-            result = await submit_qotd_answer(
-                qotd_id=self.qotd_id,
-                guild_id=interaction.guild.id,
-                user_id=interaction.user.id,
-                username=interaction.user.display_name,
-                submitted_answer=submitted_answer,
+            try:
+
+                result = await submit_qotd_answer(
+                    qotd_id=self.qotd_id,
+                    guild_id=interaction.guild.id,
+                    user_id=interaction.user.id,
+                    username=(
+                        interaction.user.display_name
+                    ),
+                    submitted_answer=str(
+                        self.answer_input.value
+                    ),
+                )
+
+            except Exception as error:
+
+                print(
+                    "QoTD submission error: "
+                    f"{error!r}"
+                )
+
+                await interaction.followup.send(
+                    (
+                        "⚠️ Something went wrong while "
+                        "processing your answer. "
+                        "Please try again."
+                    ),
+                    ephemeral=True,
+                )
+
+                return
+
+
+        finally:
+
+            reset_point_notification_context(
+                notification_token
             )
-
-        except Exception as error:
-
-            print(
-                "QoTD submission error: "
-                f"{error!r}"
-            )
-
-            await interaction.followup.send(
-                (
-                    "⚠️ Something went wrong while "
-                    "processing your answer. "
-                    "Please try again."
-                ),
-                ephemeral=True,
-            )
-
-            return
 
 
         # ==================================================
         # RESULT STATUS
         # ==================================================
-
 
         status = result["status"]
 
@@ -162,11 +176,12 @@ class QotdAnswerModal(
         # QUESTION NOT FOUND
         # ==================================================
 
-
         if status == "not_found":
 
             await interaction.followup.send(
-                embed=build_qotd_unavailable_embed(),
+                embed=(
+                    build_qotd_unavailable_embed()
+                ),
                 ephemeral=True,
             )
 
@@ -177,11 +192,12 @@ class QotdAnswerModal(
         # QUESTION EXPIRED
         # ==================================================
 
-
         if status == "expired":
 
             await interaction.followup.send(
-                embed=build_qotd_expired_embed(),
+                embed=(
+                    build_qotd_expired_embed()
+                ),
                 ephemeral=True,
             )
 
@@ -192,11 +208,12 @@ class QotdAnswerModal(
         # ALREADY COMPLETED
         # ==================================================
 
-
         if status == "already_completed":
 
             await interaction.followup.send(
-                embed=build_qotd_completed_embed(),
+                embed=(
+                    build_qotd_completed_embed()
+                ),
                 ephemeral=True,
             )
 
@@ -207,12 +224,11 @@ class QotdAnswerModal(
         # LLM UNCERTAIN
         # ==================================================
 
-
         if status == "uncertain":
 
             await interaction.followup.send(
-                embed=build_qotd_uncertain_embed(
-                    submitted_answer=submitted_answer,
+                embed=(
+                    build_qotd_uncertain_embed()
                 ),
                 ephemeral=True,
             )
@@ -224,12 +240,11 @@ class QotdAnswerModal(
         # INCORRECT
         # ==================================================
 
-
         if status == "incorrect":
 
             await interaction.followup.send(
-                embed=build_qotd_incorrect_embed(
-                    submitted_answer=submitted_answer,
+                embed=(
+                    build_qotd_incorrect_embed()
                 ),
                 ephemeral=True,
             )
@@ -241,7 +256,6 @@ class QotdAnswerModal(
         # CORRECT
         # ==================================================
 
-
         if status != "correct":
 
             raise RuntimeError(
@@ -249,58 +263,26 @@ class QotdAnswerModal(
                 f"{status}"
             )
 
+
         await interaction.followup.send(
-            embed=build_qotd_correct_embed(
-                submitted_answer=submitted_answer,
-                base_points=result["base_points"],
-                streak_bonus=result["streak_bonus"],
-                streak_days=result["streak_days"],
-                explanation=result["explanation"],
+            embed=(
+                build_qotd_correct_embed(
+                    base_points=(
+                        result["base_points"]
+                    ),
+                    streak_bonus=(
+                        result["streak_bonus"]
+                    ),
+                    streak_days=(
+                        result["streak_days"]
+                    ),
+                    explanation=(
+                        result["explanation"]
+                    ),
+                )
             ),
             ephemeral=True,
         )
-
-
-        # ==================================================
-        # PROGRESSION
-        # ==================================================
-
-
-        progression = result[
-            "progression"
-        ]
-
-
-        # ==================================================
-        # PRIVATE LEVEL UP
-        # ==================================================
-
-
-        if progression["leveled_up"]:
-
-            level_up_embed = build_level_up_embed(
-                old_level=progression["old_level"],
-                new_level=progression["new_level"],
-            )
-
-            await interaction.followup.send(
-                embed=level_up_embed,
-                ephemeral=True,
-            )
-
-
-        # ==================================================
-        # PUBLIC RANK UP
-        # ==================================================
-
-
-        if progression["ranked_up"]:
-
-            await _send_rank_up_message(
-                interaction=interaction,
-                channel_id=result["channel_id"],
-                progression=progression,
-            )
 
 
 # ==================================================
@@ -314,10 +296,6 @@ class QotdAnswerView(
     """
     Persistent Discord view containing the
     Answer Question button.
-
-    timeout=None allows the button to survive
-    beyond the lifetime of the bot process when
-    the view is restored during startup.
     """
 
     def __init__(
@@ -332,7 +310,9 @@ class QotdAnswerView(
 
         answer_button = discord.ui.Button(
             label="Answer Question",
-            style=discord.ButtonStyle.primary,
+            style=(
+                discord.ButtonStyle.primary
+            ),
             emoji="✏️",
             custom_id=(
                 f"qotd:answer:{qotd_id}"
@@ -379,7 +359,6 @@ class QotdAnswerView(
         # GET QUESTION
         # ==================================================
 
-
         qotd = await get_qotd(
             self.qotd_id
         )
@@ -387,7 +366,9 @@ class QotdAnswerView(
         if qotd is None:
 
             await interaction.response.send_message(
-                embed=build_qotd_unavailable_embed(),
+                embed=(
+                    build_qotd_unavailable_embed()
+                ),
                 ephemeral=True,
             )
 
@@ -398,14 +379,15 @@ class QotdAnswerView(
         # VERIFY SERVER
         # ==================================================
 
-
         if (
             qotd["guild_id"]
             != interaction.guild.id
         ):
 
             await interaction.response.send_message(
-                embed=build_qotd_unavailable_embed(),
+                embed=(
+                    build_qotd_unavailable_embed()
+                ),
                 ephemeral=True,
             )
 
@@ -415,7 +397,6 @@ class QotdAnswerView(
         # ==================================================
         # VERIFY DATE
         # ==================================================
-
 
         current_date = (
             get_current_chicago_date()
@@ -427,7 +408,9 @@ class QotdAnswerView(
         ):
 
             await interaction.response.send_message(
-                embed=build_qotd_expired_embed(),
+                embed=(
+                    build_qotd_expired_embed()
+                ),
                 ephemeral=True,
             )
 
@@ -438,14 +421,15 @@ class QotdAnswerView(
         # CHECK COMPLETION
         # ==================================================
 
-
         if await has_completed_qotd(
             qotd_id=self.qotd_id,
             user_id=interaction.user.id,
         ):
 
             await interaction.response.send_message(
-                embed=build_qotd_completed_embed(),
+                embed=(
+                    build_qotd_completed_embed()
+                ),
                 ephemeral=True,
             )
 
@@ -456,64 +440,8 @@ class QotdAnswerView(
         # OPEN MODAL
         # ==================================================
 
-
         await interaction.response.send_modal(
             QotdAnswerModal(
                 qotd_id=self.qotd_id
             )
         )
-
-
-# ==================================================
-# PUBLIC RANK-UP MESSAGE
-# ==================================================
-
-
-async def _send_rank_up_message(
-    interaction: discord.Interaction,
-    channel_id: int,
-    progression: dict,
-):
-    """
-    Publish a rank-up announcement in the
-    channel where the QoTD was posted.
-    """
-
-    rank_up_embed = build_rank_up_embed(
-        username=interaction.user.display_name,
-        new_rank=progression["new_rank"],
-        new_level=progression["new_level"],
-    )
-
-    channel = interaction.client.get_channel(
-        channel_id
-    )
-
-    if channel is None:
-
-        try:
-
-            channel = await interaction.client.fetch_channel(
-                channel_id
-            )
-
-        except (
-            discord.Forbidden,
-            discord.NotFound,
-            discord.HTTPException,
-        ):
-
-            return
-
-    try:
-
-        await channel.send(
-            embed=rank_up_embed
-        )
-
-    except (
-        discord.Forbidden,
-        discord.HTTPException,
-    ):
-
-        pass

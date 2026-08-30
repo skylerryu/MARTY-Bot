@@ -14,23 +14,73 @@ DB_PATH = Path(__file__).with_name(
 
 
 # ==================================================
+# DATABASE MIGRATION HELPER
+# ==================================================
+
+
+async def _ensure_column(
+    db: aiosqlite.Connection,
+    table_name: str,
+    column_name: str,
+    column_definition: str,
+):
+    """
+    Add a column to an existing table if the
+    column does not already exist.
+
+    This lets M.A.R.T.Y. upgrade an older
+    database without deleting it.
+    """
+
+    cursor = await db.execute(
+        f"PRAGMA table_info({table_name})"
+    )
+
+    rows = await cursor.fetchall()
+
+    existing_columns = {
+        row[1]
+        for row in rows
+    }
+
+    if column_name in existing_columns:
+        return
+
+    await db.execute(
+        f"""
+        ALTER TABLE {table_name}
+        ADD COLUMN {column_name}
+        {column_definition}
+        """
+    )
+
+
+# ==================================================
 # INITIALIZE DATABASE
 # ==================================================
 
 
 async def init_db():
     """
-    Create all database tables and indexes
-    required by M.A.R.T.Y.
+    Create all persistent M.A.R.T.Y. tables
+    and indexes.
+
+    Existing data is preserved.
     """
 
     async with aiosqlite.connect(
         DB_PATH
     ) as db:
 
+        await db.execute(
+            "PRAGMA foreign_keys = ON"
+        )
+
+
         # ==================================================
         # USERS
         # ==================================================
+
 
         await db.execute(
             """
@@ -38,6 +88,9 @@ async def init_db():
                 guild_id INTEGER NOT NULL,
                 user_id INTEGER NOT NULL,
                 username TEXT NOT NULL,
+
+                created_at TEXT NOT NULL
+                    DEFAULT CURRENT_TIMESTAMP,
 
                 PRIMARY KEY (
                     guild_id,
@@ -51,6 +104,7 @@ async def init_db():
         # ==================================================
         # POINT TRANSACTIONS
         # ==================================================
+
 
         await db.execute(
             """
@@ -71,8 +125,12 @@ async def init_db():
             """
         )
 
-        # Add source_key to older databases that were
-        # created before this column existed.
+
+        # ==================================================
+        # POINT TRANSACTION MIGRATIONS
+        # ==================================================
+
+
         await _ensure_column(
             db=db,
             table_name="point_transactions",
@@ -85,25 +143,11 @@ async def init_db():
         # POINT TRANSACTION INDEXES
         # ==================================================
 
-        await db.execute(
-            """
-            CREATE UNIQUE INDEX IF NOT EXISTS
-                idx_point_transactions_source_key
-
-            ON point_transactions (
-                guild_id,
-                user_id,
-                source_key
-            )
-
-            WHERE source_key IS NOT NULL
-            """
-        )
 
         await db.execute(
             """
             CREATE INDEX IF NOT EXISTS
-                idx_point_transactions_user
+            idx_point_transactions_user
 
             ON point_transactions (
                 guild_id,
@@ -115,7 +159,7 @@ async def init_db():
         await db.execute(
             """
             CREATE INDEX IF NOT EXISTS
-                idx_point_transactions_week
+            idx_point_transactions_created_at
 
             ON point_transactions (
                 guild_id,
@@ -124,10 +168,45 @@ async def init_db():
             """
         )
 
+        await db.execute(
+            """
+            CREATE INDEX IF NOT EXISTS
+            idx_point_transactions_user_created_at
+
+            ON point_transactions (
+                guild_id,
+                user_id,
+                created_at
+            )
+            """
+        )
+
+
+        # ==================================================
+        # UNIQUE POINT SOURCE
+        # ==================================================
+
+
+        await db.execute(
+            """
+            CREATE UNIQUE INDEX IF NOT EXISTS
+            idx_point_transactions_source_key
+
+            ON point_transactions (
+                guild_id,
+                user_id,
+                source_key
+            )
+
+            WHERE source_key IS NOT NULL
+            """
+        )
+
 
         # ==================================================
         # GOLDEN SPATULAS
         # ==================================================
+
 
         await db.execute(
             """
@@ -137,8 +216,31 @@ async def init_db():
                 guild_id INTEGER NOT NULL,
                 user_id INTEGER NOT NULL,
 
+                week_start TEXT NOT NULL,
+
+                username TEXT,
+                weekly_points INTEGER,
+
                 awarded_at TEXT NOT NULL
-                    DEFAULT CURRENT_TIMESTAMP
+                    DEFAULT CURRENT_TIMESTAMP,
+
+                UNIQUE (
+                    guild_id,
+                    week_start
+                )
+            )
+            """
+        )
+
+
+        await db.execute(
+            """
+            CREATE INDEX IF NOT EXISTS
+            idx_golden_spatulas_user
+
+            ON golden_spatulas (
+                guild_id,
+                user_id
             )
             """
         )
@@ -148,14 +250,20 @@ async def init_db():
         # ACTIVITY STREAKS
         # ==================================================
 
+
         await db.execute(
             """
             CREATE TABLE IF NOT EXISTS activity_streaks (
                 guild_id INTEGER NOT NULL,
                 user_id INTEGER NOT NULL,
 
-                current_streak INTEGER NOT NULL,
-                last_active_week TEXT NOT NULL,
+                current_streak INTEGER NOT NULL
+                    DEFAULT 0,
+
+                last_active_week TEXT,
+
+                updated_at TEXT NOT NULL
+                    DEFAULT CURRENT_TIMESTAMP,
 
                 PRIMARY KEY (
                     guild_id,
@@ -170,6 +278,7 @@ async def init_db():
         # QOTD QUESTIONS
         # ==================================================
 
+
         await db.execute(
             """
             CREATE TABLE IF NOT EXISTS qotd_questions (
@@ -177,12 +286,15 @@ async def init_db():
 
                 guild_id INTEGER NOT NULL,
                 channel_id INTEGER NOT NULL,
+
                 message_id INTEGER,
 
                 question_date TEXT NOT NULL,
+
                 question_text TEXT NOT NULL,
 
                 accepted_answers TEXT NOT NULL,
+
                 explanation TEXT,
 
                 created_at TEXT NOT NULL
@@ -198,13 +310,44 @@ async def init_db():
 
 
         # ==================================================
+        # QOTD QUESTION INDEXES
+        # ==================================================
+
+
+        await db.execute(
+            """
+            CREATE INDEX IF NOT EXISTS
+            idx_qotd_questions_date
+
+            ON qotd_questions (
+                guild_id,
+                question_date
+            )
+            """
+        )
+
+        await db.execute(
+            """
+            CREATE INDEX IF NOT EXISTS
+            idx_qotd_questions_message
+
+            ON qotd_questions (
+                message_id
+            )
+            """
+        )
+
+
+        # ==================================================
         # QOTD COMPLETIONS
         # ==================================================
+
 
         await db.execute(
             """
             CREATE TABLE IF NOT EXISTS qotd_completions (
                 qotd_id INTEGER NOT NULL,
+
                 guild_id INTEGER NOT NULL,
                 user_id INTEGER NOT NULL,
 
@@ -221,8 +364,38 @@ async def init_db():
 
 
         # ==================================================
+        # QOTD COMPLETION INDEXES
+        # ==================================================
+
+
+        await db.execute(
+            """
+            CREATE INDEX IF NOT EXISTS
+            idx_qotd_completions_user
+
+            ON qotd_completions (
+                guild_id,
+                user_id
+            )
+            """
+        )
+
+        await db.execute(
+            """
+            CREATE INDEX IF NOT EXISTS
+            idx_qotd_completions_qotd
+
+            ON qotd_completions (
+                qotd_id
+            )
+            """
+        )
+
+
+        # ==================================================
         # QOTD STREAKS
         # ==================================================
+
 
         await db.execute(
             """
@@ -231,6 +404,7 @@ async def init_db():
                 user_id INTEGER NOT NULL,
 
                 current_streak INTEGER NOT NULL,
+
                 last_completion_date TEXT NOT NULL,
 
                 PRIMARY KEY (
@@ -243,83 +417,73 @@ async def init_db():
 
 
         # ==================================================
-        # QOTD INDEXES
+        # ACTIVE SPEED QUESTIONS
         # ==================================================
+
 
         await db.execute(
             """
-            CREATE INDEX IF NOT EXISTS
-                idx_qotd_questions_guild_date
+            CREATE TABLE IF NOT EXISTS
+            active_speed_questions (
+                guild_id INTEGER NOT NULL,
+                channel_id INTEGER NOT NULL,
 
-            ON qotd_questions (
-                guild_id,
-                question_date
+                question_id INTEGER NOT NULL,
+
+                posted_at TEXT NOT NULL
+                    DEFAULT CURRENT_TIMESTAMP,
+
+                answered_by INTEGER,
+                answered_at TEXT,
+
+                PRIMARY KEY (
+                    guild_id,
+                    channel_id
+                )
             )
             """
         )
 
+
+        # ==================================================
+        # ACTIVE SPEED QUESTION INDEX
+        # ==================================================
+
+
         await db.execute(
             """
             CREATE INDEX IF NOT EXISTS
-                idx_qotd_completions_user
+            idx_active_speed_questions_question
 
-            ON qotd_completions (
-                guild_id,
-                user_id
+            ON active_speed_questions (
+                question_id
             )
             """
         )
 
 
         # ==================================================
-        # SAVE
+        # SAVE DATABASE CHANGES
         # ==================================================
+
 
         await db.commit()
 
 
+# ==================================================
+# DIRECT DATABASE TEST
+# ==================================================
+
+
+if __name__ == "__main__":
+
+    import asyncio
+
+    asyncio.run(
+        init_db()
+    )
+
     print(
-        f"Database initialized: {DB_PATH}"
-    )
-
-
-# ==================================================
-# DATABASE MIGRATION HELPER
-# ==================================================
-
-
-async def _ensure_column(
-    db: aiosqlite.Connection,
-    table_name: str,
-    column_name: str,
-    column_definition: str,
-):
-    """
-    Add a column to an existing table if that
-    column does not already exist.
-
-    This allows older M.A.R.T.Y. databases to
-    be upgraded without deleting their data.
-    """
-
-    cursor = await db.execute(
-        f"PRAGMA table_info({table_name})"
-    )
-
-    columns = await cursor.fetchall()
-
-    column_exists = any(
-        row[1] == column_name
-        for row in columns
-    )
-
-    if column_exists:
-        return
-
-    await db.execute(
-        f"""
-        ALTER TABLE {table_name}
-        ADD COLUMN {column_name}
-        {column_definition}
-        """
+        "M.A.R.T.Y. database initialized at: "
+        f"{DB_PATH}"
     )

@@ -1,9 +1,7 @@
 import discord
 from discord import app_commands
 
-from bot_config import (
-    DEV_GUILD_ID,
-)
+from bot_config import DEV_GUILD_ID
 
 from commands.points_commands import (
     register_points_commands,
@@ -13,8 +11,17 @@ from commands.qotd_commands import (
     register_qotd_commands,
 )
 
+from commands.question_commands import (
+    register_question_commands,
+)
+
 from data.database import (
     init_db,
+)
+
+from points.points_operations.add_points import (
+    set_point_notification_context,
+    reset_point_notification_context,
 )
 
 from points.mechanics.activity.activity import (
@@ -37,32 +44,13 @@ from points.mechanics.question_of_the_day.qotd_scheduler import (
     QotdScheduler,
 )
 
-from points.progressions.levels.levels import (
-    initialize_level_cache,
+from points.mechanics.random_speed_questions.random_speed_questions import (
+    process_speed_question_message,
 )
-
-from points.progressions.progressions_validator import (
-    validate_progression_config,
-)
-
-from points.progressions.progressions_table import (
-    generate_progressions_reference,
-)
-
-
-# ==================================================
-# DISCORD INTENTS
-# ==================================================
 
 
 intents = discord.Intents.default()
-
 intents.message_content = True
-
-
-# ==================================================
-# M.A.R.T.Y. BOT
-# ==================================================
 
 
 class MartyBot(
@@ -76,17 +64,16 @@ class MartyBot(
             intents=intents
         )
 
-        # Discord slash commands.
-        self.tree = app_commands.CommandTree(
-            self
+        self.tree = (
+            app_commands.CommandTree(
+                self
+            )
         )
 
-        # Activity points mechanic.
         self.activity_tracker = (
             ActivityTracker()
         )
 
-        # Daily Question of the Day scheduler.
         self.qotd_scheduler = (
             QotdScheduler(
                 bot=self,
@@ -103,43 +90,14 @@ class MartyBot(
     async def setup_hook(
         self,
     ):
-        """
-        Prepare M.A.R.T.Y. before the bot
-        becomes fully connected to Discord.
-        """
-
-        # ==================================================
-        # PROGRESSION SYSTEM
-        # ==================================================
-
-        initialize_level_cache()
-
-        validate_progression_config()
-
-        generate_progressions_reference()
-
-
-        # ==================================================
-        # DATABASE
-        # ==================================================
 
         await init_db()
-
-
-        # ==================================================
-        # RESTORE QOTD BUTTONS
-        # ==================================================
-
-        await self._restore_qotd_views()
-
-
-        # ==================================================
-        # COMMANDS
-        # ==================================================
 
         guild = discord.Object(
             id=DEV_GUILD_ID
         )
+
+        await self._restore_qotd_views()
 
         register_points_commands(
             tree=self.tree,
@@ -151,24 +109,22 @@ class MartyBot(
             guild=guild,
         )
 
+        register_question_commands(
+            tree=self.tree,
+            guild=guild,
+        )
 
-        # ==================================================
-        # COMMAND SYNC
-        # ==================================================
-
-        synced = await self.tree.sync(
-            guild=guild
+        synced_commands = (
+            await self.tree.sync(
+                guild=guild
+            )
         )
 
         print(
-            f"Synced {len(synced)} "
-            "slash commands."
+            "Synced "
+            f"{len(synced_commands)} "
+            "Discord slash command(s)."
         )
-
-
-        # ==================================================
-        # QOTD SCHEDULER
-        # ==================================================
 
         self.qotd_scheduler.start()
 
@@ -181,31 +137,33 @@ class MartyBot(
     async def _restore_qotd_views(
         self,
     ):
-        """
-        Restore persistent Answer Question
-        buttons after M.A.R.T.Y. restarts.
-        """
 
-        recent_qotds = (
+        qotds = (
             await get_recent_qotds_for_views(
-                limit=QOTD_PERSISTENT_VIEW_LIMIT,
+                limit=(
+                    QOTD_PERSISTENT_VIEW_LIMIT
+                )
             )
         )
 
         restored_count = 0
 
-        for qotd in recent_qotds:
+        for qotd in qotds:
 
-            message_id = qotd[
-                "message_id"
-            ]
+            qotd_id = (
+                qotd["id"]
+            )
+
+            message_id = (
+                qotd["message_id"]
+            )
 
             if message_id is None:
                 continue
 
             self.add_view(
                 QotdAnswerView(
-                    qotd_id=qotd["id"]
+                    qotd_id=qotd_id
                 ),
                 message_id=message_id,
             )
@@ -215,7 +173,7 @@ class MartyBot(
         print(
             "Restored "
             f"{restored_count} "
-            "QoTD persistent views."
+            "persistent QoTD view(s)."
         )
 
 
@@ -227,26 +185,15 @@ class MartyBot(
     async def on_ready(
         self,
     ):
-        """
-        Called when M.A.R.T.Y. is connected
-        to Discord.
-        """
-
-        if self.user is None:
-            return
 
         print(
-            "M.A.R.T.Y. connected as "
+            "M.A.R.T.Y. is online as "
             f"{self.user}"
-        )
-
-        print(
-            f"Bot ID: {self.user.id}"
         )
 
 
     # ==================================================
-    # MESSAGE ACTIVITY
+    # MESSAGE
     # ==================================================
 
 
@@ -254,19 +201,94 @@ class MartyBot(
         self,
         message: discord.Message,
     ):
-        """
-        Pass Discord messages to the activity
-        points mechanic.
-        """
 
-        await self.activity_tracker.process_message(
-            message
+        if message.author.bot:
+            return
+
+
+        # ==================================================
+        # POINT NOTIFICATION CONTEXT
+        # ==================================================
+
+        notification_token = (
+            set_point_notification_context(
+                user=message.author,
+                channel=message.channel,
+            )
         )
 
 
-# ==================================================
-# BOT INSTANCE
-# ==================================================
+        try:
+
+
+            # ==================================================
+            # ACTIVITY
+            # ==================================================
+
+            try:
+
+                await (
+                    self.activity_tracker
+                    .process_message(
+                        message
+                    )
+                )
+
+            except Exception as error:
+
+                print(
+                    "Activity processing error: "
+                    f"{error!r}"
+                )
+
+
+            # ==================================================
+            # SPEED QUESTION
+            # ==================================================
+
+            try:
+
+                await process_speed_question_message(
+                    message=message,
+                    bot_user=self.user,
+                )
+
+            except Exception as error:
+
+                print(
+                    "Speed question processing error: "
+                    f"{error!r}"
+                )
+
+
+        finally:
+
+            reset_point_notification_context(
+                notification_token
+            )
+
+
+    # ==================================================
+    # SHUTDOWN
+    # ==================================================
+
+
+    async def close(
+        self,
+    ):
+
+        try:
+
+            self.qotd_scheduler.stop()
+
+        except Exception as error:
+
+            print(
+                "QoTD scheduler shutdown error: "
+                f"{error!r}"
+            )
+
+        await super().close()
 
 
 bot = MartyBot()

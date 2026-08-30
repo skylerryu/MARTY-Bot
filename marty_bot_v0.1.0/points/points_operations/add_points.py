@@ -1,4 +1,7 @@
+from contextvars import ContextVar
+
 import aiosqlite
+import discord
 
 from data.database import (
     DB_PATH,
@@ -12,6 +15,59 @@ from points.points_operations.operations_helpers import (
 from points.progressions.progressions import (
     get_progression_change,
 )
+
+from points.progressions.levels.level_up_display import (
+    build_level_up_embed,
+)
+
+from points.progressions.ranks.rank_up_display import (
+    build_rank_up_embed,
+)
+
+
+# ==================================================
+# DISCORD NOTIFICATION CONTEXT
+# ==================================================
+
+
+_point_notification_context = ContextVar(
+    "point_notification_context",
+    default=None,
+)
+
+
+def set_point_notification_context(
+    user,
+    channel,
+):
+    """
+    Store the Discord user and channel associated
+    with point awards in the current async task.
+
+    This allows add_points() to automatically send
+    progression notifications without every mechanic
+    needing to handle them individually.
+    """
+
+    return _point_notification_context.set(
+        {
+            "user": user,
+            "channel": channel,
+        }
+    )
+
+
+def reset_point_notification_context(
+    token,
+):
+    """
+    Restore the previous Discord notification
+    context.
+    """
+
+    _point_notification_context.reset(
+        token
+    )
 
 
 # ==================================================
@@ -29,6 +85,10 @@ async def add_points(
 ) -> dict:
     """
     Add points to a user.
+
+    Whenever a successful point award causes a
+    level-up or rank-up, the appropriate public
+    Discord notification is automatically sent.
 
     source_key may be supplied when a point
     award must only be given once.
@@ -100,7 +160,9 @@ async def add_points(
             ),
         )
 
-        awarded = cursor.rowcount > 0
+        awarded = (
+            cursor.rowcount > 0
+        )
 
         await db.commit()
 
@@ -110,9 +172,14 @@ async def add_points(
     # ==================================================
 
     if awarded:
-        new_points = old_points + amount
+
+        new_points = (
+            old_points
+            + amount
+        )
 
     else:
+
         new_points = old_points
 
 
@@ -125,7 +192,9 @@ async def add_points(
         new_points=new_points,
     )
 
-    progression["awarded"] = awarded
+    progression["awarded"] = (
+        awarded
+    )
 
     progression["points_awarded"] = (
         amount
@@ -133,4 +202,254 @@ async def add_points(
         else 0
     )
 
+
+    # ==================================================
+    # PROGRESSION NOTIFICATIONS
+    # ==================================================
+
+    if awarded:
+
+        await _handle_progression_notifications(
+            progression=progression,
+            username=username,
+        )
+
+
     return progression
+
+
+# ==================================================
+# HANDLE PROGRESSION
+# ==================================================
+
+
+async def _handle_progression_notifications(
+    progression: dict,
+    username: str | None,
+):
+    """
+    Automatically send any progression
+    notifications caused by a point award.
+    """
+
+    context = (
+        _point_notification_context.get()
+    )
+
+    if context is None:
+
+        if (
+            progression.get(
+                "leveled_up",
+                False,
+            )
+            or progression.get(
+                "ranked_up",
+                False,
+            )
+        ):
+
+            print(
+                "Progression notification skipped: "
+                "no Discord notification context."
+            )
+
+        return
+
+
+    user = context.get(
+        "user"
+    )
+
+    channel = context.get(
+        "channel"
+    )
+
+
+    # ==================================================
+    # LEVEL UP
+    # ==================================================
+
+    if progression.get(
+        "leveled_up",
+        False,
+    ):
+
+        await _send_level_up_notification(
+            progression=progression,
+            user=user,
+            channel=channel,
+        )
+
+
+    # ==================================================
+    # RANK UP
+    # ==================================================
+
+    if progression.get(
+        "ranked_up",
+        False,
+    ):
+
+        await _send_rank_up_notification(
+            progression=progression,
+            user=user,
+            channel=channel,
+            username=username,
+        )
+
+
+# ==================================================
+# LEVEL UP NOTIFICATION
+# ==================================================
+
+
+async def _send_level_up_notification(
+    progression: dict,
+    user,
+    channel,
+):
+    """
+    Send a public Level Up notification in the
+    channel where the points were earned.
+    """
+
+    if channel is None:
+        return
+
+
+    level_up_embed = (
+        build_level_up_embed(
+            old_level=(
+                progression[
+                    "old_level"
+                ]
+            ),
+            new_level=(
+                progression[
+                    "new_level"
+                ]
+            ),
+        )
+    )
+
+
+    # ==================================================
+    # SEND
+    # ==================================================
+
+    try:
+
+        if (
+            user is not None
+            and hasattr(
+                user,
+                "mention",
+            )
+        ):
+
+            await channel.send(
+                content=user.mention,
+                embed=level_up_embed,
+            )
+
+        else:
+
+            await channel.send(
+                embed=level_up_embed
+            )
+
+    except (
+        discord.Forbidden,
+        discord.HTTPException,
+    ):
+
+        pass
+
+
+# ==================================================
+# RANK UP NOTIFICATION
+# ==================================================
+
+
+async def _send_rank_up_notification(
+    progression: dict,
+    user,
+    channel,
+    username: str | None,
+):
+    """
+    Send a public Rank Up notification in the
+    channel where the points were earned.
+    """
+
+    if channel is None:
+        return
+
+
+    # ==================================================
+    # DISPLAY NAME
+    # ==================================================
+
+    if username is not None:
+
+        display_name = (
+            username
+        )
+
+    elif (
+        user is not None
+        and hasattr(
+            user,
+            "display_name",
+        )
+    ):
+
+        display_name = (
+            user.display_name
+        )
+
+    else:
+
+        display_name = (
+            "A M.A.R.T.Y. user"
+        )
+
+
+    # ==================================================
+    # BUILD EMBED
+    # ==================================================
+
+    rank_up_embed = (
+        build_rank_up_embed(
+            username=display_name,
+            new_rank=(
+                progression[
+                    "new_rank"
+                ]
+            ),
+            new_level=(
+                progression[
+                    "new_level"
+                ]
+            ),
+        )
+    )
+
+
+    # ==================================================
+    # SEND
+    # ==================================================
+
+    try:
+
+        await channel.send(
+            embed=rank_up_embed
+        )
+
+    except (
+        discord.Forbidden,
+        discord.HTTPException,
+    ):
+
+        pass

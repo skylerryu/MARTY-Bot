@@ -1,0 +1,95 @@
+{
+    "next_id": 12,
+    "questions": [
+        {
+            "id": 1,
+            "category": "cpr_airway",
+            "question": "You are performing CPR on an adult in cardiac arrest. What is the recommended chest compression rate?",
+            "accepted_answers": [
+                "100 to 120 compressions per minute"
+            ],
+            "explanation": "High-quality adult CPR includes chest compressions at a rate of 100 to 120 compressions per minute.",
+            "active": true
+        },
+        {
+            "id": 2,
+            "category": "cpr_airway",
+            "question": "An unresponsive adult has a pulse but is not breathing adequately. How often should you provide ventilations?",
+            "accepted_answers": [
+                "One breath every 6 seconds"
+            ],
+            "explanation": "An adult with a pulse but inadequate breathing should receive one ventilation approximately every 6 seconds, or about 10 breaths per minute.",
+            "active": true
+        },
+        {
+            "id": 3,
+            "category": "cardiac",
+            "question": "A 58-year-old patient has crushing substernal chest pressure, diaphoresis, and nausea. What condition should you suspect?",
+            "accepted_answers": [
+                "Acute coronary syndrome"
+            ],
+            "explanation": "Chest pressure accompanied by diaphoresis and nausea is highly concerning for acute coronary syndrome, which includes myocardial infarction and unstable angina.",
+            "active": true
+        },
+        {
+            "id": 4,
+            "category": "neurological",
+            "question": "A patient suddenly develops facial droop, arm weakness, and slurred speech. What condition should you suspect?",
+            "accepted_answers": [
+                "Stroke"
+            ],
+            "explanation": "Sudden facial droop, arm weakness, and speech difficulty are classic findings associated with an acute stroke.",
+            "active": true
+        },
+        {
+            "id": 5,
+            "category": "neurological",
+            "question": "A diabetic patient is confused, pale, and diaphoretic. What should you assess early in your evaluation?",
+            "accepted_answers": [
+                "Blood glucose level"
+            ],
+            "explanation": "Altered mental status with diaphoresis in a diabetic patient may indicate hypoglycemia, so blood glucose should be assessed early when available.",
+            "active": true
+        },
+        {
+            "id": 6,
+            "category": "anaphylaxis",
+            "question": "A patient develops hives, wheezing, and hypotension shortly after being stung by a bee. What is the most appropriate medication?",
+            "accepted_answers": [
+                "Epinephrine"
+            ],
+            "explanation": "Epinephrine is the first-line medication for anaphylaxis because it helps reverse airway swelling, bronchoconstriction, and hypotension.",
+            "active": true
+        },
+        {
+            "id": 8,
+            "category": "ob_labor",
+            "question": "During delivery, you see the umbilical cord wrapped around the newborn's neck. What is this condition called?",
+            "accepted_answers": [
+                "Nuchal cord"
+            ],
+            "explanation": "An umbilical cord wrapped around the fetal neck is called a nuchal cord.",
+            "active": true
+        },
+        {
+            "id": 9,
+            "category": "trauma",
+            "question": "A trauma patient has severe respiratory distress, absent breath sounds on the left side, hypotension, and signs of shock. What life-threatening condition should you suspect?",
+            "accepted_answers": [
+                "Tension pneumothorax"
+            ],
+            "explanation": "Severe respiratory distress, unilateral absent breath sounds, and shock following trauma are highly concerning for a tension pneumothorax.",
+            "active": true
+        },
+        {
+            "id": 10,
+            "category": "trauma",
+            "question": "A patient has bright red blood spurting rhythmically from a deep leg wound. What type of bleeding is this?",
+            "accepted_answers": [
+                "Arterial bleeding"
+            ],
+            "explanation": "Bright red blood that spurts or pulses with the heartbeat is characteristic of arterial bleeding.",
+            "active": true
+        }
+    ]
+}

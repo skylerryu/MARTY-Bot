@@ -14,7 +14,6 @@ from points.progressions.levels.levels import (
 
 from points.progressions.ranks.ranks import (
     get_rank_for_level,
-    get_next_rank,
 )
 
 
@@ -50,10 +49,6 @@ async def build_my_points_embed(
     ]
 
     rank = get_rank_for_level(
-        level
-    )
-
-    next_rank = get_next_rank(
         level
     )
 
@@ -98,57 +93,21 @@ async def build_my_points_embed(
     )
 
     # --------------------------------------------------
-    # POINT TOTALS
+    # STATS
     # --------------------------------------------------
 
     embed.add_field(
-        name="📅 This Week",
+        name="Stats",
         value=(
-            f"**{points['weekly_points']}** pts"
-        ),
-        inline=True,
-    )
-
-    embed.add_field(
-        name="🏆 All-Time",
-        value=(
-            f"**{all_time_points}** pts"
-        ),
-        inline=True,
-    )
-
-    embed.add_field(
-        name="🍴 Golden Spatulas",
-        value=(
+            f"📅 **This Week:** "
+            f"**{points['weekly_points']} pts**\n"
+            f"🏆 **All-Time:** "
+            f"**{all_time_points} pts**\n"
+            f"🍴 **Golden Spatulas:** "
             f"**{points['golden_spatulas']}**"
         ),
-        inline=True,
+        inline=False,
     )
-
-    # --------------------------------------------------
-    # NEXT RANK
-    # --------------------------------------------------
-
-    if next_rank is not None:
-        embed.add_field(
-            name="Next Rank",
-            value=(
-                f"**{next_rank['name']}** "
-                f"at Level "
-                f"{next_rank['start_level']}"
-            ),
-            inline=False,
-        )
-
-    else:
-        embed.add_field(
-            name="Rank",
-            value=(
-                "You have reached the highest "
-                "M.A.R.T.Y. rank."
-            ),
-            inline=False,
-        )
 
     return embed
 
