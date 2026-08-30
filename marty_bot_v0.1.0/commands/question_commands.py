@@ -5,7 +5,7 @@ from commands.command_helpers import (
     make_command,
 )
 
-from data.question_bank import (
+from data.question_manager import (
     CATEGORY_NAMES,
     add_question,
     get_question_by_id,
@@ -424,14 +424,6 @@ def register_question_commands(
         # MAKE QUESTION ACTIVE
         # ==================================================
 
-
-        # This recreates the v0.0.1 behavior:
-        #
-        # /question posts a question and stores it as
-        # the active speed question for this channel.
-        #
-        # Student messages in this channel can then
-        # be graded by on_message().
 
         await set_active_speed_question(
             guild_id=interaction.guild.id,

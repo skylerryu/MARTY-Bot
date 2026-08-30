@@ -1,9 +1,14 @@
 import asyncio
+import random
 from datetime import time
 from zoneinfo import ZoneInfo
 
 import discord
 from discord.ext import tasks
+
+from data.question_manager import (
+    get_all_questions,
+)
 
 from points.time_helpers import (
     get_current_chicago_date,
@@ -16,7 +21,11 @@ from points.mechanics.question_of_the_day.qotd_config import (
 )
 
 from points.mechanics.question_of_the_day.qotd_questions import (
+    QotdAlreadyExistsError,
+    create_qotd,
     get_qotd_for_date,
+    get_used_qotd_question_bank_ids,
+    get_older_posted_qotds,
     set_qotd_message_id,
 )
 
@@ -27,6 +36,16 @@ from points.mechanics.question_of_the_day.qotd_display import (
 from points.mechanics.question_of_the_day.qotd_modal import (
     QotdAnswerView,
 )
+
+
+# ==================================================
+# QOTD QUESTION CATEGORIES
+# ==================================================
+
+
+QOTD_EXCLUDED_CATEGORIES = {
+    "cet_fun_fact",
+}
 
 
 # ==================================================
@@ -47,30 +66,67 @@ QOTD_POST_TIME = time(
 
 
 # ==================================================
+# QOTD QUESTION SELECTION
+# ==================================================
+
+
+def _get_random_qotd_question(
+    excluded_ids: set[int] | None = None,
+) -> dict | None:
+    """
+    Select a random active question that is
+    eligible for Question of the Day.
+
+    CET Fun Facts are intentionally excluded
+    from QoTD selection.
+    """
+
+    if excluded_ids is None:
+
+        excluded_ids = set()
+
+
+    eligible_questions = [
+        question
+        for question in get_all_questions(
+            active_only=True
+        )
+        if (
+            question.get("category")
+            not in QOTD_EXCLUDED_CATEGORIES
+            and question["id"]
+            not in excluded_ids
+        )
+    ]
+
+
+    if not eligible_questions:
+
+        return None
+
+
+    return random.choice(
+        eligible_questions
+    )
+
+
+# ==================================================
 # QOTD SCHEDULER
 # ==================================================
 
 
 class QotdScheduler:
-    """
-    Automatically posts the Question of the Day
-    at the configured Chicago time.
-
-    The question must already exist in the database
-    for the current date.
-
-    If M.A.R.T.Y. starts after the normal posting
-    time and today's question has not been posted,
-    it will post it when the bot starts.
-    """
 
     def __init__(
         self,
         bot: discord.Client,
         guild_id: int,
+        channel_id: int,
     ):
+
         self.bot = bot
         self.guild_id = guild_id
+        self.channel_id = channel_id
 
         self._post_lock = asyncio.Lock()
 
@@ -81,11 +137,9 @@ class QotdScheduler:
 
 
     def start(self):
-        """
-        Start the daily QoTD scheduler.
-        """
 
         if not self.daily_qotd_post.is_running():
+
             self.daily_qotd_post.start()
 
 
@@ -95,11 +149,9 @@ class QotdScheduler:
 
 
     def stop(self):
-        """
-        Stop the daily QoTD scheduler.
-        """
 
         if self.daily_qotd_post.is_running():
+
             self.daily_qotd_post.cancel()
 
 
@@ -114,10 +166,6 @@ class QotdScheduler:
     async def daily_qotd_post(
         self,
     ):
-        """
-        Run every day at the configured
-        Question of the Day posting time.
-        """
 
         await self.ensure_today_qotd_posted(
             require_post_time=False,
@@ -133,13 +181,6 @@ class QotdScheduler:
     async def before_daily_qotd_post(
         self,
     ):
-        """
-        Wait until Discord is ready.
-
-        If M.A.R.T.Y. started after today's normal
-        posting time, attempt to catch up and post
-        today's question.
-        """
 
         await self.bot.wait_until_ready()
 
@@ -158,9 +199,6 @@ class QotdScheduler:
         self,
         error: Exception,
     ):
-        """
-        Log unexpected scheduler errors.
-        """
 
         print(
             "QoTD scheduler error: "
@@ -177,65 +215,80 @@ class QotdScheduler:
         self,
         require_post_time: bool = True,
     ) -> bool:
-        """
-        Make sure today's QoTD has been posted.
-
-        Returns True if a question was posted.
-
-        Returns False if:
-        - it is too early,
-        - no question exists for today, or
-        - today's question was already posted.
-        """
 
         async with self._post_lock:
+
 
             # ==================================================
             # POSTING TIME CHECK
             # ==================================================
 
+
             if (
                 require_post_time
                 and not self._post_time_has_arrived()
             ):
+
                 return False
 
 
             # ==================================================
-            # GET TODAY'S QUESTION
+            # TODAY
             # ==================================================
+
 
             current_date = (
                 get_current_chicago_date()
             )
+
+
+            # ==================================================
+            # GET EXISTING QOTD
+            # ==================================================
+
 
             qotd = await get_qotd_for_date(
                 guild_id=self.guild_id,
                 question_date=current_date,
             )
 
+
+            # ==================================================
+            # CREATE TODAY'S QOTD
+            # ==================================================
+
+
             if qotd is None:
 
-                print(
-                    "QoTD scheduler: "
-                    f"No question is scheduled for "
-                    f"{current_date.isoformat()}."
+                qotd = (
+                    await self._create_today_qotd(
+                        current_date=current_date,
+                    )
                 )
 
-                return False
+                if qotd is None:
+
+                    return False
 
 
             # ==================================================
             # ALREADY POSTED
             # ==================================================
 
+
             if qotd["message_id"] is not None:
+
+                await self._remove_old_qotd_buttons(
+                    current_date=current_date,
+                )
+
                 return False
 
 
             # ==================================================
             # GET CHANNEL
             # ==================================================
+
 
             channel = self.bot.get_channel(
                 qotd["channel_id"]
@@ -245,8 +298,10 @@ class QotdScheduler:
 
                 try:
 
-                    channel = await self.bot.fetch_channel(
-                        qotd["channel_id"]
+                    channel = (
+                        await self.bot.fetch_channel(
+                            qotd["channel_id"]
+                        )
                     )
 
                 except (
@@ -268,11 +323,17 @@ class QotdScheduler:
             # POST QUESTION
             # ==================================================
 
+
             try:
 
                 message = await channel.send(
                     embed=build_qotd_question_embed(
-                        qotd["question_text"]
+                        question_text=(
+                            qotd["question_text"]
+                        ),
+                        question_date=(
+                            qotd["question_date"]
+                        ),
                     ),
                     view=QotdAnswerView(
                         qotd_id=qotd["id"]
@@ -297,6 +358,7 @@ class QotdScheduler:
             # SAVE MESSAGE ID
             # ==================================================
 
+
             try:
 
                 await set_qotd_message_id(
@@ -306,34 +368,222 @@ class QotdScheduler:
 
             except Exception:
 
-                # If Discord received the message but the
-                # database could not save its ID, remove the
-                # message so a later retry does not create
-                # duplicate QoTD posts.
-
                 try:
+
                     await message.delete()
 
                 except (
                     discord.Forbidden,
                     discord.HTTPException,
                 ):
+
                     pass
 
                 raise
 
 
             # ==================================================
+            # REMOVE OLD BUTTONS
+            # ==================================================
+
+
+            await self._remove_old_qotd_buttons(
+                current_date=current_date,
+            )
+
+
+            # ==================================================
             # SUCCESS
             # ==================================================
+
 
             print(
                 "QoTD scheduler: "
                 f"Posted QoTD #{qotd['id']} "
-                f"for {current_date.isoformat()}."
+                f"for {current_date.isoformat()} "
+                f"using bank question "
+                f"#{qotd['question_bank_id']}."
             )
 
             return True
+
+
+    # ==================================================
+    # CREATE TODAY'S QOTD
+    # ==================================================
+
+
+    async def _create_today_qotd(
+        self,
+        current_date,
+    ) -> dict | None:
+
+        used_question_ids = (
+            await get_used_qotd_question_bank_ids(
+                guild_id=self.guild_id,
+            )
+        )
+
+
+        # ==================================================
+        # SELECT UNUSED ELIGIBLE QUESTION
+        # ==================================================
+
+
+        question = (
+            _get_random_qotd_question(
+                excluded_ids=used_question_ids
+            )
+        )
+
+
+        # ==================================================
+        # START NEW CYCLE
+        # ==================================================
+
+
+        if question is None:
+
+            question = (
+                _get_random_qotd_question()
+            )
+
+            if question is None:
+
+                print(
+                    "QoTD scheduler: "
+                    "The question bank contains "
+                    "no active QoTD-eligible "
+                    "questions."
+                )
+
+                return None
+
+            print(
+                "QoTD scheduler: "
+                "All active QoTD-eligible questions "
+                "have already been used. "
+                "Starting a new cycle."
+            )
+
+
+        # ==================================================
+        # CREATE DATABASE RECORD
+        # ==================================================
+
+
+        try:
+
+            qotd = await create_qotd(
+                guild_id=self.guild_id,
+                channel_id=self.channel_id,
+                question_date=current_date,
+                question_bank_id=question["id"],
+                question_text=question["question"],
+                accepted_answers=(
+                    question["accepted_answers"]
+                ),
+                explanation=(
+                    question.get(
+                        "explanation"
+                    )
+                ),
+            )
+
+        except QotdAlreadyExistsError:
+
+            return await get_qotd_for_date(
+                guild_id=self.guild_id,
+                question_date=current_date,
+            )
+
+
+        print(
+            "QoTD scheduler: "
+            f"Selected bank question "
+            f"#{question['id']} for "
+            f"{current_date.isoformat()}."
+        )
+
+        return qotd
+
+
+    # ==================================================
+    # REMOVE OLD QOTD BUTTONS
+    # ==================================================
+
+
+    async def _remove_old_qotd_buttons(
+        self,
+        current_date,
+    ):
+        """
+        Remove the Answer Question button from
+        every QoTD older than today's question.
+
+        The old message itself remains visible.
+        """
+
+        old_qotds = (
+            await get_older_posted_qotds(
+                guild_id=self.guild_id,
+                before_date=current_date,
+            )
+        )
+
+        for old_qotd in old_qotds:
+
+            channel = self.bot.get_channel(
+                old_qotd["channel_id"]
+            )
+
+            if channel is None:
+
+                try:
+
+                    channel = (
+                        await self.bot.fetch_channel(
+                            old_qotd["channel_id"]
+                        )
+                    )
+
+                except (
+                    discord.Forbidden,
+                    discord.NotFound,
+                    discord.HTTPException,
+                ):
+
+                    continue
+
+
+            try:
+
+                message = (
+                    await channel.fetch_message(
+                        old_qotd["message_id"]
+                    )
+                )
+
+                await message.edit(
+                    view=None
+                )
+
+
+            except discord.NotFound:
+
+                continue
+
+
+            except (
+                discord.Forbidden,
+                discord.HTTPException,
+            ) as error:
+
+                print(
+                    "QoTD scheduler could not remove "
+                    "an old Answer Question button: "
+                    f"{error!r}"
+                )
 
 
     # ==================================================
@@ -344,10 +594,6 @@ class QotdScheduler:
     def _post_time_has_arrived(
         self,
     ) -> bool:
-        """
-        Return True once the configured QoTD
-        posting time has been reached today.
-        """
 
         from datetime import datetime
 

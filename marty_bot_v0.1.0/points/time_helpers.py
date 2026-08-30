@@ -1,4 +1,10 @@
-from datetime import date, datetime, timedelta, timezone
+from datetime import (
+    date,
+    datetime,
+    time,
+    timedelta,
+    timezone,
+)
 from zoneinfo import ZoneInfo
 
 
@@ -13,6 +19,22 @@ CHICAGO_TIMEZONE = ZoneInfo(
 
 
 # ==================================================
+# CURRENT CHICAGO DATETIME
+# ==================================================
+
+
+def get_current_chicago_datetime() -> datetime:
+    """
+    Return the current date and time in
+    America/Chicago.
+    """
+
+    return datetime.now(
+        CHICAGO_TIMEZONE
+    )
+
+
+# ==================================================
 # CURRENT CHICAGO DATE
 # ==================================================
 
@@ -23,9 +45,35 @@ def get_current_chicago_date() -> date:
     America/Chicago time.
     """
 
-    return datetime.now(
-        CHICAGO_TIMEZONE
-    ).date()
+    return (
+        get_current_chicago_datetime()
+        .date()
+    )
+
+
+# ==================================================
+# CHICAGO DATETIME FOR DATE
+# ==================================================
+
+
+def get_chicago_datetime(
+    calendar_date: date,
+    hour: int = 0,
+    minute: int = 0,
+) -> datetime:
+    """
+    Build an America/Chicago datetime for a
+    particular calendar date and clock time.
+    """
+
+    return datetime.combine(
+        calendar_date,
+        time(
+            hour=hour,
+            minute=minute,
+        ),
+        tzinfo=CHICAGO_TIMEZONE,
+    )
 
 
 # ==================================================
@@ -39,8 +87,8 @@ def get_current_week_start_chicago() -> date:
     Chicago calendar week.
     """
 
-    now_chicago = datetime.now(
-        CHICAGO_TIMEZONE
+    now_chicago = (
+        get_current_chicago_datetime()
     )
 
     monday_chicago = (
@@ -67,14 +115,10 @@ def get_current_week_start_utc() -> str:
     """
     Return the beginning of the current Chicago
     calendar week converted to UTC.
-
-    This is useful when comparing Chicago-based
-    weekly activity against SQLite timestamps,
-    which are stored in UTC.
     """
 
-    now_chicago = datetime.now(
-        CHICAGO_TIMEZONE
+    now_chicago = (
+        get_current_chicago_datetime()
     )
 
     monday_chicago = (

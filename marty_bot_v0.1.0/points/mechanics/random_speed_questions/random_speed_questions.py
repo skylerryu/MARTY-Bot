@@ -7,7 +7,7 @@ import discord
 
 from data.database import DB_PATH
 
-from data.question_bank import (
+from data.question_manager import (
     get_question_by_id,
 )
 

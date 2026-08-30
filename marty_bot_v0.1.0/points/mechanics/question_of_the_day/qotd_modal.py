@@ -1,7 +1,13 @@
+from datetime import (
+    date,
+    timedelta,
+)
+
 import discord
 
 from points.time_helpers import (
-    get_current_chicago_date,
+    get_chicago_datetime,
+    get_current_chicago_datetime,
 )
 
 from points.points_operations.add_points import (
@@ -23,6 +29,8 @@ from points.mechanics.question_of_the_day.qotd_completions import (
 
 from points.mechanics.question_of_the_day.qotd_config import (
     QOTD_ANSWER_MAX_LENGTH,
+    QOTD_POST_HOUR,
+    QOTD_POST_MINUTE,
 )
 
 from points.mechanics.question_of_the_day.qotd_display import (
@@ -33,6 +41,44 @@ from points.mechanics.question_of_the_day.qotd_display import (
     build_qotd_expired_embed,
     build_qotd_unavailable_embed,
 )
+
+
+# ==================================================
+# QOTD OPEN / CLOSED
+# ==================================================
+
+
+def _qotd_is_open(
+    question_date: str,
+) -> bool:
+    """
+    A QoTD remains open until the next QoTD
+    posting time.
+
+    Example:
+
+    Sunday QoTD
+    opens Sunday at 6:00 AM
+    closes Monday at 6:00 AM
+    """
+
+    qotd_date = date.fromisoformat(
+        question_date
+    )
+
+    deadline = get_chicago_datetime(
+        calendar_date=(
+            qotd_date
+            + timedelta(days=1)
+        ),
+        hour=QOTD_POST_HOUR,
+        minute=QOTD_POST_MINUTE,
+    )
+
+    return (
+        get_current_chicago_datetime()
+        < deadline
+    )
 
 
 # ==================================================
@@ -52,6 +98,7 @@ class QotdAnswerModal(
         self,
         qotd_id: int,
     ):
+
         super().__init__(
             title="Question of the Day"
         )
@@ -98,6 +145,12 @@ class QotdAnswerModal(
             thinking=True,
         )
 
+
+        # ==================================================
+        # SERVER ONLY
+        # ==================================================
+
+
         if interaction.guild is None:
 
             await interaction.followup.send(
@@ -112,8 +165,19 @@ class QotdAnswerModal(
 
 
         # ==================================================
+        # SUBMITTED ANSWER
+        # ==================================================
+
+
+        submitted_answer = str(
+            self.answer_input.value
+        )
+
+
+        # ==================================================
         # POINT NOTIFICATION CONTEXT
         # ==================================================
+
 
         notification_token = (
             set_point_notification_context(
@@ -134,8 +198,8 @@ class QotdAnswerModal(
                     username=(
                         interaction.user.display_name
                     ),
-                    submitted_answer=str(
-                        self.answer_input.value
+                    submitted_answer=(
+                        submitted_answer
                     ),
                 )
 
@@ -157,7 +221,6 @@ class QotdAnswerModal(
 
                 return
 
-
         finally:
 
             reset_point_notification_context(
@@ -169,12 +232,16 @@ class QotdAnswerModal(
         # RESULT STATUS
         # ==================================================
 
-        status = result["status"]
+
+        status = result[
+            "status"
+        ]
 
 
         # ==================================================
         # QUESTION NOT FOUND
         # ==================================================
+
 
         if status == "not_found":
 
@@ -192,6 +259,7 @@ class QotdAnswerModal(
         # QUESTION EXPIRED
         # ==================================================
 
+
         if status == "expired":
 
             await interaction.followup.send(
@@ -207,6 +275,7 @@ class QotdAnswerModal(
         # ==================================================
         # ALREADY COMPLETED
         # ==================================================
+
 
         if status == "already_completed":
 
@@ -224,11 +293,16 @@ class QotdAnswerModal(
         # LLM UNCERTAIN
         # ==================================================
 
+
         if status == "uncertain":
 
             await interaction.followup.send(
                 embed=(
-                    build_qotd_uncertain_embed()
+                    build_qotd_uncertain_embed(
+                        submitted_answer=(
+                            submitted_answer
+                        ),
+                    )
                 ),
                 ephemeral=True,
             )
@@ -240,11 +314,16 @@ class QotdAnswerModal(
         # INCORRECT
         # ==================================================
 
+
         if status == "incorrect":
 
             await interaction.followup.send(
                 embed=(
-                    build_qotd_incorrect_embed()
+                    build_qotd_incorrect_embed(
+                        submitted_answer=(
+                            submitted_answer
+                        ),
+                    )
                 ),
                 ephemeral=True,
             )
@@ -256,6 +335,7 @@ class QotdAnswerModal(
         # CORRECT
         # ==================================================
 
+
         if status != "correct":
 
             raise RuntimeError(
@@ -264,9 +344,41 @@ class QotdAnswerModal(
             )
 
 
+        # ==================================================
+        # GET QOTD BANK ANSWER(S)
+        # ==================================================
+
+
+        qotd = await get_qotd(
+            self.qotd_id
+        )
+
+        if qotd is None:
+
+            await interaction.followup.send(
+                embed=(
+                    build_qotd_unavailable_embed()
+                ),
+                ephemeral=True,
+            )
+
+            return
+
+
+        # ==================================================
+        # DISPLAY CORRECT RESULT
+        # ==================================================
+
+
         await interaction.followup.send(
             embed=(
                 build_qotd_correct_embed(
+                    accepted_answers=(
+                        qotd["accepted_answers"]
+                    ),
+                    submitted_answer=(
+                        submitted_answer
+                    ),
                     base_points=(
                         result["base_points"]
                     ),
@@ -302,6 +414,7 @@ class QotdAnswerView(
         self,
         qotd_id: int,
     ):
+
         super().__init__(
             timeout=None
         )
@@ -342,6 +455,12 @@ class QotdAnswerView(
         QoTD and open the private answer modal.
         """
 
+
+        # ==================================================
+        # SERVER ONLY
+        # ==================================================
+
+
         if interaction.guild is None:
 
             await interaction.response.send_message(
@@ -358,6 +477,7 @@ class QotdAnswerView(
         # ==================================================
         # GET QUESTION
         # ==================================================
+
 
         qotd = await get_qotd(
             self.qotd_id
@@ -379,6 +499,7 @@ class QotdAnswerView(
         # VERIFY SERVER
         # ==================================================
 
+
         if (
             qotd["guild_id"]
             != interaction.guild.id
@@ -395,16 +516,12 @@ class QotdAnswerView(
 
 
         # ==================================================
-        # VERIFY DATE
+        # VERIFY QOTD IS STILL OPEN
         # ==================================================
 
-        current_date = (
-            get_current_chicago_date()
-        )
 
-        if (
+        if not _qotd_is_open(
             qotd["question_date"]
-            != current_date.isoformat()
         ):
 
             await interaction.response.send_message(
@@ -420,6 +537,7 @@ class QotdAnswerView(
         # ==================================================
         # CHECK COMPLETION
         # ==================================================
+
 
         if await has_completed_qotd(
             qotd_id=self.qotd_id,
@@ -439,6 +557,7 @@ class QotdAnswerView(
         # ==================================================
         # OPEN MODAL
         # ==================================================
+
 
         await interaction.response.send_modal(
             QotdAnswerModal(

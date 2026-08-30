@@ -1,12 +1,224 @@
+import math
+from datetime import (
+    date,
+    datetime,
+    timedelta,
+)
+
 import discord
 
-from points.displays.displays_helpers import (
-    build_progress_bar,
+from points.time_helpers import (
+    get_chicago_datetime,
+    get_current_chicago_datetime,
 )
 
 from points.mechanics.question_of_the_day.qotd_config import (
-    QOTD_STREAK_MAX_BONUS_DAY,
+    QOTD_POST_HOUR,
+    QOTD_POST_MINUTE,
 )
+
+
+# ==================================================
+# QOTD DATE HELPERS
+# ==================================================
+
+
+def _parse_question_date(
+    question_date: date | str,
+) -> date:
+
+    if isinstance(
+        question_date,
+        date,
+    ):
+        return question_date
+
+    return date.fromisoformat(
+        question_date
+    )
+
+
+def _format_qotd_date(
+    question_date: date | str,
+) -> str:
+
+    parsed_date = (
+        _parse_question_date(
+            question_date
+        )
+    )
+
+    return parsed_date.strftime(
+        "%m/%d/%Y"
+    )
+
+
+def _get_qotd_expiration_datetime(
+    question_date: date | str,
+) -> datetime:
+
+    parsed_date = (
+        _parse_question_date(
+            question_date
+        )
+    )
+
+    return get_chicago_datetime(
+        calendar_date=(
+            parsed_date
+            + timedelta(days=1)
+        ),
+        hour=QOTD_POST_HOUR,
+        minute=QOTD_POST_MINUTE,
+    )
+
+
+# ==================================================
+# TIME REMAINING
+# ==================================================
+
+
+def get_qotd_time_remaining_text(
+    question_date: date | str,
+    now: datetime | None = None,
+) -> str:
+
+    if now is None:
+
+        now = (
+            get_current_chicago_datetime()
+        )
+
+    expiration = (
+        _get_qotd_expiration_datetime(
+            question_date
+        )
+    )
+
+    remaining_seconds = max(
+        0,
+        int(
+            (
+                expiration
+                - now
+            ).total_seconds()
+        ),
+    )
+
+
+    # ==================================================
+    # CLOSED
+    # ==================================================
+
+
+    if remaining_seconds <= 0:
+
+        return "Closed"
+
+
+    # ==================================================
+    # 1 HOUR OR MORE
+    # WHOLE-HOUR WARNINGS
+    # ==================================================
+
+
+    if remaining_seconds >= 3600:
+
+        hours = math.ceil(
+            remaining_seconds
+            / 3600
+        )
+
+        return (
+            f"< {hours} "
+            "hrs"
+        )
+
+
+    # ==================================================
+    # LESS THAN 1 HOUR
+    # 15-MINUTE WARNINGS
+    # ==================================================
+
+
+    if remaining_seconds >= 900:
+
+        minutes = (
+            math.ceil(
+                remaining_seconds
+                / 900
+            )
+            * 15
+        )
+
+        return (
+            f"< {minutes} mins"
+        )
+
+
+    # ==================================================
+    # LESS THAN 15 MINUTES
+    # 5-MINUTE WARNINGS
+    # ==================================================
+
+
+    if remaining_seconds >= 60:
+
+        minutes = (
+            math.ceil(
+                remaining_seconds
+                / 300
+            )
+            * 5
+        )
+
+        if minutes < 5:
+
+            minutes = 5
+
+        return (
+            f"< {minutes} mins"
+        )
+
+
+    # ==================================================
+    # LESS THAN 1 MINUTE
+    # 15-SECOND WARNINGS
+    # ==================================================
+
+
+    if remaining_seconds >= 30:
+
+        seconds = (
+            math.ceil(
+                remaining_seconds
+                / 15
+            )
+            * 15
+        )
+
+        return (
+            f"< {seconds} secs"
+        )
+
+
+    # ==================================================
+    # LESS THAN 30 SECONDS
+    # 5-SECOND WARNINGS
+    # ==================================================
+
+
+    seconds = (
+        math.ceil(
+            remaining_seconds
+            / 5
+        )
+        * 5
+    )
+
+    return (
+        f"< {seconds} secs"
+    )
 
 
 # ==================================================
@@ -16,14 +228,31 @@ from points.mechanics.question_of_the_day.qotd_config import (
 
 def build_qotd_question_embed(
     question_text: str,
+    question_date: date | str,
 ) -> discord.Embed:
-    """
-    Build the public Question of the Day embed.
-    """
+
+    date_text = (
+        _format_qotd_date(
+            question_date
+        )
+    )
+
+    time_remaining = (
+        get_qotd_time_remaining_text(
+            question_date
+        )
+    )
 
     embed = discord.Embed(
-        title="🩺 Question of the Day",
-        description=question_text,
+        title=(
+            f"Question of the Day "
+            f"[{date_text}]"
+        ),
+        description=(
+            f"{question_text}\n\n"
+            f"⏳ **Time Remaining:** **{time_remaining}** ⏳"
+        ),
+        color=discord.Color.blurple(),
     )
 
     embed.set_footer(
@@ -42,107 +271,86 @@ def build_qotd_question_embed(
 
 
 def build_qotd_correct_embed(
+    accepted_answers: list[str],
     submitted_answer: str,
     base_points: int,
     streak_bonus: int,
     streak_days: int,
     explanation: str | None,
 ) -> discord.Embed:
-    """
-    Build the private response shown after
-    a correct QoTD answer.
-    """
 
     total_points = (
         base_points
         + streak_bonus
     )
 
-    embed = discord.Embed(
-        title="✅ Correct!",
-        description=(
-            f"You earned **+{total_points} points**."
-        ),
+    day_label = (
+        "Day"
+        if streak_days == 1
+        else "Days"
     )
 
-    embed.add_field(
-        name="Your Answer",
-        value=submitted_answer[:1024],
-        inline=False,
-    )
-
-    embed.add_field(
-        name="Points",
-        value=(
-            f"Question: **+{base_points}**\n"
-            f"Streak Bonus: **+{streak_bonus}**"
-        ),
-        inline=False,
+    explanation_text = (
+        explanation[:1500]
+        if explanation
+        else "No explanation provided."
     )
 
 
     # ==================================================
-    # STREAK PROGRESS
+    # ACCEPTED ANSWER DISPLAY
     # ==================================================
 
 
-    displayed_streak_days = min(
-        streak_days,
-        QOTD_STREAK_MAX_BONUS_DAY,
-    )
+    cleaned_answers = [
+        answer.strip()
+        for answer in accepted_answers
+        if answer.strip()
+    ]
 
-    progress_percent = (
-        displayed_streak_days
-        / QOTD_STREAK_MAX_BONUS_DAY
-        * 100
-    )
+    if not cleaned_answers:
 
-    progress_bar = build_progress_bar(
-        progress_percent=progress_percent,
-        length=QOTD_STREAK_MAX_BONUS_DAY,
-    )
+        answer_text = (
+            "No accepted answer provided."
+        )
 
-    if (
-        streak_days
-        >= QOTD_STREAK_MAX_BONUS_DAY
-    ):
+    elif len(cleaned_answers) == 1:
 
-        streak_text = (
-            f"`{progress_bar}`\n"
-            f"🔥 **{streak_days} day streak**\n"
-            "Maximum streak bonus active!"
+        answer_text = (
+            cleaned_answers[0]
         )
 
     else:
 
-        streak_text = (
-            f"`{progress_bar}`\n"
-            f"🔥 **{streak_days} day streak**\n"
-            f"{streak_days} / "
-            f"{QOTD_STREAK_MAX_BONUS_DAY} days"
+        answer_text = "\n".join(
+            f"• {answer}"
+            for answer in cleaned_answers
         )
 
-    embed.add_field(
-        name="QoTD Streak",
-        value=streak_text,
-        inline=False,
+
+    # ==================================================
+    # EMBED
+    # ==================================================
+
+
+    return discord.Embed(
+        title="✅ Correct!",
+        description=(
+            "**Answer**\n"
+            f"{answer_text[:1500]}\n\n"
+            "**Your Answer**\n"
+            f"{submitted_answer[:1000]}\n\n"
+            "**Explanation**\n"
+            f"{explanation_text}\n\n"
+            "**QoTD Streak**\n"
+            f"🔥 **{streak_days} {day_label}** 🔥\n\n"
+            "**Points**\n"
+            f"Correct Answer  **+{base_points}**\n"
+            f"Streak Bonus  **+{streak_bonus}**\n\n"
+            f"**You earned +{total_points} total points!**"
+        ),
+        color=discord.Color.green(),
     )
-
-
-    # ==================================================
-    # EXPLANATION
-    # ==================================================
-
-
-    if explanation:
-
-        embed.add_field(
-            name="Explanation",
-            value=explanation[:1024],
-            inline=False,
-        )
-
-    return embed
 
 
 # ==================================================
@@ -153,26 +361,15 @@ def build_qotd_correct_embed(
 def build_qotd_incorrect_embed(
     submitted_answer: str,
 ) -> discord.Embed:
-    """
-    Build the private response shown after
-    a confidently incorrect answer.
-    """
 
-    embed = discord.Embed(
-        title="❌ Not Quite",
+    return discord.Embed(
+        title="❌ Not Quite. Try again!",
         description=(
-            "That answer isn't correct.\n\n"
-            "You can try again."
+            "**Your Answer**\n"
+            f"{submitted_answer[:1000]}"
         ),
+        color=discord.Color.red(),
     )
-
-    embed.add_field(
-        name="Your Answer",
-        value=submitted_answer[:1024],
-        inline=False,
-    )
-
-    return embed
 
 
 # ==================================================
@@ -183,28 +380,18 @@ def build_qotd_incorrect_embed(
 def build_qotd_uncertain_embed(
     submitted_answer: str,
 ) -> discord.Embed:
-    """
-    Build the private response shown when the
-    LLM cannot grade the answer confidently.
-    """
 
-    embed = discord.Embed(
+    return discord.Embed(
         title="🤔 Try Rephrasing",
         description=(
-            "I couldn't confidently evaluate "
-            "that answer.\n\n"
-            "Try answering again with a little "
-            "more detail or different wording."
+            "**Your Answer**\n"
+            f"{submitted_answer[:1000]}\n\n"
+            "I couldn't confidently evaluate that answer.\n\n"
+            "Try answering again with a little more detail "
+            "or different wording."
         ),
+        color=discord.Color.orange(),
     )
-
-    embed.add_field(
-        name="Your Answer",
-        value=submitted_answer[:1024],
-        inline=False,
-    )
-
-    return embed
 
 
 # ==================================================
@@ -213,17 +400,14 @@ def build_qotd_uncertain_embed(
 
 
 def build_qotd_completed_embed() -> discord.Embed:
-    """
-    Build the private response shown when a user
-    has already completed this QoTD.
-    """
 
     return discord.Embed(
         title="✅ Already Completed",
         description=(
-            "You've already completed today's "
+            "You've already completed this "
             "Question of the Day."
         ),
+        color=discord.Color.green(),
     )
 
 
@@ -233,17 +417,14 @@ def build_qotd_completed_embed() -> discord.Embed:
 
 
 def build_qotd_expired_embed() -> discord.Embed:
-    """
-    Build the private response shown when someone
-    tries to answer an older QoTD.
-    """
 
     return discord.Embed(
         title="⌛ Question Expired",
         description=(
-            "This is no longer today's "
-            "Question of the Day."
+            "This Question of the Day has closed.\n\n"
+            "The next daily question is now available."
         ),
+        color=discord.Color.dark_grey(),
     )
 
 
@@ -253,10 +434,6 @@ def build_qotd_expired_embed() -> discord.Embed:
 
 
 def build_qotd_unavailable_embed() -> discord.Embed:
-    """
-    Build the private response shown when the
-    requested QoTD cannot be found.
-    """
 
     return discord.Embed(
         title="Question Unavailable",
@@ -264,4 +441,5 @@ def build_qotd_unavailable_embed() -> discord.Embed:
             "This Question of the Day "
             "is no longer available."
         ),
+        color=discord.Color.dark_grey(),
     )

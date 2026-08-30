@@ -291,6 +291,8 @@ async def init_db():
 
                 question_date TEXT NOT NULL,
 
+                question_bank_id INTEGER,
+
                 question_text TEXT NOT NULL,
 
                 accepted_answers TEXT NOT NULL,
@@ -306,6 +308,19 @@ async def init_db():
                 )
             )
             """
+        )
+
+
+        # ==================================================
+        # QOTD QUESTION MIGRATIONS
+        # ==================================================
+
+
+        await _ensure_column(
+            db=db,
+            table_name="qotd_questions",
+            column_name="question_bank_id",
+            column_definition="INTEGER",
         )
 
 
@@ -333,6 +348,18 @@ async def init_db():
 
             ON qotd_questions (
                 message_id
+            )
+            """
+        )
+
+        await db.execute(
+            """
+            CREATE INDEX IF NOT EXISTS
+            idx_qotd_questions_bank_id
+
+            ON qotd_questions (
+                guild_id,
+                question_bank_id
             )
             """
         )

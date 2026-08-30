@@ -1,7 +1,10 @@
 import discord
 from discord import app_commands
 
-from bot_config import DEV_GUILD_ID
+from bot_config import (
+    DEV_GUILD_ID,
+    QOTD_CHANNEL_ID,
+)
 
 from commands.points_commands import (
     register_points_commands,
@@ -13,6 +16,10 @@ from commands.qotd_commands import (
 
 from commands.question_commands import (
     register_question_commands,
+)
+
+from commands.admin_commands.qotd_admin_commands import (
+    register_qotd_admin_commands,
 )
 
 from data.database import (
@@ -49,8 +56,19 @@ from points.mechanics.random_speed_questions.random_speed_questions import (
 )
 
 
+# ==================================================
+# DISCORD INTENTS
+# ==================================================
+
+
 intents = discord.Intents.default()
+
 intents.message_content = True
+
+
+# ==================================================
+# M.A.R.T.Y. BOT
+# ==================================================
 
 
 class MartyBot(
@@ -60,9 +78,16 @@ class MartyBot(
     def __init__(
         self,
     ):
+
         super().__init__(
             intents=intents
         )
+
+
+        # ==================================================
+        # COMMAND TREE
+        # ==================================================
+
 
         self.tree = (
             app_commands.CommandTree(
@@ -70,14 +95,27 @@ class MartyBot(
             )
         )
 
+
+        # ==================================================
+        # ACTIVITY TRACKER
+        # ==================================================
+
+
         self.activity_tracker = (
             ActivityTracker()
         )
+
+
+        # ==================================================
+        # QOTD SCHEDULER
+        # ==================================================
+
 
         self.qotd_scheduler = (
             QotdScheduler(
                 bot=self,
                 guild_id=DEV_GUILD_ID,
+                channel_id=QOTD_CHANNEL_ID,
             )
         )
 
@@ -91,13 +129,36 @@ class MartyBot(
         self,
     ):
 
+        # ==================================================
+        # DATABASE
+        # ==================================================
+
+
         await init_db()
+
+
+        # ==================================================
+        # DEVELOPMENT GUILD
+        # ==================================================
+
 
         guild = discord.Object(
             id=DEV_GUILD_ID
         )
 
+
+        # ==================================================
+        # RESTORE PERSISTENT QOTD VIEWS
+        # ==================================================
+
+
         await self._restore_qotd_views()
+
+
+        # ==================================================
+        # NORMAL COMMANDS
+        # ==================================================
+
 
         register_points_commands(
             tree=self.tree,
@@ -114,6 +175,23 @@ class MartyBot(
             guild=guild,
         )
 
+
+        # ==================================================
+        # ADMIN COMMANDS
+        # ==================================================
+
+
+        register_qotd_admin_commands(
+            tree=self.tree,
+            guild=guild,
+        )
+
+
+        # ==================================================
+        # SYNC COMMANDS
+        # ==================================================
+
+
         synced_commands = (
             await self.tree.sync(
                 guild=guild
@@ -125,6 +203,12 @@ class MartyBot(
             f"{len(synced_commands)} "
             "Discord slash command(s)."
         )
+
+
+        # ==================================================
+        # START QOTD SCHEDULER
+        # ==================================================
+
 
         self.qotd_scheduler.start()
 
@@ -148,6 +232,7 @@ class MartyBot(
 
         restored_count = 0
 
+
         for qotd in qotds:
 
             qotd_id = (
@@ -159,7 +244,9 @@ class MartyBot(
             )
 
             if message_id is None:
+
                 continue
+
 
             self.add_view(
                 QotdAnswerView(
@@ -169,6 +256,7 @@ class MartyBot(
             )
 
             restored_count += 1
+
 
         print(
             "Restored "
@@ -203,12 +291,14 @@ class MartyBot(
     ):
 
         if message.author.bot:
+
             return
 
 
         # ==================================================
         # POINT NOTIFICATION CONTEXT
         # ==================================================
+
 
         notification_token = (
             set_point_notification_context(
@@ -224,6 +314,7 @@ class MartyBot(
             # ==================================================
             # ACTIVITY
             # ==================================================
+
 
             try:
 
@@ -245,6 +336,7 @@ class MartyBot(
             # ==================================================
             # SPEED QUESTION
             # ==================================================
+
 
             try:
 
@@ -289,6 +381,11 @@ class MartyBot(
             )
 
         await super().close()
+
+
+# ==================================================
+# BOT INSTANCE
+# ==================================================
 
 
 bot = MartyBot()

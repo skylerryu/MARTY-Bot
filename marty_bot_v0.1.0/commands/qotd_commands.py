@@ -33,14 +33,11 @@ from points.mechanics.question_of_the_day.qotd_modal import (
 def _parse_accepted_answers(
     accepted_answers: str,
 ) -> list[str]:
-    """
-    Split instructor-provided accepted answers
-    using | as the separator.
-    """
 
     return [
         answer.strip()
-        for answer in accepted_answers.split("|")
+        for answer
+        in accepted_answers.split("|")
         if answer.strip()
     ]
 
@@ -54,9 +51,6 @@ def register_qotd_commands(
     tree: app_commands.CommandTree,
     guild: discord.Object,
 ):
-    """
-    Register Question of the Day commands.
-    """
 
     command = make_command(
         tree=tree,
@@ -71,7 +65,9 @@ def register_qotd_commands(
 
     @command(
         name="postqotd",
-        description="Post today's Question of the Day.",
+        description=(
+            "Post today's Question of the Day."
+        ),
     )
     @app_commands.describe(
         question=(
@@ -94,39 +90,37 @@ def register_qotd_commands(
         accepted_answers: str,
         explanation: str | None = None,
     ):
-        """
-        Manually create and post today's QoTD.
-        """
-
-        # ==================================================
-        # SERVER / CHANNEL CHECK
-        # ==================================================
 
         if interaction.guild is None:
 
             await interaction.response.send_message(
-                "This command must be used in a server.",
+                (
+                    "This command must be used "
+                    "in a server."
+                ),
                 ephemeral=True,
             )
 
             return
+
 
         if interaction.channel is None:
 
             await interaction.response.send_message(
-                "I couldn't determine the current channel.",
+                (
+                    "I couldn't determine the "
+                    "current channel."
+                ),
                 ephemeral=True,
             )
 
             return
 
 
-        # ==================================================
-        # PARSE ANSWERS
-        # ==================================================
-
-        parsed_answers = _parse_accepted_answers(
-            accepted_answers
+        parsed_answers = (
+            _parse_accepted_answers(
+                accepted_answers
+            )
         )
 
         if not parsed_answers:
@@ -142,19 +136,11 @@ def register_qotd_commands(
             return
 
 
-        # ==================================================
-        # DEFER
-        # ==================================================
-
         await interaction.response.defer(
             ephemeral=True,
             thinking=True,
         )
 
-
-        # ==================================================
-        # CREATE QOTD
-        # ==================================================
 
         try:
 
@@ -181,6 +167,7 @@ def register_qotd_commands(
 
             return
 
+
         except ValueError as error:
 
             await interaction.followup.send(
@@ -191,20 +178,22 @@ def register_qotd_commands(
             return
 
 
-        # ==================================================
-        # POST TO DISCORD
-        # ==================================================
-
         try:
 
             message = await interaction.channel.send(
                 embed=build_qotd_question_embed(
-                    qotd["question_text"]
+                    question_text=(
+                        qotd["question_text"]
+                    ),
+                    question_date=(
+                        qotd["question_date"]
+                    ),
                 ),
                 view=QotdAnswerView(
                     qotd_id=qotd["id"]
                 ),
             )
+
 
         except (
             discord.Forbidden,
@@ -231,19 +220,11 @@ def register_qotd_commands(
             return
 
 
-        # ==================================================
-        # SAVE MESSAGE ID
-        # ==================================================
-
         await set_qotd_message_id(
             qotd_id=qotd["id"],
             message_id=message.id,
         )
 
-
-        # ==================================================
-        # CONFIRM
-        # ==================================================
 
         await interaction.followup.send(
             "Question of the Day posted.",

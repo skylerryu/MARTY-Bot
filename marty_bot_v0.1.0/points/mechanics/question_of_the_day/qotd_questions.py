@@ -27,10 +27,6 @@ class QotdAlreadyExistsError(Exception):
 def _row_to_qotd(
     row: aiosqlite.Row,
 ) -> dict:
-    """
-    Convert a database row into the QoTD
-    dictionary used by the rest of M.A.R.T.Y.
-    """
 
     return {
         "id": row["id"],
@@ -38,6 +34,9 @@ def _row_to_qotd(
         "channel_id": row["channel_id"],
         "message_id": row["message_id"],
         "question_date": row["question_date"],
+        "question_bank_id": (
+            row["question_bank_id"]
+        ),
         "question_text": row["question_text"],
         "accepted_answers": json.loads(
             row["accepted_answers"]
@@ -58,13 +57,8 @@ async def create_qotd(
     question_text: str,
     accepted_answers: list[str],
     explanation: str | None = None,
+    question_bank_id: int | None = None,
 ) -> dict:
-    """
-    Store a new Question of the Day.
-
-    Only one QoTD may exist for a guild
-    on a particular calendar date.
-    """
 
     question_text = question_text.strip()
 
@@ -103,16 +97,18 @@ async def create_qotd(
                     guild_id,
                     channel_id,
                     question_date,
+                    question_bank_id,
                     question_text,
                     accepted_answers,
                     explanation
                 )
-                VALUES (?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     guild_id,
                     channel_id,
                     question_date.isoformat(),
+                    question_bank_id,
                     question_text,
                     accepted_answers_json,
                     explanation,
@@ -143,6 +139,7 @@ async def create_qotd(
         "channel_id": channel_id,
         "message_id": None,
         "question_date": question_date.isoformat(),
+        "question_bank_id": question_bank_id,
         "question_text": question_text,
         "accepted_answers": cleaned_answers,
         "explanation": explanation,
@@ -157,9 +154,6 @@ async def create_qotd(
 async def get_qotd(
     qotd_id: int,
 ) -> dict | None:
-    """
-    Retrieve a Question of the Day by ID.
-    """
 
     async with aiosqlite.connect(
         DB_PATH
@@ -175,6 +169,7 @@ async def get_qotd(
                 channel_id,
                 message_id,
                 question_date,
+                question_bank_id,
                 question_text,
                 accepted_answers,
                 explanation
@@ -205,10 +200,6 @@ async def get_qotd_for_date(
     guild_id: int,
     question_date: date,
 ) -> dict | None:
-    """
-    Retrieve the Question of the Day for
-    a guild on a particular date.
-    """
 
     async with aiosqlite.connect(
         DB_PATH
@@ -224,6 +215,7 @@ async def get_qotd_for_date(
                 channel_id,
                 message_id,
                 question_date,
+                question_bank_id,
                 question_text,
                 accepted_answers,
                 explanation
@@ -248,6 +240,97 @@ async def get_qotd_for_date(
 
 
 # ==================================================
+# USED QUESTION BANK IDS
+# ==================================================
+
+
+async def get_used_qotd_question_bank_ids(
+    guild_id: int,
+) -> set[int]:
+
+    async with aiosqlite.connect(
+        DB_PATH
+    ) as db:
+
+        cursor = await db.execute(
+            """
+            SELECT DISTINCT
+                question_bank_id
+
+            FROM qotd_questions
+
+            WHERE guild_id = ?
+              AND question_bank_id IS NOT NULL
+            """,
+            (
+                guild_id,
+            ),
+        )
+
+        rows = await cursor.fetchall()
+
+    return {
+        int(row[0])
+        for row in rows
+    }
+
+
+# ==================================================
+# OLDER POSTED QOTDS
+# ==================================================
+
+
+async def get_older_posted_qotds(
+    guild_id: int,
+    before_date: date,
+) -> list[dict]:
+    """
+    Get old QoTD messages so their buttons
+    can be removed when the next QoTD posts.
+    """
+
+    async with aiosqlite.connect(
+        DB_PATH
+    ) as db:
+
+        db.row_factory = aiosqlite.Row
+
+        cursor = await db.execute(
+            """
+            SELECT
+                id,
+                channel_id,
+                message_id,
+                question_date
+
+            FROM qotd_questions
+
+            WHERE guild_id = ?
+              AND question_date < ?
+              AND message_id IS NOT NULL
+
+            ORDER BY question_date DESC
+            """,
+            (
+                guild_id,
+                before_date.isoformat(),
+            ),
+        )
+
+        rows = await cursor.fetchall()
+
+    return [
+        {
+            "id": row["id"],
+            "channel_id": row["channel_id"],
+            "message_id": row["message_id"],
+            "question_date": row["question_date"],
+        }
+        for row in rows
+    ]
+
+
+# ==================================================
 # SET MESSAGE ID
 # ==================================================
 
@@ -256,12 +339,6 @@ async def set_qotd_message_id(
     qotd_id: int,
     message_id: int,
 ):
-    """
-    Store the Discord message ID for a QoTD.
-
-    This is used to restore the Answer Question
-    button after M.A.R.T.Y. restarts.
-    """
 
     async with aiosqlite.connect(
         DB_PATH
@@ -270,7 +347,9 @@ async def set_qotd_message_id(
         await db.execute(
             """
             UPDATE qotd_questions
+
             SET message_id = ?
+
             WHERE id = ?
             """,
             (
@@ -290,13 +369,6 @@ async def set_qotd_message_id(
 async def delete_qotd(
     qotd_id: int,
 ):
-    """
-    Delete a QoTD.
-
-    This is mainly used if the database record
-    is created but the Discord message fails
-    to post.
-    """
 
     async with aiosqlite.connect(
         DB_PATH
@@ -323,11 +395,6 @@ async def delete_qotd(
 async def get_recent_qotds_for_views(
     limit: int,
 ) -> list[dict]:
-    """
-    Return recently posted QoTD messages so
-    their persistent Discord buttons can be
-    restored after a bot restart.
-    """
 
     if limit <= 0:
         return []
@@ -343,9 +410,13 @@ async def get_recent_qotds_for_views(
             SELECT
                 id,
                 message_id
+
             FROM qotd_questions
+
             WHERE message_id IS NOT NULL
+
             ORDER BY id DESC
+
             LIMIT ?
             """,
             (

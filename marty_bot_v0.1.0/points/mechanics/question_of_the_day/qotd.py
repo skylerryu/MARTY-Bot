@@ -1,7 +1,12 @@
 import asyncio
+from datetime import (
+    date,
+    timedelta,
+)
 
 from points.time_helpers import (
-    get_current_chicago_date,
+    get_chicago_datetime,
+    get_current_chicago_datetime,
 )
 
 from points.mechanics.question_of_the_day.qotd_questions import (
@@ -28,6 +33,11 @@ from points.mechanics.question_of_the_day.qotd_points import (
     award_qotd_points,
 )
 
+from points.mechanics.question_of_the_day.qotd_config import (
+    QOTD_POST_HOUR,
+    QOTD_POST_MINUTE,
+)
+
 
 # ==================================================
 # SUBMISSION LOCKS
@@ -41,10 +51,6 @@ def _get_submission_lock(
     qotd_id: int,
     user_id: int,
 ) -> asyncio.Lock:
-    """
-    Prevent the same user from having multiple
-    answers to the same QoTD processed at once.
-    """
 
     key = (
         qotd_id,
@@ -52,9 +58,49 @@ def _get_submission_lock(
     )
 
     if key not in _submission_locks:
-        _submission_locks[key] = asyncio.Lock()
+
+        _submission_locks[key] = (
+            asyncio.Lock()
+        )
 
     return _submission_locks[key]
+
+
+# ==================================================
+# QOTD OPEN CHECK
+# ==================================================
+
+
+def _get_qotd_date(
+    question_date: str,
+) -> date:
+
+    return date.fromisoformat(
+        question_date
+    )
+
+
+def _qotd_is_open(
+    question_date: str,
+) -> bool:
+
+    qotd_date = _get_qotd_date(
+        question_date
+    )
+
+    deadline = get_chicago_datetime(
+        calendar_date=(
+            qotd_date
+            + timedelta(days=1)
+        ),
+        hour=QOTD_POST_HOUR,
+        minute=QOTD_POST_MINUTE,
+    )
+
+    return (
+        get_current_chicago_datetime()
+        < deadline
+    )
 
 
 # ==================================================
@@ -69,43 +115,38 @@ async def submit_qotd_answer(
     username: str,
     submitted_answer: str,
 ) -> dict:
-    """
-    Process one student's Question of the Day
-    answer.
-
-    Coordinates:
-    - question validation
-    - grading
-    - streak calculation
-    - point awards
-    - completion tracking
-    """
 
     submitted_answer = (
         submitted_answer.strip()
     )
 
     if not submitted_answer:
+
         return {
             "status": "incorrect",
         }
+
 
     lock = _get_submission_lock(
         qotd_id=qotd_id,
         user_id=user_id,
     )
 
+
     async with lock:
+
 
         # ==================================================
         # QUESTION
         # ==================================================
+
 
         qotd = await get_qotd(
             qotd_id
         )
 
         if qotd is None:
+
             return {
                 "status": "not_found",
             }
@@ -115,24 +156,23 @@ async def submit_qotd_answer(
         # SERVER
         # ==================================================
 
+
         if qotd["guild_id"] != guild_id:
+
             return {
                 "status": "not_found",
             }
 
 
         # ==================================================
-        # DATE
+        # EXPIRATION
         # ==================================================
 
-        current_date = (
-            get_current_chicago_date()
-        )
 
-        if (
+        if not _qotd_is_open(
             qotd["question_date"]
-            != current_date.isoformat()
         ):
+
             return {
                 "status": "expired",
             }
@@ -142,10 +182,12 @@ async def submit_qotd_answer(
         # COMPLETION
         # ==================================================
 
+
         if await has_completed_qotd(
             qotd_id=qotd_id,
             user_id=user_id,
         ):
+
             return {
                 "status": "already_completed",
             }
@@ -155,23 +197,29 @@ async def submit_qotd_answer(
         # GRADING
         # ==================================================
 
+
         grade = await grade_qotd_answer(
             question=qotd["question_text"],
-            accepted_answers=qotd["accepted_answers"],
+            accepted_answers=(
+                qotd["accepted_answers"]
+            ),
             student_answer=submitted_answer,
         )
 
         if grade["status"] == "uncertain":
+
             return {
                 "status": "uncertain",
             }
 
         if grade["status"] == "incorrect":
+
             return {
                 "status": "incorrect",
             }
 
         if grade["status"] != "correct":
+
             raise RuntimeError(
                 "Unknown QoTD grading status: "
                 f"{grade['status']}"
@@ -179,8 +227,19 @@ async def submit_qotd_answer(
 
 
         # ==================================================
+        # QOTD LOGICAL DATE
+        # ==================================================
+
+
+        completion_date = _get_qotd_date(
+            qotd["question_date"]
+        )
+
+
+        # ==================================================
         # STREAK
         # ==================================================
+
 
         (
             current_streak,
@@ -196,7 +255,9 @@ async def submit_qotd_answer(
                 last_completion_date=(
                     last_completion_date
                 ),
-                completion_date=current_date,
+                completion_date=(
+                    completion_date
+                ),
             )
         )
 
@@ -211,6 +272,7 @@ async def submit_qotd_answer(
         # POINTS
         # ==================================================
 
+
         point_result = await award_qotd_points(
             qotd_id=qotd_id,
             guild_id=guild_id,
@@ -224,17 +286,19 @@ async def submit_qotd_answer(
         # STREAK UPDATE
         # ==================================================
 
+
         await update_qotd_streak(
             guild_id=guild_id,
             user_id=user_id,
             streak_days=new_streak,
-            completion_date=current_date,
+            completion_date=completion_date,
         )
 
 
         # ==================================================
         # RECORD COMPLETION
         # ==================================================
+
 
         completion_recorded = (
             await record_qotd_completion(
@@ -245,6 +309,7 @@ async def submit_qotd_answer(
         )
 
         if not completion_recorded:
+
             return {
                 "status": "already_completed",
             }
@@ -254,21 +319,41 @@ async def submit_qotd_answer(
         # SUCCESS
         # ==================================================
 
+
         return {
             "status": "correct",
+
             "base_points": (
-                point_result["base_points"]
+                point_result[
+                    "base_points"
+                ]
             ),
+
             "streak_bonus": (
-                point_result["streak_bonus"]
+                point_result[
+                    "streak_bonus"
+                ]
             ),
+
             "total_points_awarded": (
-                point_result["total_points"]
+                point_result[
+                    "total_points"
+                ]
             ),
+
             "streak_days": new_streak,
-            "explanation": qotd["explanation"],
-            "channel_id": qotd["channel_id"],
+
+            "explanation": (
+                qotd["explanation"]
+            ),
+
+            "channel_id": (
+                qotd["channel_id"]
+            ),
+
             "progression": (
-                point_result["progression"]
+                point_result[
+                    "progression"
+                ]
             ),
         }
