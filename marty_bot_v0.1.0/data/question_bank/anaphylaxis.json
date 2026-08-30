@@ -1,0 +1,299 @@
+[
+    {
+        "id": 6,
+        "question": "A patient develops hives, wheezing, and hypotension shortly after being stung by a bee. What is the most appropriate medication?",
+        "accepted_answers": [
+            "Epinephrine"
+        ],
+        "explanation": "Epinephrine is the first-line medication for anaphylaxis because it helps reverse airway swelling, bronchoconstriction, and hypotension.",
+        "active": true
+    },
+    {
+        "id": 54,
+        "question": "What medication is first-line for a severe allergic reaction with airway or circulatory compromise?",
+        "accepted_answers": [
+            "Epinephrine"
+        ],
+        "explanation": "Epinephrine is the first-line medication for anaphylaxis because it treats airway swelling, bronchospasm, and hypotension.",
+        "active": true
+    },
+    {
+        "id": 55,
+        "question": "What combination of findings is most concerning for anaphylaxis?",
+        "accepted_answers": [
+            "Respiratory distress with signs of a severe allergic reaction"
+        ],
+        "explanation": "Anaphylaxis is a systemic allergic reaction that may rapidly compromise the airway, breathing, or circulation.",
+        "active": true
+    },
+    {
+        "id": 56,
+        "question": "What skin finding is commonly associated with an allergic reaction?",
+        "accepted_answers": [
+            "Hives"
+        ],
+        "explanation": "Hives, or urticaria, are a common manifestation of histamine release during allergic reactions.",
+        "active": true
+    },
+    {
+        "id": 57,
+        "question": "What respiratory finding may occur during anaphylaxis because of bronchoconstriction?",
+        "accepted_answers": [
+            "Wheezing"
+        ],
+        "explanation": "Bronchoconstriction can cause wheezing during anaphylaxis.",
+        "active": true
+    },
+    {
+        "id": 58,
+        "question": "What airway finding may occur during anaphylaxis because of upper airway swelling?",
+        "accepted_answers": [
+            "Stridor"
+        ],
+        "explanation": "Upper airway edema can narrow the airway and produce stridor.",
+        "active": true
+    },
+    {
+        "id": 59,
+        "question": "Why can anaphylaxis cause hypotension?",
+        "accepted_answers": [
+            "Widespread vasodilation and fluid shift"
+        ],
+        "explanation": "Anaphylaxis can cause vasodilation and increased vascular permeability, reducing effective circulating volume and blood pressure.",
+        "active": true
+    },
+    {
+        "id": 60,
+        "question": "What is the major difference between a mild allergic reaction and anaphylaxis?",
+        "accepted_answers": [
+            "Anaphylaxis involves life-threatening airway, breathing, or circulatory compromise"
+        ],
+        "explanation": "Anaphylaxis is a severe systemic reaction with potential airway, respiratory, or circulatory failure.",
+        "active": true
+    },
+    {
+        "id": 61,
+        "question": "After epinephrine is given for anaphylaxis, what should the EMT continue to do?",
+        "accepted_answers": [
+            "Reassess the airway, breathing, circulation, and patient response"
+        ],
+        "explanation": "Anaphylaxis can recur or progress, so repeated reassessment is essential after treatment.",
+        "active": true
+    },
+    {
+        "id": 174,
+        "question": "During EMT review, what medication is first-line for a severe allergic reaction with airway or circulatory compromise?",
+        "accepted_answers": [
+            "Epinephrine"
+        ],
+        "explanation": "Epinephrine is the first-line medication for anaphylaxis because it treats airway swelling, bronchospasm, and hypotension.",
+        "active": true
+    },
+    {
+        "id": 175,
+        "question": "During EMT review, what combination of findings is most concerning for anaphylaxis?",
+        "accepted_answers": [
+            "Respiratory distress with signs of a severe allergic reaction"
+        ],
+        "explanation": "Anaphylaxis is a systemic allergic reaction that may rapidly compromise the airway, breathing, or circulation.",
+        "active": true
+    },
+    {
+        "id": 176,
+        "question": "During EMT review, what skin finding is commonly associated with an allergic reaction?",
+        "accepted_answers": [
+            "Hives"
+        ],
+        "explanation": "Hives, or urticaria, are a common manifestation of histamine release during allergic reactions.",
+        "active": true
+    },
+    {
+        "id": 177,
+        "question": "During EMT review, what respiratory finding may occur during anaphylaxis because of bronchoconstriction?",
+        "accepted_answers": [
+            "Wheezing"
+        ],
+        "explanation": "Bronchoconstriction can cause wheezing during anaphylaxis.",
+        "active": true
+    },
+    {
+        "id": 178,
+        "question": "During EMT review, what airway finding may occur during anaphylaxis because of upper airway swelling?",
+        "accepted_answers": [
+            "Stridor"
+        ],
+        "explanation": "Upper airway edema can narrow the airway and produce stridor.",
+        "active": true
+    },
+    {
+        "id": 179,
+        "question": "During EMT review, why can anaphylaxis cause hypotension?",
+        "accepted_answers": [
+            "Widespread vasodilation and fluid shift"
+        ],
+        "explanation": "Anaphylaxis can cause vasodilation and increased vascular permeability, reducing effective circulating volume and blood pressure.",
+        "active": true
+    },
+    {
+        "id": 180,
+        "question": "During EMT review, what is the major difference between a mild allergic reaction and anaphylaxis?",
+        "accepted_answers": [
+            "Anaphylaxis involves life-threatening airway, breathing, or circulatory compromise"
+        ],
+        "explanation": "Anaphylaxis is a severe systemic reaction with potential airway, respiratory, or circulatory failure.",
+        "active": true
+    },
+    {
+        "id": 181,
+        "question": "During EMT review, after epinephrine is given for anaphylaxis, what should the EMT continue to do?",
+        "accepted_answers": [
+            "Reassess the airway, breathing, circulation, and patient response"
+        ],
+        "explanation": "Anaphylaxis can recur or progress, so repeated reassessment is essential after treatment.",
+        "active": true
+    },
+    {
+        "id": 294,
+        "question": "An EMT student is asked: What medication is first-line for a severe allergic reaction with airway or circulatory compromise?",
+        "accepted_answers": [
+            "Epinephrine"
+        ],
+        "explanation": "Epinephrine is the first-line medication for anaphylaxis because it treats airway swelling, bronchospasm, and hypotension.",
+        "active": true
+    },
+    {
+        "id": 295,
+        "question": "An EMT student is asked: What combination of findings is most concerning for anaphylaxis?",
+        "accepted_answers": [
+            "Respiratory distress with signs of a severe allergic reaction"
+        ],
+        "explanation": "Anaphylaxis is a systemic allergic reaction that may rapidly compromise the airway, breathing, or circulation.",
+        "active": true
+    },
+    {
+        "id": 296,
+        "question": "An EMT student is asked: What skin finding is commonly associated with an allergic reaction?",
+        "accepted_answers": [
+            "Hives"
+        ],
+        "explanation": "Hives, or urticaria, are a common manifestation of histamine release during allergic reactions.",
+        "active": true
+    },
+    {
+        "id": 297,
+        "question": "An EMT student is asked: What respiratory finding may occur during anaphylaxis because of bronchoconstriction?",
+        "accepted_answers": [
+            "Wheezing"
+        ],
+        "explanation": "Bronchoconstriction can cause wheezing during anaphylaxis.",
+        "active": true
+    },
+    {
+        "id": 298,
+        "question": "An EMT student is asked: What airway finding may occur during anaphylaxis because of upper airway swelling?",
+        "accepted_answers": [
+            "Stridor"
+        ],
+        "explanation": "Upper airway edema can narrow the airway and produce stridor.",
+        "active": true
+    },
+    {
+        "id": 299,
+        "question": "An EMT student is asked: Why can anaphylaxis cause hypotension?",
+        "accepted_answers": [
+            "Widespread vasodilation and fluid shift"
+        ],
+        "explanation": "Anaphylaxis can cause vasodilation and increased vascular permeability, reducing effective circulating volume and blood pressure.",
+        "active": true
+    },
+    {
+        "id": 300,
+        "question": "An EMT student is asked: What is the major difference between a mild allergic reaction and anaphylaxis?",
+        "accepted_answers": [
+            "Anaphylaxis involves life-threatening airway, breathing, or circulatory compromise"
+        ],
+        "explanation": "Anaphylaxis is a severe systemic reaction with potential airway, respiratory, or circulatory failure.",
+        "active": true
+    },
+    {
+        "id": 301,
+        "question": "An EMT student is asked: After epinephrine is given for anaphylaxis, what should the EMT continue to do?",
+        "accepted_answers": [
+            "Reassess the airway, breathing, circulation, and patient response"
+        ],
+        "explanation": "Anaphylaxis can recur or progress, so repeated reassessment is essential after treatment.",
+        "active": true
+    },
+    {
+        "id": 414,
+        "question": "In a patient-care scenario, what medication is first-line for a severe allergic reaction with airway or circulatory compromise?",
+        "accepted_answers": [
+            "Epinephrine"
+        ],
+        "explanation": "Epinephrine is the first-line medication for anaphylaxis because it treats airway swelling, bronchospasm, and hypotension.",
+        "active": true
+    },
+    {
+        "id": 415,
+        "question": "In a patient-care scenario, what combination of findings is most concerning for anaphylaxis?",
+        "accepted_answers": [
+            "Respiratory distress with signs of a severe allergic reaction"
+        ],
+        "explanation": "Anaphylaxis is a systemic allergic reaction that may rapidly compromise the airway, breathing, or circulation.",
+        "active": true
+    },
+    {
+        "id": 416,
+        "question": "In a patient-care scenario, what skin finding is commonly associated with an allergic reaction?",
+        "accepted_answers": [
+            "Hives"
+        ],
+        "explanation": "Hives, or urticaria, are a common manifestation of histamine release during allergic reactions.",
+        "active": true
+    },
+    {
+        "id": 417,
+        "question": "In a patient-care scenario, what respiratory finding may occur during anaphylaxis because of bronchoconstriction?",
+        "accepted_answers": [
+            "Wheezing"
+        ],
+        "explanation": "Bronchoconstriction can cause wheezing during anaphylaxis.",
+        "active": true
+    },
+    {
+        "id": 418,
+        "question": "In a patient-care scenario, what airway finding may occur during anaphylaxis because of upper airway swelling?",
+        "accepted_answers": [
+            "Stridor"
+        ],
+        "explanation": "Upper airway edema can narrow the airway and produce stridor.",
+        "active": true
+    },
+    {
+        "id": 419,
+        "question": "In a patient-care scenario, why can anaphylaxis cause hypotension?",
+        "accepted_answers": [
+            "Widespread vasodilation and fluid shift"
+        ],
+        "explanation": "Anaphylaxis can cause vasodilation and increased vascular permeability, reducing effective circulating volume and blood pressure.",
+        "active": true
+    },
+    {
+        "id": 420,
+        "question": "In a patient-care scenario, what is the major difference between a mild allergic reaction and anaphylaxis?",
+        "accepted_answers": [
+            "Anaphylaxis involves life-threatening airway, breathing, or circulatory compromise"
+        ],
+        "explanation": "Anaphylaxis is a severe systemic reaction with potential airway, respiratory, or circulatory failure.",
+        "active": true
+    },
+    {
+        "id": 421,
+        "question": "In a patient-care scenario, after epinephrine is given for anaphylaxis, what should the EMT continue to do?",
+        "accepted_answers": [
+            "Reassess the airway, breathing, circulation, and patient response"
+        ],
+        "explanation": "Anaphylaxis can recur or progress, so repeated reassessment is essential after treatment.",
+        "active": true
+    }
+]
