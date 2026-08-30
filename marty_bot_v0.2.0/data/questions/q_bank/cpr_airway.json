@@ -1,0 +1,839 @@
+[
+    {
+        "id": 1,
+        "question": "You are performing CPR on an adult in cardiac arrest. What is the recommended chest compression rate?",
+        "accepted_answers": [
+            "100 to 120 compressions per minute"
+        ],
+        "explanation": "High-quality adult CPR includes chest compressions at a rate of 100 to 120 compressions per minute.",
+        "active": true
+    },
+    {
+        "id": 2,
+        "question": "An unresponsive adult has a pulse but is not breathing adequately. How often should you provide ventilations?",
+        "accepted_answers": [
+            "One breath every 6 seconds"
+        ],
+        "explanation": "An adult with a pulse but inadequate breathing should receive one ventilation approximately every 6 seconds, or about 10 breaths per minute.",
+        "active": true
+    },
+    {
+        "id": 12,
+        "question": "What airway maneuver should be used for an unresponsive patient with no suspected spinal trauma?",
+        "accepted_answers": [
+            "Head-tilt/chin-lift"
+        ],
+        "explanation": "The head-tilt/chin-lift is the standard manual airway maneuver when spinal trauma is not suspected.",
+        "active": true
+    },
+    {
+        "id": 13,
+        "question": "What airway maneuver is preferred when spinal trauma is suspected?",
+        "accepted_answers": [
+            "Jaw-thrust maneuver"
+        ],
+        "explanation": "The jaw-thrust is preferred when spinal injury is suspected because it minimizes movement of the cervical spine.",
+        "active": true
+    },
+    {
+        "id": 14,
+        "question": "What device is commonly used to suction the mouth and oropharynx of an adult patient?",
+        "accepted_answers": [
+            "Yankauer catheter"
+        ],
+        "explanation": "A rigid Yankauer suction catheter is commonly used to clear secretions, blood, or vomitus from the mouth and oropharynx.",
+        "active": true
+    },
+    {
+        "id": 15,
+        "question": "What type of airway adjunct is contraindicated in a patient with an intact gag reflex?",
+        "accepted_answers": [
+            "Oropharyngeal airway"
+        ],
+        "explanation": "An oropharyngeal airway may stimulate gagging or vomiting in a patient with an intact gag reflex.",
+        "active": true
+    },
+    {
+        "id": 16,
+        "question": "What airway adjunct may be considered in a patient who has an intact gag reflex and no contraindication to nasal insertion?",
+        "accepted_answers": [
+            "Nasopharyngeal airway"
+        ],
+        "explanation": "A nasopharyngeal airway is often tolerated in patients with an intact gag reflex when nasal insertion is appropriate.",
+        "active": true
+    },
+    {
+        "id": 17,
+        "question": "What finding best indicates that bag-mask ventilations are moving air effectively?",
+        "accepted_answers": [
+            "Visible chest rise"
+        ],
+        "explanation": "Visible chest rise is a key sign that positive-pressure ventilations are entering the lungs effectively.",
+        "active": true
+    },
+    {
+        "id": 18,
+        "question": "When ventilating with a bag-mask device, what should happen after each breath?",
+        "accepted_answers": [
+            "The chest should visibly rise"
+        ],
+        "explanation": "Each ventilation should produce visible chest rise without excessive force or volume.",
+        "active": true
+    },
+    {
+        "id": 19,
+        "question": "What is the preferred initial action when a conscious adult has a severe foreign-body airway obstruction and cannot speak or cough?",
+        "accepted_answers": [
+            "Abdominal thrusts"
+        ],
+        "explanation": "For a conscious adult with severe airway obstruction, abdominal thrusts are commonly used to attempt to expel the object.",
+        "active": true
+    },
+    {
+        "id": 20,
+        "question": "What should you do if an adult choking patient becomes unresponsive?",
+        "accepted_answers": [
+            "Begin CPR"
+        ],
+        "explanation": "If a choking adult becomes unresponsive, begin CPR and check for a visible object when opening the airway.",
+        "active": true
+    },
+    {
+        "id": 21,
+        "question": "What should an EMT do before inserting an oropharyngeal airway?",
+        "accepted_answers": [
+            "Measure the airway for proper size"
+        ],
+        "explanation": "An airway adjunct should be properly sized before insertion to reduce the risk of obstruction or trauma.",
+        "active": true
+    },
+    {
+        "id": 22,
+        "question": "What is the main purpose of an oropharyngeal airway?",
+        "accepted_answers": [
+            "Prevent the tongue from obstructing the airway"
+        ],
+        "explanation": "An oropharyngeal airway helps keep the tongue from falling back and obstructing the pharynx.",
+        "active": true
+    },
+    {
+        "id": 23,
+        "question": "What is the main purpose of suctioning an airway?",
+        "accepted_answers": [
+            "Remove material that is obstructing the airway"
+        ],
+        "explanation": "Suctioning removes blood, vomit, secretions, or other material that can interfere with airway patency.",
+        "active": true
+    },
+    {
+        "id": 24,
+        "question": "What is the preferred position for an unresponsive patient with adequate breathing and no suspected spinal injury?",
+        "accepted_answers": [
+            "Recovery position"
+        ],
+        "explanation": "The recovery position helps maintain an open airway and allows fluids to drain from the mouth.",
+        "active": true
+    },
+    {
+        "id": 25,
+        "question": "What does cyanosis generally suggest in a respiratory patient?",
+        "accepted_answers": [
+            "Inadequate oxygenation"
+        ],
+        "explanation": "Cyanosis can indicate significant hypoxemia and inadequate oxygen delivery to tissues.",
+        "active": true
+    },
+    {
+        "id": 26,
+        "question": "What is stridor most strongly associated with?",
+        "accepted_answers": [
+            "Upper airway obstruction"
+        ],
+        "explanation": "Stridor is a high-pitched sound commonly associated with narrowing or obstruction of the upper airway.",
+        "active": true
+    },
+    {
+        "id": 27,
+        "question": "What breath sound is commonly associated with bronchospasm?",
+        "accepted_answers": [
+            "Wheezing"
+        ],
+        "explanation": "Wheezing is produced by air moving through narrowed lower airways and is commonly heard with bronchospasm.",
+        "active": true
+    },
+    {
+        "id": 28,
+        "question": "What abnormal breath sound may be heard when fluid is present in the small airways or alveoli?",
+        "accepted_answers": [
+            "Crackles"
+        ],
+        "explanation": "Crackles may be heard when fluid is present in the distal airways or alveoli.",
+        "active": true
+    },
+    {
+        "id": 29,
+        "question": "What should be prioritized when a patient is apneic but has a pulse?",
+        "accepted_answers": [
+            "Ventilation"
+        ],
+        "explanation": "A patient with a pulse but no effective breathing requires assisted ventilation.",
+        "active": true
+    },
+    {
+        "id": 30,
+        "question": "What is the primary purpose of a nonrebreather mask?",
+        "accepted_answers": [
+            "Deliver a high concentration of oxygen to a spontaneously breathing patient"
+        ],
+        "explanation": "A nonrebreather mask is used to provide a high inspired oxygen concentration to a patient who is breathing on their own.",
+        "active": true
+    },
+    {
+        "id": 31,
+        "question": "What is the primary purpose of CPAP in a spontaneously breathing patient?",
+        "accepted_answers": [
+            "Provide continuous positive airway pressure"
+        ],
+        "explanation": "CPAP provides continuous positive airway pressure that can improve oxygenation and reduce work of breathing in appropriate patients.",
+        "active": true
+    },
+    {
+        "id": 132,
+        "question": "During EMT review, what airway maneuver should be used for an unresponsive patient with no suspected spinal trauma?",
+        "accepted_answers": [
+            "Head-tilt/chin-lift"
+        ],
+        "explanation": "The head-tilt/chin-lift is the standard manual airway maneuver when spinal trauma is not suspected.",
+        "active": true
+    },
+    {
+        "id": 133,
+        "question": "During EMT review, what airway maneuver is preferred when spinal trauma is suspected?",
+        "accepted_answers": [
+            "Jaw-thrust maneuver"
+        ],
+        "explanation": "The jaw-thrust is preferred when spinal injury is suspected because it minimizes movement of the cervical spine.",
+        "active": true
+    },
+    {
+        "id": 134,
+        "question": "During EMT review, what device is commonly used to suction the mouth and oropharynx of an adult patient?",
+        "accepted_answers": [
+            "Yankauer catheter"
+        ],
+        "explanation": "A rigid Yankauer suction catheter is commonly used to clear secretions, blood, or vomitus from the mouth and oropharynx.",
+        "active": true
+    },
+    {
+        "id": 135,
+        "question": "During EMT review, what type of airway adjunct is contraindicated in a patient with an intact gag reflex?",
+        "accepted_answers": [
+            "Oropharyngeal airway"
+        ],
+        "explanation": "An oropharyngeal airway may stimulate gagging or vomiting in a patient with an intact gag reflex.",
+        "active": true
+    },
+    {
+        "id": 136,
+        "question": "During EMT review, what airway adjunct may be considered in a patient who has an intact gag reflex and no contraindication to nasal insertion?",
+        "accepted_answers": [
+            "Nasopharyngeal airway"
+        ],
+        "explanation": "A nasopharyngeal airway is often tolerated in patients with an intact gag reflex when nasal insertion is appropriate.",
+        "active": true
+    },
+    {
+        "id": 137,
+        "question": "During EMT review, what finding best indicates that bag-mask ventilations are moving air effectively?",
+        "accepted_answers": [
+            "Visible chest rise"
+        ],
+        "explanation": "Visible chest rise is a key sign that positive-pressure ventilations are entering the lungs effectively.",
+        "active": true
+    },
+    {
+        "id": 138,
+        "question": "During EMT review, when ventilating with a bag-mask device, what should happen after each breath?",
+        "accepted_answers": [
+            "The chest should visibly rise"
+        ],
+        "explanation": "Each ventilation should produce visible chest rise without excessive force or volume.",
+        "active": true
+    },
+    {
+        "id": 139,
+        "question": "During EMT review, what is the preferred initial action when a conscious adult has a severe foreign-body airway obstruction and cannot speak or cough?",
+        "accepted_answers": [
+            "Abdominal thrusts"
+        ],
+        "explanation": "For a conscious adult with severe airway obstruction, abdominal thrusts are commonly used to attempt to expel the object.",
+        "active": true
+    },
+    {
+        "id": 140,
+        "question": "During EMT review, what should you do if an adult choking patient becomes unresponsive?",
+        "accepted_answers": [
+            "Begin CPR"
+        ],
+        "explanation": "If a choking adult becomes unresponsive, begin CPR and check for a visible object when opening the airway.",
+        "active": true
+    },
+    {
+        "id": 141,
+        "question": "During EMT review, what should an EMT do before inserting an oropharyngeal airway?",
+        "accepted_answers": [
+            "Measure the airway for proper size"
+        ],
+        "explanation": "An airway adjunct should be properly sized before insertion to reduce the risk of obstruction or trauma.",
+        "active": true
+    },
+    {
+        "id": 142,
+        "question": "During EMT review, what is the main purpose of an oropharyngeal airway?",
+        "accepted_answers": [
+            "Prevent the tongue from obstructing the airway"
+        ],
+        "explanation": "An oropharyngeal airway helps keep the tongue from falling back and obstructing the pharynx.",
+        "active": true
+    },
+    {
+        "id": 143,
+        "question": "During EMT review, what is the main purpose of suctioning an airway?",
+        "accepted_answers": [
+            "Remove material that is obstructing the airway"
+        ],
+        "explanation": "Suctioning removes blood, vomit, secretions, or other material that can interfere with airway patency.",
+        "active": true
+    },
+    {
+        "id": 144,
+        "question": "During EMT review, what is the preferred position for an unresponsive patient with adequate breathing and no suspected spinal injury?",
+        "accepted_answers": [
+            "Recovery position"
+        ],
+        "explanation": "The recovery position helps maintain an open airway and allows fluids to drain from the mouth.",
+        "active": true
+    },
+    {
+        "id": 145,
+        "question": "During EMT review, what does cyanosis generally suggest in a respiratory patient?",
+        "accepted_answers": [
+            "Inadequate oxygenation"
+        ],
+        "explanation": "Cyanosis can indicate significant hypoxemia and inadequate oxygen delivery to tissues.",
+        "active": true
+    },
+    {
+        "id": 146,
+        "question": "During EMT review, what is stridor most strongly associated with?",
+        "accepted_answers": [
+            "Upper airway obstruction"
+        ],
+        "explanation": "Stridor is a high-pitched sound commonly associated with narrowing or obstruction of the upper airway.",
+        "active": true
+    },
+    {
+        "id": 147,
+        "question": "During EMT review, what breath sound is commonly associated with bronchospasm?",
+        "accepted_answers": [
+            "Wheezing"
+        ],
+        "explanation": "Wheezing is produced by air moving through narrowed lower airways and is commonly heard with bronchospasm.",
+        "active": true
+    },
+    {
+        "id": 148,
+        "question": "During EMT review, what abnormal breath sound may be heard when fluid is present in the small airways or alveoli?",
+        "accepted_answers": [
+            "Crackles"
+        ],
+        "explanation": "Crackles may be heard when fluid is present in the distal airways or alveoli.",
+        "active": true
+    },
+    {
+        "id": 149,
+        "question": "During EMT review, what should be prioritized when a patient is apneic but has a pulse?",
+        "accepted_answers": [
+            "Ventilation"
+        ],
+        "explanation": "A patient with a pulse but no effective breathing requires assisted ventilation.",
+        "active": true
+    },
+    {
+        "id": 150,
+        "question": "During EMT review, what is the primary purpose of a nonrebreather mask?",
+        "accepted_answers": [
+            "Deliver a high concentration of oxygen to a spontaneously breathing patient"
+        ],
+        "explanation": "A nonrebreather mask is used to provide a high inspired oxygen concentration to a patient who is breathing on their own.",
+        "active": true
+    },
+    {
+        "id": 151,
+        "question": "During EMT review, what is the primary purpose of CPAP in a spontaneously breathing patient?",
+        "accepted_answers": [
+            "Provide continuous positive airway pressure"
+        ],
+        "explanation": "CPAP provides continuous positive airway pressure that can improve oxygenation and reduce work of breathing in appropriate patients.",
+        "active": true
+    },
+    {
+        "id": 252,
+        "question": "An EMT student is asked: What airway maneuver should be used for an unresponsive patient with no suspected spinal trauma?",
+        "accepted_answers": [
+            "Head-tilt/chin-lift"
+        ],
+        "explanation": "The head-tilt/chin-lift is the standard manual airway maneuver when spinal trauma is not suspected.",
+        "active": true
+    },
+    {
+        "id": 253,
+        "question": "An EMT student is asked: What airway maneuver is preferred when spinal trauma is suspected?",
+        "accepted_answers": [
+            "Jaw-thrust maneuver"
+        ],
+        "explanation": "The jaw-thrust is preferred when spinal injury is suspected because it minimizes movement of the cervical spine.",
+        "active": true
+    },
+    {
+        "id": 254,
+        "question": "An EMT student is asked: What device is commonly used to suction the mouth and oropharynx of an adult patient?",
+        "accepted_answers": [
+            "Yankauer catheter"
+        ],
+        "explanation": "A rigid Yankauer suction catheter is commonly used to clear secretions, blood, or vomitus from the mouth and oropharynx.",
+        "active": true
+    },
+    {
+        "id": 255,
+        "question": "An EMT student is asked: What type of airway adjunct is contraindicated in a patient with an intact gag reflex?",
+        "accepted_answers": [
+            "Oropharyngeal airway"
+        ],
+        "explanation": "An oropharyngeal airway may stimulate gagging or vomiting in a patient with an intact gag reflex.",
+        "active": true
+    },
+    {
+        "id": 256,
+        "question": "An EMT student is asked: What airway adjunct may be considered in a patient who has an intact gag reflex and no contraindication to nasal insertion?",
+        "accepted_answers": [
+            "Nasopharyngeal airway"
+        ],
+        "explanation": "A nasopharyngeal airway is often tolerated in patients with an intact gag reflex when nasal insertion is appropriate.",
+        "active": true
+    },
+    {
+        "id": 257,
+        "question": "An EMT student is asked: What finding best indicates that bag-mask ventilations are moving air effectively?",
+        "accepted_answers": [
+            "Visible chest rise"
+        ],
+        "explanation": "Visible chest rise is a key sign that positive-pressure ventilations are entering the lungs effectively.",
+        "active": true
+    },
+    {
+        "id": 258,
+        "question": "An EMT student is asked: When ventilating with a bag-mask device, what should happen after each breath?",
+        "accepted_answers": [
+            "The chest should visibly rise"
+        ],
+        "explanation": "Each ventilation should produce visible chest rise without excessive force or volume.",
+        "active": true
+    },
+    {
+        "id": 259,
+        "question": "An EMT student is asked: What is the preferred initial action when a conscious adult has a severe foreign-body airway obstruction and cannot speak or cough?",
+        "accepted_answers": [
+            "Abdominal thrusts"
+        ],
+        "explanation": "For a conscious adult with severe airway obstruction, abdominal thrusts are commonly used to attempt to expel the object.",
+        "active": true
+    },
+    {
+        "id": 260,
+        "question": "An EMT student is asked: What should you do if an adult choking patient becomes unresponsive?",
+        "accepted_answers": [
+            "Begin CPR"
+        ],
+        "explanation": "If a choking adult becomes unresponsive, begin CPR and check for a visible object when opening the airway.",
+        "active": true
+    },
+    {
+        "id": 261,
+        "question": "An EMT student is asked: What should an EMT do before inserting an oropharyngeal airway?",
+        "accepted_answers": [
+            "Measure the airway for proper size"
+        ],
+        "explanation": "An airway adjunct should be properly sized before insertion to reduce the risk of obstruction or trauma.",
+        "active": true
+    },
+    {
+        "id": 262,
+        "question": "An EMT student is asked: What is the main purpose of an oropharyngeal airway?",
+        "accepted_answers": [
+            "Prevent the tongue from obstructing the airway"
+        ],
+        "explanation": "An oropharyngeal airway helps keep the tongue from falling back and obstructing the pharynx.",
+        "active": true
+    },
+    {
+        "id": 263,
+        "question": "An EMT student is asked: What is the main purpose of suctioning an airway?",
+        "accepted_answers": [
+            "Remove material that is obstructing the airway"
+        ],
+        "explanation": "Suctioning removes blood, vomit, secretions, or other material that can interfere with airway patency.",
+        "active": true
+    },
+    {
+        "id": 264,
+        "question": "An EMT student is asked: What is the preferred position for an unresponsive patient with adequate breathing and no suspected spinal injury?",
+        "accepted_answers": [
+            "Recovery position"
+        ],
+        "explanation": "The recovery position helps maintain an open airway and allows fluids to drain from the mouth.",
+        "active": true
+    },
+    {
+        "id": 265,
+        "question": "An EMT student is asked: What does cyanosis generally suggest in a respiratory patient?",
+        "accepted_answers": [
+            "Inadequate oxygenation"
+        ],
+        "explanation": "Cyanosis can indicate significant hypoxemia and inadequate oxygen delivery to tissues.",
+        "active": true
+    },
+    {
+        "id": 266,
+        "question": "An EMT student is asked: What is stridor most strongly associated with?",
+        "accepted_answers": [
+            "Upper airway obstruction"
+        ],
+        "explanation": "Stridor is a high-pitched sound commonly associated with narrowing or obstruction of the upper airway.",
+        "active": true
+    },
+    {
+        "id": 267,
+        "question": "An EMT student is asked: What breath sound is commonly associated with bronchospasm?",
+        "accepted_answers": [
+            "Wheezing"
+        ],
+        "explanation": "Wheezing is produced by air moving through narrowed lower airways and is commonly heard with bronchospasm.",
+        "active": true
+    },
+    {
+        "id": 268,
+        "question": "An EMT student is asked: What abnormal breath sound may be heard when fluid is present in the small airways or alveoli?",
+        "accepted_answers": [
+            "Crackles"
+        ],
+        "explanation": "Crackles may be heard when fluid is present in the distal airways or alveoli.",
+        "active": true
+    },
+    {
+        "id": 269,
+        "question": "An EMT student is asked: What should be prioritized when a patient is apneic but has a pulse?",
+        "accepted_answers": [
+            "Ventilation"
+        ],
+        "explanation": "A patient with a pulse but no effective breathing requires assisted ventilation.",
+        "active": true
+    },
+    {
+        "id": 270,
+        "question": "An EMT student is asked: What is the primary purpose of a nonrebreather mask?",
+        "accepted_answers": [
+            "Deliver a high concentration of oxygen to a spontaneously breathing patient"
+        ],
+        "explanation": "A nonrebreather mask is used to provide a high inspired oxygen concentration to a patient who is breathing on their own.",
+        "active": true
+    },
+    {
+        "id": 271,
+        "question": "An EMT student is asked: What is the primary purpose of CPAP in a spontaneously breathing patient?",
+        "accepted_answers": [
+            "Provide continuous positive airway pressure"
+        ],
+        "explanation": "CPAP provides continuous positive airway pressure that can improve oxygenation and reduce work of breathing in appropriate patients.",
+        "active": true
+    },
+    {
+        "id": 372,
+        "question": "In a patient-care scenario, what airway maneuver should be used for an unresponsive patient with no suspected spinal trauma?",
+        "accepted_answers": [
+            "Head-tilt/chin-lift"
+        ],
+        "explanation": "The head-tilt/chin-lift is the standard manual airway maneuver when spinal trauma is not suspected.",
+        "active": true
+    },
+    {
+        "id": 373,
+        "question": "In a patient-care scenario, what airway maneuver is preferred when spinal trauma is suspected?",
+        "accepted_answers": [
+            "Jaw-thrust maneuver"
+        ],
+        "explanation": "The jaw-thrust is preferred when spinal injury is suspected because it minimizes movement of the cervical spine.",
+        "active": true
+    },
+    {
+        "id": 374,
+        "question": "In a patient-care scenario, what device is commonly used to suction the mouth and oropharynx of an adult patient?",
+        "accepted_answers": [
+            "Yankauer catheter"
+        ],
+        "explanation": "A rigid Yankauer suction catheter is commonly used to clear secretions, blood, or vomitus from the mouth and oropharynx.",
+        "active": true
+    },
+    {
+        "id": 375,
+        "question": "In a patient-care scenario, what type of airway adjunct is contraindicated in a patient with an intact gag reflex?",
+        "accepted_answers": [
+            "Oropharyngeal airway"
+        ],
+        "explanation": "An oropharyngeal airway may stimulate gagging or vomiting in a patient with an intact gag reflex.",
+        "active": true
+    },
+    {
+        "id": 376,
+        "question": "In a patient-care scenario, what airway adjunct may be considered in a patient who has an intact gag reflex and no contraindication to nasal insertion?",
+        "accepted_answers": [
+            "Nasopharyngeal airway"
+        ],
+        "explanation": "A nasopharyngeal airway is often tolerated in patients with an intact gag reflex when nasal insertion is appropriate.",
+        "active": true
+    },
+    {
+        "id": 377,
+        "question": "In a patient-care scenario, what finding best indicates that bag-mask ventilations are moving air effectively?",
+        "accepted_answers": [
+            "Visible chest rise"
+        ],
+        "explanation": "Visible chest rise is a key sign that positive-pressure ventilations are entering the lungs effectively.",
+        "active": true
+    },
+    {
+        "id": 378,
+        "question": "In a patient-care scenario, when ventilating with a bag-mask device, what should happen after each breath?",
+        "accepted_answers": [
+            "The chest should visibly rise"
+        ],
+        "explanation": "Each ventilation should produce visible chest rise without excessive force or volume.",
+        "active": true
+    },
+    {
+        "id": 379,
+        "question": "In a patient-care scenario, what is the preferred initial action when a conscious adult has a severe foreign-body airway obstruction and cannot speak or cough?",
+        "accepted_answers": [
+            "Abdominal thrusts"
+        ],
+        "explanation": "For a conscious adult with severe airway obstruction, abdominal thrusts are commonly used to attempt to expel the object.",
+        "active": true
+    },
+    {
+        "id": 380,
+        "question": "In a patient-care scenario, what should you do if an adult choking patient becomes unresponsive?",
+        "accepted_answers": [
+            "Begin CPR"
+        ],
+        "explanation": "If a choking adult becomes unresponsive, begin CPR and check for a visible object when opening the airway.",
+        "active": true
+    },
+    {
+        "id": 381,
+        "question": "In a patient-care scenario, what should an EMT do before inserting an oropharyngeal airway?",
+        "accepted_answers": [
+            "Measure the airway for proper size"
+        ],
+        "explanation": "An airway adjunct should be properly sized before insertion to reduce the risk of obstruction or trauma.",
+        "active": true
+    },
+    {
+        "id": 382,
+        "question": "In a patient-care scenario, what is the main purpose of an oropharyngeal airway?",
+        "accepted_answers": [
+            "Prevent the tongue from obstructing the airway"
+        ],
+        "explanation": "An oropharyngeal airway helps keep the tongue from falling back and obstructing the pharynx.",
+        "active": true
+    },
+    {
+        "id": 383,
+        "question": "In a patient-care scenario, what is the main purpose of suctioning an airway?",
+        "accepted_answers": [
+            "Remove material that is obstructing the airway"
+        ],
+        "explanation": "Suctioning removes blood, vomit, secretions, or other material that can interfere with airway patency.",
+        "active": true
+    },
+    {
+        "id": 384,
+        "question": "In a patient-care scenario, what is the preferred position for an unresponsive patient with adequate breathing and no suspected spinal injury?",
+        "accepted_answers": [
+            "Recovery position"
+        ],
+        "explanation": "The recovery position helps maintain an open airway and allows fluids to drain from the mouth.",
+        "active": true
+    },
+    {
+        "id": 385,
+        "question": "In a patient-care scenario, what does cyanosis generally suggest in a respiratory patient?",
+        "accepted_answers": [
+            "Inadequate oxygenation"
+        ],
+        "explanation": "Cyanosis can indicate significant hypoxemia and inadequate oxygen delivery to tissues.",
+        "active": true
+    },
+    {
+        "id": 386,
+        "question": "In a patient-care scenario, what is stridor most strongly associated with?",
+        "accepted_answers": [
+            "Upper airway obstruction"
+        ],
+        "explanation": "Stridor is a high-pitched sound commonly associated with narrowing or obstruction of the upper airway.",
+        "active": true
+    },
+    {
+        "id": 387,
+        "question": "In a patient-care scenario, what breath sound is commonly associated with bronchospasm?",
+        "accepted_answers": [
+            "Wheezing"
+        ],
+        "explanation": "Wheezing is produced by air moving through narrowed lower airways and is commonly heard with bronchospasm.",
+        "active": true
+    },
+    {
+        "id": 388,
+        "question": "In a patient-care scenario, what abnormal breath sound may be heard when fluid is present in the small airways or alveoli?",
+        "accepted_answers": [
+            "Crackles"
+        ],
+        "explanation": "Crackles may be heard when fluid is present in the distal airways or alveoli.",
+        "active": true
+    },
+    {
+        "id": 389,
+        "question": "In a patient-care scenario, what should be prioritized when a patient is apneic but has a pulse?",
+        "accepted_answers": [
+            "Ventilation"
+        ],
+        "explanation": "A patient with a pulse but no effective breathing requires assisted ventilation.",
+        "active": true
+    },
+    {
+        "id": 390,
+        "question": "In a patient-care scenario, what is the primary purpose of a nonrebreather mask?",
+        "accepted_answers": [
+            "Deliver a high concentration of oxygen to a spontaneously breathing patient"
+        ],
+        "explanation": "A nonrebreather mask is used to provide a high inspired oxygen concentration to a patient who is breathing on their own.",
+        "active": true
+    },
+    {
+        "id": 391,
+        "question": "In a patient-care scenario, what is the primary purpose of CPAP in a spontaneously breathing patient?",
+        "accepted_answers": [
+            "Provide continuous positive airway pressure"
+        ],
+        "explanation": "CPAP provides continuous positive airway pressure that can improve oxygenation and reduce work of breathing in appropriate patients.",
+        "active": true
+    },
+    {
+        "id": 492,
+        "question": "For NREMT-style review, what airway maneuver should be used for an unresponsive patient with no suspected spinal trauma?",
+        "accepted_answers": [
+            "Head-tilt/chin-lift"
+        ],
+        "explanation": "The head-tilt/chin-lift is the standard manual airway maneuver when spinal trauma is not suspected.",
+        "active": true
+    },
+    {
+        "id": 493,
+        "question": "For NREMT-style review, what airway maneuver is preferred when spinal trauma is suspected?",
+        "accepted_answers": [
+            "Jaw-thrust maneuver"
+        ],
+        "explanation": "The jaw-thrust is preferred when spinal injury is suspected because it minimizes movement of the cervical spine.",
+        "active": true
+    },
+    {
+        "id": 494,
+        "question": "For NREMT-style review, what device is commonly used to suction the mouth and oropharynx of an adult patient?",
+        "accepted_answers": [
+            "Yankauer catheter"
+        ],
+        "explanation": "A rigid Yankauer suction catheter is commonly used to clear secretions, blood, or vomitus from the mouth and oropharynx.",
+        "active": true
+    },
+    {
+        "id": 495,
+        "question": "For NREMT-style review, what type of airway adjunct is contraindicated in a patient with an intact gag reflex?",
+        "accepted_answers": [
+            "Oropharyngeal airway"
+        ],
+        "explanation": "An oropharyngeal airway may stimulate gagging or vomiting in a patient with an intact gag reflex.",
+        "active": true
+    },
+    {
+        "id": 496,
+        "question": "For NREMT-style review, what airway adjunct may be considered in a patient who has an intact gag reflex and no contraindication to nasal insertion?",
+        "accepted_answers": [
+            "Nasopharyngeal airway"
+        ],
+        "explanation": "A nasopharyngeal airway is often tolerated in patients with an intact gag reflex when nasal insertion is appropriate.",
+        "active": true
+    },
+    {
+        "id": 497,
+        "question": "For NREMT-style review, what finding best indicates that bag-mask ventilations are moving air effectively?",
+        "accepted_answers": [
+            "Visible chest rise"
+        ],
+        "explanation": "Visible chest rise is a key sign that positive-pressure ventilations are entering the lungs effectively.",
+        "active": true
+    },
+    {
+        "id": 498,
+        "question": "For NREMT-style review, when ventilating with a bag-mask device, what should happen after each breath?",
+        "accepted_answers": [
+            "The chest should visibly rise"
+        ],
+        "explanation": "Each ventilation should produce visible chest rise without excessive force or volume.",
+        "active": true
+    },
+    {
+        "id": 499,
+        "question": "For NREMT-style review, what is the preferred initial action when a conscious adult has a severe foreign-body airway obstruction and cannot speak or cough?",
+        "accepted_answers": [
+            "Abdominal thrusts"
+        ],
+        "explanation": "For a conscious adult with severe airway obstruction, abdominal thrusts are commonly used to attempt to expel the object.",
+        "active": true
+    },
+    {
+        "id": 500,
+        "question": "For NREMT-style review, what should you do if an adult choking patient becomes unresponsive?",
+        "accepted_answers": [
+            "Begin CPR"
+        ],
+        "explanation": "If a choking adult becomes unresponsive, begin CPR and check for a visible object when opening the airway.",
+        "active": true
+    },
+    {
+        "id": 501,
+        "question": "For NREMT-style review, what should an EMT do before inserting an oropharyngeal airway?",
+        "accepted_answers": [
+            "Measure the airway for proper size"
+        ],
+        "explanation": "An airway adjunct should be properly sized before insertion to reduce the risk of obstruction or trauma.",
+        "active": true
+    },
+    {
+        "id": 502,
+        "question": "For NREMT-style review, what is the main purpose of an oropharyngeal airway?",
+        "accepted_answers": [
+            "Prevent the tongue from obstructing the airway"
+        ],
+        "explanation": "An oropharyngeal airway helps keep the tongue from falling back and obstructing the pharynx.",
+        "active": true
+    }
+]

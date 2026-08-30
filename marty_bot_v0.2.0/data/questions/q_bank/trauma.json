@@ -1,0 +1,884 @@
+[
+    {
+        "id": 9,
+        "question": "A trauma patient has severe respiratory distress, absent breath sounds on the left side, hypotension, and signs of shock. What life-threatening condition should you suspect?",
+        "accepted_answers": [
+            "Tension pneumothorax"
+        ],
+        "explanation": "Severe respiratory distress, unilateral absent breath sounds, and shock following trauma are highly concerning for a tension pneumothorax.",
+        "active": true
+    },
+    {
+        "id": 10,
+        "question": "A patient has bright red blood spurting rhythmically from a deep leg wound. What type of bleeding is this?",
+        "accepted_answers": [
+            "Arterial bleeding"
+        ],
+        "explanation": "Bright red blood that spurts or pulses with the heartbeat is characteristic of arterial bleeding.",
+        "active": true
+    },
+    {
+        "id": 82,
+        "question": "What is the first priority when severe external bleeding is found during a trauma assessment?",
+        "accepted_answers": [
+            "Control the bleeding"
+        ],
+        "explanation": "Life-threatening external hemorrhage should be controlled immediately.",
+        "active": true
+    },
+    {
+        "id": 83,
+        "question": "What is the preferred first method for controlling most severe external bleeding?",
+        "accepted_answers": [
+            "Direct pressure"
+        ],
+        "explanation": "Firm direct pressure is the initial method used to control most external bleeding.",
+        "active": true
+    },
+    {
+        "id": 84,
+        "question": "When should a tourniquet be considered for extremity bleeding?",
+        "accepted_answers": [
+            "When severe extremity bleeding cannot be rapidly controlled with direct pressure"
+        ],
+        "explanation": "A tourniquet is appropriate for life-threatening extremity hemorrhage when rapid control is needed.",
+        "active": true
+    },
+    {
+        "id": 85,
+        "question": "Where should a tourniquet be placed relative to a severe extremity wound?",
+        "accepted_answers": [
+            "Proximal to the wound"
+        ],
+        "explanation": "A tourniquet is placed above the wound on the injured extremity and not directly over a joint.",
+        "active": true
+    },
+    {
+        "id": 86,
+        "question": "What is a sucking chest wound?",
+        "accepted_answers": [
+            "An open chest wound that allows air to move through the chest wall"
+        ],
+        "explanation": "An open chest wound can permit air movement through the thoracic wall and interfere with normal ventilation.",
+        "active": true
+    },
+    {
+        "id": 87,
+        "question": "What dressing is commonly used for an open chest wound?",
+        "accepted_answers": [
+            "Occlusive dressing"
+        ],
+        "explanation": "An occlusive dressing is used to limit air movement through an open chest wound while the patient is closely reassessed.",
+        "active": true
+    },
+    {
+        "id": 88,
+        "question": "What is paradoxical chest movement associated with?",
+        "accepted_answers": [
+            "Flail chest"
+        ],
+        "explanation": "A flail segment may move opposite the rest of the chest during breathing because multiple adjacent ribs are fractured in multiple places.",
+        "active": true
+    },
+    {
+        "id": 89,
+        "question": "What condition should be suspected after blunt chest trauma with respiratory distress and diminished breath sounds on one side?",
+        "accepted_answers": [
+            "Pneumothorax"
+        ],
+        "explanation": "Air in the pleural space can collapse a lung and reduce breath sounds on the affected side.",
+        "active": true
+    },
+    {
+        "id": 90,
+        "question": "What is hemothorax?",
+        "accepted_answers": [
+            "Blood in the pleural space"
+        ],
+        "explanation": "A hemothorax is an accumulation of blood between the lung and chest wall.",
+        "active": true
+    },
+    {
+        "id": 91,
+        "question": "What is pneumothorax?",
+        "accepted_answers": [
+            "Air in the pleural space"
+        ],
+        "explanation": "A pneumothorax occurs when air enters the pleural space and can partially or completely collapse a lung.",
+        "active": true
+    },
+    {
+        "id": 92,
+        "question": "What is the primary concern with a pelvic fracture?",
+        "accepted_answers": [
+            "Severe internal bleeding"
+        ],
+        "explanation": "Pelvic fractures can injure major blood vessels and produce significant concealed hemorrhage.",
+        "active": true
+    },
+    {
+        "id": 93,
+        "question": "What is the primary concern with a femur fracture?",
+        "accepted_answers": [
+            "Significant blood loss"
+        ],
+        "explanation": "A femur fracture can be associated with substantial internal blood loss into the thigh.",
+        "active": true
+    },
+    {
+        "id": 94,
+        "question": "What should be done with an impaled object in most situations?",
+        "accepted_answers": [
+            "Stabilize it in place"
+        ],
+        "explanation": "Impaled objects are generally stabilized in place rather than removed in the field because removal may worsen bleeding or injury.",
+        "active": true
+    },
+    {
+        "id": 95,
+        "question": "What should an EMT do with an amputated body part?",
+        "accepted_answers": [
+            "Wrap it in sterile moist dressing, place it in a sealed bag, and keep it cool"
+        ],
+        "explanation": "An amputated part should be protected from direct ice contact and transported with the patient when possible.",
+        "active": true
+    },
+    {
+        "id": 96,
+        "question": "What is an open fracture?",
+        "accepted_answers": [
+            "A fracture associated with an open wound communicating with the fracture site"
+        ],
+        "explanation": "An open fracture involves a break in the skin that communicates with the fracture and increases infection risk.",
+        "active": true
+    },
+    {
+        "id": 97,
+        "question": "What is crepitus?",
+        "accepted_answers": [
+            "A grating sensation or sound from bone ends or tissues rubbing together"
+        ],
+        "explanation": "Crepitus may be felt or heard when injured structures move against one another.",
+        "active": true
+    },
+    {
+        "id": 98,
+        "question": "What does distal neurovascular assessment evaluate after an extremity injury?",
+        "accepted_answers": [
+            "Circulation, sensation, and motor function beyond the injury"
+        ],
+        "explanation": "Checking distal circulation, sensation, and movement helps identify vascular or nerve compromise.",
+        "active": true
+    },
+    {
+        "id": 99,
+        "question": "What is the purpose of splinting an injured extremity?",
+        "accepted_answers": [
+            "Limit movement and reduce further injury"
+        ],
+        "explanation": "Splinting supports the injured area, reduces movement, and may reduce pain and additional tissue damage.",
+        "active": true
+    },
+    {
+        "id": 100,
+        "question": "What finding may indicate spinal cord injury after trauma?",
+        "accepted_answers": [
+            "Neurological deficit below the level of injury"
+        ],
+        "explanation": "Weakness, numbness, paralysis, or altered sensation below an injury can indicate spinal cord involvement.",
+        "active": true
+    },
+    {
+        "id": 101,
+        "question": "What is the purpose of manual cervical spine stabilization?",
+        "accepted_answers": [
+            "Limit movement of the cervical spine"
+        ],
+        "explanation": "Manual stabilization is used to reduce unnecessary motion when a significant spinal injury is suspected.",
+        "active": true
+    },
+    {
+        "id": 102,
+        "question": "What type of shock is most commonly associated with major blood loss?",
+        "accepted_answers": [
+            "Hypovolemic shock"
+        ],
+        "explanation": "Loss of circulating blood volume reduces preload and tissue perfusion, producing hypovolemic shock.",
+        "active": true
+    },
+    {
+        "id": 103,
+        "question": "What skin findings are common in compensated hypovolemic shock?",
+        "accepted_answers": [
+            "Pale, cool, clammy skin"
+        ],
+        "explanation": "Peripheral vasoconstriction and sympathetic activation commonly produce pale, cool, moist skin during hypovolemic shock.",
+        "active": true
+    },
+    {
+        "id": 104,
+        "question": "What does a decreasing level of consciousness in a trauma patient suggest?",
+        "accepted_answers": [
+            "Possible worsening brain injury or poor perfusion"
+        ],
+        "explanation": "Deteriorating mental status can indicate worsening intracranial injury, hypoxia, or shock and requires urgent reassessment.",
+        "active": true
+    },
+    {
+        "id": 105,
+        "question": "What is the key concern with abdominal evisceration?",
+        "accepted_answers": [
+            "Exposed abdominal organs"
+        ],
+        "explanation": "Evisceration exposes abdominal organs and requires protection with appropriate moist sterile dressings and rapid transport.",
+        "active": true
+    },
+    {
+        "id": 202,
+        "question": "During EMT review, what is the first priority when severe external bleeding is found during a trauma assessment?",
+        "accepted_answers": [
+            "Control the bleeding"
+        ],
+        "explanation": "Life-threatening external hemorrhage should be controlled immediately.",
+        "active": true
+    },
+    {
+        "id": 203,
+        "question": "During EMT review, what is the preferred first method for controlling most severe external bleeding?",
+        "accepted_answers": [
+            "Direct pressure"
+        ],
+        "explanation": "Firm direct pressure is the initial method used to control most external bleeding.",
+        "active": true
+    },
+    {
+        "id": 204,
+        "question": "During EMT review, when should a tourniquet be considered for extremity bleeding?",
+        "accepted_answers": [
+            "When severe extremity bleeding cannot be rapidly controlled with direct pressure"
+        ],
+        "explanation": "A tourniquet is appropriate for life-threatening extremity hemorrhage when rapid control is needed.",
+        "active": true
+    },
+    {
+        "id": 205,
+        "question": "During EMT review, where should a tourniquet be placed relative to a severe extremity wound?",
+        "accepted_answers": [
+            "Proximal to the wound"
+        ],
+        "explanation": "A tourniquet is placed above the wound on the injured extremity and not directly over a joint.",
+        "active": true
+    },
+    {
+        "id": 206,
+        "question": "During EMT review, what is a sucking chest wound?",
+        "accepted_answers": [
+            "An open chest wound that allows air to move through the chest wall"
+        ],
+        "explanation": "An open chest wound can permit air movement through the thoracic wall and interfere with normal ventilation.",
+        "active": true
+    },
+    {
+        "id": 207,
+        "question": "During EMT review, what dressing is commonly used for an open chest wound?",
+        "accepted_answers": [
+            "Occlusive dressing"
+        ],
+        "explanation": "An occlusive dressing is used to limit air movement through an open chest wound while the patient is closely reassessed.",
+        "active": true
+    },
+    {
+        "id": 208,
+        "question": "During EMT review, what is paradoxical chest movement associated with?",
+        "accepted_answers": [
+            "Flail chest"
+        ],
+        "explanation": "A flail segment may move opposite the rest of the chest during breathing because multiple adjacent ribs are fractured in multiple places.",
+        "active": true
+    },
+    {
+        "id": 209,
+        "question": "During EMT review, what condition should be suspected after blunt chest trauma with respiratory distress and diminished breath sounds on one side?",
+        "accepted_answers": [
+            "Pneumothorax"
+        ],
+        "explanation": "Air in the pleural space can collapse a lung and reduce breath sounds on the affected side.",
+        "active": true
+    },
+    {
+        "id": 210,
+        "question": "During EMT review, what is hemothorax?",
+        "accepted_answers": [
+            "Blood in the pleural space"
+        ],
+        "explanation": "A hemothorax is an accumulation of blood between the lung and chest wall.",
+        "active": true
+    },
+    {
+        "id": 211,
+        "question": "During EMT review, what is pneumothorax?",
+        "accepted_answers": [
+            "Air in the pleural space"
+        ],
+        "explanation": "A pneumothorax occurs when air enters the pleural space and can partially or completely collapse a lung.",
+        "active": true
+    },
+    {
+        "id": 212,
+        "question": "During EMT review, what is the primary concern with a pelvic fracture?",
+        "accepted_answers": [
+            "Severe internal bleeding"
+        ],
+        "explanation": "Pelvic fractures can injure major blood vessels and produce significant concealed hemorrhage.",
+        "active": true
+    },
+    {
+        "id": 213,
+        "question": "During EMT review, what is the primary concern with a femur fracture?",
+        "accepted_answers": [
+            "Significant blood loss"
+        ],
+        "explanation": "A femur fracture can be associated with substantial internal blood loss into the thigh.",
+        "active": true
+    },
+    {
+        "id": 214,
+        "question": "During EMT review, what should be done with an impaled object in most situations?",
+        "accepted_answers": [
+            "Stabilize it in place"
+        ],
+        "explanation": "Impaled objects are generally stabilized in place rather than removed in the field because removal may worsen bleeding or injury.",
+        "active": true
+    },
+    {
+        "id": 215,
+        "question": "During EMT review, what should an EMT do with an amputated body part?",
+        "accepted_answers": [
+            "Wrap it in sterile moist dressing, place it in a sealed bag, and keep it cool"
+        ],
+        "explanation": "An amputated part should be protected from direct ice contact and transported with the patient when possible.",
+        "active": true
+    },
+    {
+        "id": 216,
+        "question": "During EMT review, what is an open fracture?",
+        "accepted_answers": [
+            "A fracture associated with an open wound communicating with the fracture site"
+        ],
+        "explanation": "An open fracture involves a break in the skin that communicates with the fracture and increases infection risk.",
+        "active": true
+    },
+    {
+        "id": 217,
+        "question": "During EMT review, what is crepitus?",
+        "accepted_answers": [
+            "A grating sensation or sound from bone ends or tissues rubbing together"
+        ],
+        "explanation": "Crepitus may be felt or heard when injured structures move against one another.",
+        "active": true
+    },
+    {
+        "id": 218,
+        "question": "During EMT review, what does distal neurovascular assessment evaluate after an extremity injury?",
+        "accepted_answers": [
+            "Circulation, sensation, and motor function beyond the injury"
+        ],
+        "explanation": "Checking distal circulation, sensation, and movement helps identify vascular or nerve compromise.",
+        "active": true
+    },
+    {
+        "id": 219,
+        "question": "During EMT review, what is the purpose of splinting an injured extremity?",
+        "accepted_answers": [
+            "Limit movement and reduce further injury"
+        ],
+        "explanation": "Splinting supports the injured area, reduces movement, and may reduce pain and additional tissue damage.",
+        "active": true
+    },
+    {
+        "id": 220,
+        "question": "During EMT review, what finding may indicate spinal cord injury after trauma?",
+        "accepted_answers": [
+            "Neurological deficit below the level of injury"
+        ],
+        "explanation": "Weakness, numbness, paralysis, or altered sensation below an injury can indicate spinal cord involvement.",
+        "active": true
+    },
+    {
+        "id": 221,
+        "question": "During EMT review, what is the purpose of manual cervical spine stabilization?",
+        "accepted_answers": [
+            "Limit movement of the cervical spine"
+        ],
+        "explanation": "Manual stabilization is used to reduce unnecessary motion when a significant spinal injury is suspected.",
+        "active": true
+    },
+    {
+        "id": 222,
+        "question": "During EMT review, what type of shock is most commonly associated with major blood loss?",
+        "accepted_answers": [
+            "Hypovolemic shock"
+        ],
+        "explanation": "Loss of circulating blood volume reduces preload and tissue perfusion, producing hypovolemic shock.",
+        "active": true
+    },
+    {
+        "id": 223,
+        "question": "During EMT review, what skin findings are common in compensated hypovolemic shock?",
+        "accepted_answers": [
+            "Pale, cool, clammy skin"
+        ],
+        "explanation": "Peripheral vasoconstriction and sympathetic activation commonly produce pale, cool, moist skin during hypovolemic shock.",
+        "active": true
+    },
+    {
+        "id": 224,
+        "question": "During EMT review, what does a decreasing level of consciousness in a trauma patient suggest?",
+        "accepted_answers": [
+            "Possible worsening brain injury or poor perfusion"
+        ],
+        "explanation": "Deteriorating mental status can indicate worsening intracranial injury, hypoxia, or shock and requires urgent reassessment.",
+        "active": true
+    },
+    {
+        "id": 225,
+        "question": "During EMT review, what is the key concern with abdominal evisceration?",
+        "accepted_answers": [
+            "Exposed abdominal organs"
+        ],
+        "explanation": "Evisceration exposes abdominal organs and requires protection with appropriate moist sterile dressings and rapid transport.",
+        "active": true
+    },
+    {
+        "id": 322,
+        "question": "An EMT student is asked: What is the first priority when severe external bleeding is found during a trauma assessment?",
+        "accepted_answers": [
+            "Control the bleeding"
+        ],
+        "explanation": "Life-threatening external hemorrhage should be controlled immediately.",
+        "active": true
+    },
+    {
+        "id": 323,
+        "question": "An EMT student is asked: What is the preferred first method for controlling most severe external bleeding?",
+        "accepted_answers": [
+            "Direct pressure"
+        ],
+        "explanation": "Firm direct pressure is the initial method used to control most external bleeding.",
+        "active": true
+    },
+    {
+        "id": 324,
+        "question": "An EMT student is asked: When should a tourniquet be considered for extremity bleeding?",
+        "accepted_answers": [
+            "When severe extremity bleeding cannot be rapidly controlled with direct pressure"
+        ],
+        "explanation": "A tourniquet is appropriate for life-threatening extremity hemorrhage when rapid control is needed.",
+        "active": true
+    },
+    {
+        "id": 325,
+        "question": "An EMT student is asked: Where should a tourniquet be placed relative to a severe extremity wound?",
+        "accepted_answers": [
+            "Proximal to the wound"
+        ],
+        "explanation": "A tourniquet is placed above the wound on the injured extremity and not directly over a joint.",
+        "active": true
+    },
+    {
+        "id": 326,
+        "question": "An EMT student is asked: What is a sucking chest wound?",
+        "accepted_answers": [
+            "An open chest wound that allows air to move through the chest wall"
+        ],
+        "explanation": "An open chest wound can permit air movement through the thoracic wall and interfere with normal ventilation.",
+        "active": true
+    },
+    {
+        "id": 327,
+        "question": "An EMT student is asked: What dressing is commonly used for an open chest wound?",
+        "accepted_answers": [
+            "Occlusive dressing"
+        ],
+        "explanation": "An occlusive dressing is used to limit air movement through an open chest wound while the patient is closely reassessed.",
+        "active": true
+    },
+    {
+        "id": 328,
+        "question": "An EMT student is asked: What is paradoxical chest movement associated with?",
+        "accepted_answers": [
+            "Flail chest"
+        ],
+        "explanation": "A flail segment may move opposite the rest of the chest during breathing because multiple adjacent ribs are fractured in multiple places.",
+        "active": true
+    },
+    {
+        "id": 329,
+        "question": "An EMT student is asked: What condition should be suspected after blunt chest trauma with respiratory distress and diminished breath sounds on one side?",
+        "accepted_answers": [
+            "Pneumothorax"
+        ],
+        "explanation": "Air in the pleural space can collapse a lung and reduce breath sounds on the affected side.",
+        "active": true
+    },
+    {
+        "id": 330,
+        "question": "An EMT student is asked: What is hemothorax?",
+        "accepted_answers": [
+            "Blood in the pleural space"
+        ],
+        "explanation": "A hemothorax is an accumulation of blood between the lung and chest wall.",
+        "active": true
+    },
+    {
+        "id": 331,
+        "question": "An EMT student is asked: What is pneumothorax?",
+        "accepted_answers": [
+            "Air in the pleural space"
+        ],
+        "explanation": "A pneumothorax occurs when air enters the pleural space and can partially or completely collapse a lung.",
+        "active": true
+    },
+    {
+        "id": 332,
+        "question": "An EMT student is asked: What is the primary concern with a pelvic fracture?",
+        "accepted_answers": [
+            "Severe internal bleeding"
+        ],
+        "explanation": "Pelvic fractures can injure major blood vessels and produce significant concealed hemorrhage.",
+        "active": true
+    },
+    {
+        "id": 333,
+        "question": "An EMT student is asked: What is the primary concern with a femur fracture?",
+        "accepted_answers": [
+            "Significant blood loss"
+        ],
+        "explanation": "A femur fracture can be associated with substantial internal blood loss into the thigh.",
+        "active": true
+    },
+    {
+        "id": 334,
+        "question": "An EMT student is asked: What should be done with an impaled object in most situations?",
+        "accepted_answers": [
+            "Stabilize it in place"
+        ],
+        "explanation": "Impaled objects are generally stabilized in place rather than removed in the field because removal may worsen bleeding or injury.",
+        "active": true
+    },
+    {
+        "id": 335,
+        "question": "An EMT student is asked: What should an EMT do with an amputated body part?",
+        "accepted_answers": [
+            "Wrap it in sterile moist dressing, place it in a sealed bag, and keep it cool"
+        ],
+        "explanation": "An amputated part should be protected from direct ice contact and transported with the patient when possible.",
+        "active": true
+    },
+    {
+        "id": 336,
+        "question": "An EMT student is asked: What is an open fracture?",
+        "accepted_answers": [
+            "A fracture associated with an open wound communicating with the fracture site"
+        ],
+        "explanation": "An open fracture involves a break in the skin that communicates with the fracture and increases infection risk.",
+        "active": true
+    },
+    {
+        "id": 337,
+        "question": "An EMT student is asked: What is crepitus?",
+        "accepted_answers": [
+            "A grating sensation or sound from bone ends or tissues rubbing together"
+        ],
+        "explanation": "Crepitus may be felt or heard when injured structures move against one another.",
+        "active": true
+    },
+    {
+        "id": 338,
+        "question": "An EMT student is asked: What does distal neurovascular assessment evaluate after an extremity injury?",
+        "accepted_answers": [
+            "Circulation, sensation, and motor function beyond the injury"
+        ],
+        "explanation": "Checking distal circulation, sensation, and movement helps identify vascular or nerve compromise.",
+        "active": true
+    },
+    {
+        "id": 339,
+        "question": "An EMT student is asked: What is the purpose of splinting an injured extremity?",
+        "accepted_answers": [
+            "Limit movement and reduce further injury"
+        ],
+        "explanation": "Splinting supports the injured area, reduces movement, and may reduce pain and additional tissue damage.",
+        "active": true
+    },
+    {
+        "id": 340,
+        "question": "An EMT student is asked: What finding may indicate spinal cord injury after trauma?",
+        "accepted_answers": [
+            "Neurological deficit below the level of injury"
+        ],
+        "explanation": "Weakness, numbness, paralysis, or altered sensation below an injury can indicate spinal cord involvement.",
+        "active": true
+    },
+    {
+        "id": 341,
+        "question": "An EMT student is asked: What is the purpose of manual cervical spine stabilization?",
+        "accepted_answers": [
+            "Limit movement of the cervical spine"
+        ],
+        "explanation": "Manual stabilization is used to reduce unnecessary motion when a significant spinal injury is suspected.",
+        "active": true
+    },
+    {
+        "id": 342,
+        "question": "An EMT student is asked: What type of shock is most commonly associated with major blood loss?",
+        "accepted_answers": [
+            "Hypovolemic shock"
+        ],
+        "explanation": "Loss of circulating blood volume reduces preload and tissue perfusion, producing hypovolemic shock.",
+        "active": true
+    },
+    {
+        "id": 343,
+        "question": "An EMT student is asked: What skin findings are common in compensated hypovolemic shock?",
+        "accepted_answers": [
+            "Pale, cool, clammy skin"
+        ],
+        "explanation": "Peripheral vasoconstriction and sympathetic activation commonly produce pale, cool, moist skin during hypovolemic shock.",
+        "active": true
+    },
+    {
+        "id": 344,
+        "question": "An EMT student is asked: What does a decreasing level of consciousness in a trauma patient suggest?",
+        "accepted_answers": [
+            "Possible worsening brain injury or poor perfusion"
+        ],
+        "explanation": "Deteriorating mental status can indicate worsening intracranial injury, hypoxia, or shock and requires urgent reassessment.",
+        "active": true
+    },
+    {
+        "id": 345,
+        "question": "An EMT student is asked: What is the key concern with abdominal evisceration?",
+        "accepted_answers": [
+            "Exposed abdominal organs"
+        ],
+        "explanation": "Evisceration exposes abdominal organs and requires protection with appropriate moist sterile dressings and rapid transport.",
+        "active": true
+    },
+    {
+        "id": 442,
+        "question": "In a patient-care scenario, what is the first priority when severe external bleeding is found during a trauma assessment?",
+        "accepted_answers": [
+            "Control the bleeding"
+        ],
+        "explanation": "Life-threatening external hemorrhage should be controlled immediately.",
+        "active": true
+    },
+    {
+        "id": 443,
+        "question": "In a patient-care scenario, what is the preferred first method for controlling most severe external bleeding?",
+        "accepted_answers": [
+            "Direct pressure"
+        ],
+        "explanation": "Firm direct pressure is the initial method used to control most external bleeding.",
+        "active": true
+    },
+    {
+        "id": 444,
+        "question": "In a patient-care scenario, when should a tourniquet be considered for extremity bleeding?",
+        "accepted_answers": [
+            "When severe extremity bleeding cannot be rapidly controlled with direct pressure"
+        ],
+        "explanation": "A tourniquet is appropriate for life-threatening extremity hemorrhage when rapid control is needed.",
+        "active": true
+    },
+    {
+        "id": 445,
+        "question": "In a patient-care scenario, where should a tourniquet be placed relative to a severe extremity wound?",
+        "accepted_answers": [
+            "Proximal to the wound"
+        ],
+        "explanation": "A tourniquet is placed above the wound on the injured extremity and not directly over a joint.",
+        "active": true
+    },
+    {
+        "id": 446,
+        "question": "In a patient-care scenario, what is a sucking chest wound?",
+        "accepted_answers": [
+            "An open chest wound that allows air to move through the chest wall"
+        ],
+        "explanation": "An open chest wound can permit air movement through the thoracic wall and interfere with normal ventilation.",
+        "active": true
+    },
+    {
+        "id": 447,
+        "question": "In a patient-care scenario, what dressing is commonly used for an open chest wound?",
+        "accepted_answers": [
+            "Occlusive dressing"
+        ],
+        "explanation": "An occlusive dressing is used to limit air movement through an open chest wound while the patient is closely reassessed.",
+        "active": true
+    },
+    {
+        "id": 448,
+        "question": "In a patient-care scenario, what is paradoxical chest movement associated with?",
+        "accepted_answers": [
+            "Flail chest"
+        ],
+        "explanation": "A flail segment may move opposite the rest of the chest during breathing because multiple adjacent ribs are fractured in multiple places.",
+        "active": true
+    },
+    {
+        "id": 449,
+        "question": "In a patient-care scenario, what condition should be suspected after blunt chest trauma with respiratory distress and diminished breath sounds on one side?",
+        "accepted_answers": [
+            "Pneumothorax"
+        ],
+        "explanation": "Air in the pleural space can collapse a lung and reduce breath sounds on the affected side.",
+        "active": true
+    },
+    {
+        "id": 450,
+        "question": "In a patient-care scenario, what is hemothorax?",
+        "accepted_answers": [
+            "Blood in the pleural space"
+        ],
+        "explanation": "A hemothorax is an accumulation of blood between the lung and chest wall.",
+        "active": true
+    },
+    {
+        "id": 451,
+        "question": "In a patient-care scenario, what is pneumothorax?",
+        "accepted_answers": [
+            "Air in the pleural space"
+        ],
+        "explanation": "A pneumothorax occurs when air enters the pleural space and can partially or completely collapse a lung.",
+        "active": true
+    },
+    {
+        "id": 452,
+        "question": "In a patient-care scenario, what is the primary concern with a pelvic fracture?",
+        "accepted_answers": [
+            "Severe internal bleeding"
+        ],
+        "explanation": "Pelvic fractures can injure major blood vessels and produce significant concealed hemorrhage.",
+        "active": true
+    },
+    {
+        "id": 453,
+        "question": "In a patient-care scenario, what is the primary concern with a femur fracture?",
+        "accepted_answers": [
+            "Significant blood loss"
+        ],
+        "explanation": "A femur fracture can be associated with substantial internal blood loss into the thigh.",
+        "active": true
+    },
+    {
+        "id": 454,
+        "question": "In a patient-care scenario, what should be done with an impaled object in most situations?",
+        "accepted_answers": [
+            "Stabilize it in place"
+        ],
+        "explanation": "Impaled objects are generally stabilized in place rather than removed in the field because removal may worsen bleeding or injury.",
+        "active": true
+    },
+    {
+        "id": 455,
+        "question": "In a patient-care scenario, what should an EMT do with an amputated body part?",
+        "accepted_answers": [
+            "Wrap it in sterile moist dressing, place it in a sealed bag, and keep it cool"
+        ],
+        "explanation": "An amputated part should be protected from direct ice contact and transported with the patient when possible.",
+        "active": true
+    },
+    {
+        "id": 456,
+        "question": "In a patient-care scenario, what is an open fracture?",
+        "accepted_answers": [
+            "A fracture associated with an open wound communicating with the fracture site"
+        ],
+        "explanation": "An open fracture involves a break in the skin that communicates with the fracture and increases infection risk.",
+        "active": true
+    },
+    {
+        "id": 457,
+        "question": "In a patient-care scenario, what is crepitus?",
+        "accepted_answers": [
+            "A grating sensation or sound from bone ends or tissues rubbing together"
+        ],
+        "explanation": "Crepitus may be felt or heard when injured structures move against one another.",
+        "active": true
+    },
+    {
+        "id": 458,
+        "question": "In a patient-care scenario, what does distal neurovascular assessment evaluate after an extremity injury?",
+        "accepted_answers": [
+            "Circulation, sensation, and motor function beyond the injury"
+        ],
+        "explanation": "Checking distal circulation, sensation, and movement helps identify vascular or nerve compromise.",
+        "active": true
+    },
+    {
+        "id": 459,
+        "question": "In a patient-care scenario, what is the purpose of splinting an injured extremity?",
+        "accepted_answers": [
+            "Limit movement and reduce further injury"
+        ],
+        "explanation": "Splinting supports the injured area, reduces movement, and may reduce pain and additional tissue damage.",
+        "active": true
+    },
+    {
+        "id": 460,
+        "question": "In a patient-care scenario, what finding may indicate spinal cord injury after trauma?",
+        "accepted_answers": [
+            "Neurological deficit below the level of injury"
+        ],
+        "explanation": "Weakness, numbness, paralysis, or altered sensation below an injury can indicate spinal cord involvement.",
+        "active": true
+    },
+    {
+        "id": 461,
+        "question": "In a patient-care scenario, what is the purpose of manual cervical spine stabilization?",
+        "accepted_answers": [
+            "Limit movement of the cervical spine"
+        ],
+        "explanation": "Manual stabilization is used to reduce unnecessary motion when a significant spinal injury is suspected.",
+        "active": true
+    },
+    {
+        "id": 462,
+        "question": "In a patient-care scenario, what type of shock is most commonly associated with major blood loss?",
+        "accepted_answers": [
+            "Hypovolemic shock"
+        ],
+        "explanation": "Loss of circulating blood volume reduces preload and tissue perfusion, producing hypovolemic shock.",
+        "active": true
+    },
+    {
+        "id": 463,
+        "question": "In a patient-care scenario, what skin findings are common in compensated hypovolemic shock?",
+        "accepted_answers": [
+            "Pale, cool, clammy skin"
+        ],
+        "explanation": "Peripheral vasoconstriction and sympathetic activation commonly produce pale, cool, moist skin during hypovolemic shock.",
+        "active": true
+    },
+    {
+        "id": 464,
+        "question": "In a patient-care scenario, what does a decreasing level of consciousness in a trauma patient suggest?",
+        "accepted_answers": [
+            "Possible worsening brain injury or poor perfusion"
+        ],
+        "explanation": "Deteriorating mental status can indicate worsening intracranial injury, hypoxia, or shock and requires urgent reassessment.",
+        "active": true
+    },
+    {
+        "id": 465,
+        "question": "In a patient-care scenario, what is the key concern with abdominal evisceration?",
+        "accepted_answers": [
+            "Exposed abdominal organs"
+        ],
+        "explanation": "Evisceration exposes abdominal organs and requires protection with appropriate moist sterile dressings and rapid transport.",
+        "active": true
+    }
+]
