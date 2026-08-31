@@ -1,0 +1,218 @@
+[
+    {
+        "id": 126,
+        "question": "What does EMT stand for?",
+        "accepted_answers": [
+            "Emergency Medical Technician"
+        ],
+        "explanation": "EMT stands for Emergency Medical Technician.",
+        "active": true
+    },
+    {
+        "id": 127,
+        "question": "What does EMS stand for?",
+        "accepted_answers": [
+            "Emergency Medical Services"
+        ],
+        "explanation": "EMS stands for Emergency Medical Services.",
+        "active": true
+    },
+    {
+        "id": 128,
+        "question": "What does AED stand for?",
+        "accepted_answers": [
+            "Automated External Defibrillator"
+        ],
+        "explanation": "AED stands for Automated External Defibrillator.",
+        "active": true
+    },
+    {
+        "id": 129,
+        "question": "What does BLS stand for in EMS?",
+        "accepted_answers": [
+            "Basic Life Support"
+        ],
+        "explanation": "BLS stands for Basic Life Support.",
+        "active": true
+    },
+    {
+        "id": 130,
+        "question": "What does CPR stand for?",
+        "accepted_answers": [
+            "Cardiopulmonary resuscitation"
+        ],
+        "explanation": "CPR stands for cardiopulmonary resuscitation.",
+        "active": true
+    },
+    {
+        "id": 131,
+        "question": "What does PPE stand for?",
+        "accepted_answers": [
+            "Personal protective equipment"
+        ],
+        "explanation": "PPE stands for personal protective equipment.",
+        "active": true
+    },
+    {
+        "id": 246,
+        "question": "During EMT review, what does EMT stand for?",
+        "accepted_answers": [
+            "Emergency Medical Technician"
+        ],
+        "explanation": "EMT stands for Emergency Medical Technician.",
+        "active": true
+    },
+    {
+        "id": 247,
+        "question": "During EMT review, what does EMS stand for?",
+        "accepted_answers": [
+            "Emergency Medical Services"
+        ],
+        "explanation": "EMS stands for Emergency Medical Services.",
+        "active": true
+    },
+    {
+        "id": 248,
+        "question": "During EMT review, what does AED stand for?",
+        "accepted_answers": [
+            "Automated External Defibrillator"
+        ],
+        "explanation": "AED stands for Automated External Defibrillator.",
+        "active": true
+    },
+    {
+        "id": 249,
+        "question": "During EMT review, what does BLS stand for in EMS?",
+        "accepted_answers": [
+            "Basic Life Support"
+        ],
+        "explanation": "BLS stands for Basic Life Support.",
+        "active": true
+    },
+    {
+        "id": 250,
+        "question": "During EMT review, what does CPR stand for?",
+        "accepted_answers": [
+            "Cardiopulmonary resuscitation"
+        ],
+        "explanation": "CPR stands for cardiopulmonary resuscitation.",
+        "active": true
+    },
+    {
+        "id": 251,
+        "question": "During EMT review, what does PPE stand for?",
+        "accepted_answers": [
+            "Personal protective equipment"
+        ],
+        "explanation": "PPE stands for personal protective equipment.",
+        "active": true
+    },
+    {
+        "id": 366,
+        "question": "An EMT student is asked: What does EMT stand for?",
+        "accepted_answers": [
+            "Emergency Medical Technician"
+        ],
+        "explanation": "EMT stands for Emergency Medical Technician.",
+        "active": true
+    },
+    {
+        "id": 367,
+        "question": "An EMT student is asked: What does EMS stand for?",
+        "accepted_answers": [
+            "Emergency Medical Services"
+        ],
+        "explanation": "EMS stands for Emergency Medical Services.",
+        "active": true
+    },
+    {
+        "id": 368,
+        "question": "An EMT student is asked: What does AED stand for?",
+        "accepted_answers": [
+            "Automated External Defibrillator"
+        ],
+        "explanation": "AED stands for Automated External Defibrillator.",
+        "active": true
+    },
+    {
+        "id": 369,
+        "question": "An EMT student is asked: What does BLS stand for in EMS?",
+        "accepted_answers": [
+            "Basic Life Support"
+        ],
+        "explanation": "BLS stands for Basic Life Support.",
+        "active": true
+    },
+    {
+        "id": 370,
+        "question": "An EMT student is asked: What does CPR stand for?",
+        "accepted_answers": [
+            "Cardiopulmonary resuscitation"
+        ],
+        "explanation": "CPR stands for cardiopulmonary resuscitation.",
+        "active": true
+    },
+    {
+        "id": 371,
+        "question": "An EMT student is asked: What does PPE stand for?",
+        "accepted_answers": [
+            "Personal protective equipment"
+        ],
+        "explanation": "PPE stands for personal protective equipment.",
+        "active": true
+    },
+    {
+        "id": 486,
+        "question": "In a patient-care scenario, what does EMT stand for?",
+        "accepted_answers": [
+            "Emergency Medical Technician"
+        ],
+        "explanation": "EMT stands for Emergency Medical Technician.",
+        "active": true
+    },
+    {
+        "id": 487,
+        "question": "In a patient-care scenario, what does EMS stand for?",
+        "accepted_answers": [
+            "Emergency Medical Services"
+        ],
+        "explanation": "EMS stands for Emergency Medical Services.",
+        "active": true
+    },
+    {
+        "id": 488,
+        "question": "In a patient-care scenario, what does AED stand for?",
+        "accepted_answers": [
+            "Automated External Defibrillator"
+        ],
+        "explanation": "AED stands for Automated External Defibrillator.",
+        "active": true
+    },
+    {
+        "id": 489,
+        "question": "In a patient-care scenario, what does BLS stand for in EMS?",
+        "accepted_answers": [
+            "Basic Life Support"
+        ],
+        "explanation": "BLS stands for Basic Life Support.",
+        "active": true
+    },
+    {
+        "id": 490,
+        "question": "In a patient-care scenario, what does CPR stand for?",
+        "accepted_answers": [
+            "Cardiopulmonary resuscitation"
+        ],
+        "explanation": "CPR stands for cardiopulmonary resuscitation.",
+        "active": true
+    },
+    {
+        "id": 491,
+        "question": "In a patient-care scenario, what does PPE stand for?",
+        "accepted_answers": [
+            "Personal protective equipment"
+        ],
+        "explanation": "PPE stands for personal protective equipment.",
+        "active": true
+    }
+]

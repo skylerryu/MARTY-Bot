@@ -1,0 +1,443 @@
+[
+    {
+        "id": 8,
+        "question": "During delivery, you see the umbilical cord wrapped around the newborn's neck. What is this condition called?",
+        "accepted_answers": [
+            "Nuchal cord"
+        ],
+        "explanation": "An umbilical cord wrapped around the fetal neck is called a nuchal cord.",
+        "active": true
+    },
+    {
+        "id": 70,
+        "question": "What is crowning during childbirth?",
+        "accepted_answers": [
+            "The fetal head is visible at the vaginal opening"
+        ],
+        "explanation": "Crowning occurs when the fetal head remains visible at the vaginal opening during labor.",
+        "active": true
+    },
+    {
+        "id": 71,
+        "question": "What does a prolapsed umbilical cord mean?",
+        "accepted_answers": [
+            "The umbilical cord presents before the baby"
+        ],
+        "explanation": "A prolapsed cord occurs when the cord descends through the birth canal ahead of the fetus and can become compressed.",
+        "active": true
+    },
+    {
+        "id": 72,
+        "question": "What position may help reduce pressure on a prolapsed umbilical cord while preparing for rapid transport?",
+        "accepted_answers": [
+            "Knee-chest position"
+        ],
+        "explanation": "Positioning can help reduce compression of a prolapsed cord while urgent transport and definitive care are arranged.",
+        "active": true
+    },
+    {
+        "id": 73,
+        "question": "What is meconium?",
+        "accepted_answers": [
+            "The newborn's first stool"
+        ],
+        "explanation": "Meconium is the dark green first stool produced by a newborn and may be present in amniotic fluid.",
+        "active": true
+    },
+    {
+        "id": 74,
+        "question": "What is the first priority immediately after a normal newborn is delivered?",
+        "accepted_answers": [
+            "Warm, dry, and stimulate the newborn while assessing breathing"
+        ],
+        "explanation": "Newborn care begins with temperature control, drying, stimulation, and assessment of respirations and tone.",
+        "active": true
+    },
+    {
+        "id": 75,
+        "question": "What should an EMT do if the amniotic sac is still covering the newborn's face after delivery?",
+        "accepted_answers": [
+            "Open the sac away from the face"
+        ],
+        "explanation": "The membrane should be cleared from the newborn's face so the airway is not obstructed.",
+        "active": true
+    },
+    {
+        "id": 76,
+        "question": "What is the placenta?",
+        "accepted_answers": [
+            "The organ that exchanges oxygen and nutrients between mother and fetus"
+        ],
+        "explanation": "The placenta supports fetal gas, nutrient, and waste exchange during pregnancy.",
+        "active": true
+    },
+    {
+        "id": 77,
+        "question": "What is the umbilical cord's primary function?",
+        "accepted_answers": [
+            "Carry blood between the fetus and placenta"
+        ],
+        "explanation": "The umbilical cord contains vessels that carry blood between the fetus and placenta.",
+        "active": true
+    },
+    {
+        "id": 78,
+        "question": "What is postpartum hemorrhage?",
+        "accepted_answers": [
+            "Excessive bleeding after delivery"
+        ],
+        "explanation": "Postpartum hemorrhage is excessive bleeding after childbirth and can rapidly cause shock.",
+        "active": true
+    },
+    {
+        "id": 79,
+        "question": "What is a breech presentation?",
+        "accepted_answers": [
+            "The buttocks or feet present first"
+        ],
+        "explanation": "In a breech presentation, the fetal buttocks or feet enter the birth canal before the head.",
+        "active": true
+    },
+    {
+        "id": 80,
+        "question": "What does gravida refer to in an obstetric history?",
+        "accepted_answers": [
+            "The number of times a patient has been pregnant"
+        ],
+        "explanation": "Gravida describes the total number of pregnancies, regardless of outcome.",
+        "active": true
+    },
+    {
+        "id": 81,
+        "question": "What does para refer to in an obstetric history?",
+        "accepted_answers": [
+            "The number of pregnancies carried to viable gestational age"
+        ],
+        "explanation": "Para describes pregnancies carried to a viable gestational age, with exact definitions depending on the documentation system used.",
+        "active": true
+    },
+    {
+        "id": 190,
+        "question": "During EMT review, what is crowning during childbirth?",
+        "accepted_answers": [
+            "The fetal head is visible at the vaginal opening"
+        ],
+        "explanation": "Crowning occurs when the fetal head remains visible at the vaginal opening during labor.",
+        "active": true
+    },
+    {
+        "id": 191,
+        "question": "During EMT review, what does a prolapsed umbilical cord mean?",
+        "accepted_answers": [
+            "The umbilical cord presents before the baby"
+        ],
+        "explanation": "A prolapsed cord occurs when the cord descends through the birth canal ahead of the fetus and can become compressed.",
+        "active": true
+    },
+    {
+        "id": 192,
+        "question": "During EMT review, what position may help reduce pressure on a prolapsed umbilical cord while preparing for rapid transport?",
+        "accepted_answers": [
+            "Knee-chest position"
+        ],
+        "explanation": "Positioning can help reduce compression of a prolapsed cord while urgent transport and definitive care are arranged.",
+        "active": true
+    },
+    {
+        "id": 193,
+        "question": "During EMT review, what is meconium?",
+        "accepted_answers": [
+            "The newborn's first stool"
+        ],
+        "explanation": "Meconium is the dark green first stool produced by a newborn and may be present in amniotic fluid.",
+        "active": true
+    },
+    {
+        "id": 194,
+        "question": "During EMT review, what is the first priority immediately after a normal newborn is delivered?",
+        "accepted_answers": [
+            "Warm, dry, and stimulate the newborn while assessing breathing"
+        ],
+        "explanation": "Newborn care begins with temperature control, drying, stimulation, and assessment of respirations and tone.",
+        "active": true
+    },
+    {
+        "id": 195,
+        "question": "During EMT review, what should an EMT do if the amniotic sac is still covering the newborn's face after delivery?",
+        "accepted_answers": [
+            "Open the sac away from the face"
+        ],
+        "explanation": "The membrane should be cleared from the newborn's face so the airway is not obstructed.",
+        "active": true
+    },
+    {
+        "id": 196,
+        "question": "During EMT review, what is the placenta?",
+        "accepted_answers": [
+            "The organ that exchanges oxygen and nutrients between mother and fetus"
+        ],
+        "explanation": "The placenta supports fetal gas, nutrient, and waste exchange during pregnancy.",
+        "active": true
+    },
+    {
+        "id": 197,
+        "question": "During EMT review, what is the umbilical cord's primary function?",
+        "accepted_answers": [
+            "Carry blood between the fetus and placenta"
+        ],
+        "explanation": "The umbilical cord contains vessels that carry blood between the fetus and placenta.",
+        "active": true
+    },
+    {
+        "id": 198,
+        "question": "During EMT review, what is postpartum hemorrhage?",
+        "accepted_answers": [
+            "Excessive bleeding after delivery"
+        ],
+        "explanation": "Postpartum hemorrhage is excessive bleeding after childbirth and can rapidly cause shock.",
+        "active": true
+    },
+    {
+        "id": 199,
+        "question": "During EMT review, what is a breech presentation?",
+        "accepted_answers": [
+            "The buttocks or feet present first"
+        ],
+        "explanation": "In a breech presentation, the fetal buttocks or feet enter the birth canal before the head.",
+        "active": true
+    },
+    {
+        "id": 200,
+        "question": "During EMT review, what does gravida refer to in an obstetric history?",
+        "accepted_answers": [
+            "The number of times a patient has been pregnant"
+        ],
+        "explanation": "Gravida describes the total number of pregnancies, regardless of outcome.",
+        "active": true
+    },
+    {
+        "id": 201,
+        "question": "During EMT review, what does para refer to in an obstetric history?",
+        "accepted_answers": [
+            "The number of pregnancies carried to viable gestational age"
+        ],
+        "explanation": "Para describes pregnancies carried to a viable gestational age, with exact definitions depending on the documentation system used.",
+        "active": true
+    },
+    {
+        "id": 310,
+        "question": "An EMT student is asked: What is crowning during childbirth?",
+        "accepted_answers": [
+            "The fetal head is visible at the vaginal opening"
+        ],
+        "explanation": "Crowning occurs when the fetal head remains visible at the vaginal opening during labor.",
+        "active": true
+    },
+    {
+        "id": 311,
+        "question": "An EMT student is asked: What does a prolapsed umbilical cord mean?",
+        "accepted_answers": [
+            "The umbilical cord presents before the baby"
+        ],
+        "explanation": "A prolapsed cord occurs when the cord descends through the birth canal ahead of the fetus and can become compressed.",
+        "active": true
+    },
+    {
+        "id": 312,
+        "question": "An EMT student is asked: What position may help reduce pressure on a prolapsed umbilical cord while preparing for rapid transport?",
+        "accepted_answers": [
+            "Knee-chest position"
+        ],
+        "explanation": "Positioning can help reduce compression of a prolapsed cord while urgent transport and definitive care are arranged.",
+        "active": true
+    },
+    {
+        "id": 313,
+        "question": "An EMT student is asked: What is meconium?",
+        "accepted_answers": [
+            "The newborn's first stool"
+        ],
+        "explanation": "Meconium is the dark green first stool produced by a newborn and may be present in amniotic fluid.",
+        "active": true
+    },
+    {
+        "id": 314,
+        "question": "An EMT student is asked: What is the first priority immediately after a normal newborn is delivered?",
+        "accepted_answers": [
+            "Warm, dry, and stimulate the newborn while assessing breathing"
+        ],
+        "explanation": "Newborn care begins with temperature control, drying, stimulation, and assessment of respirations and tone.",
+        "active": true
+    },
+    {
+        "id": 315,
+        "question": "An EMT student is asked: What should an EMT do if the amniotic sac is still covering the newborn's face after delivery?",
+        "accepted_answers": [
+            "Open the sac away from the face"
+        ],
+        "explanation": "The membrane should be cleared from the newborn's face so the airway is not obstructed.",
+        "active": true
+    },
+    {
+        "id": 316,
+        "question": "An EMT student is asked: What is the placenta?",
+        "accepted_answers": [
+            "The organ that exchanges oxygen and nutrients between mother and fetus"
+        ],
+        "explanation": "The placenta supports fetal gas, nutrient, and waste exchange during pregnancy.",
+        "active": true
+    },
+    {
+        "id": 317,
+        "question": "An EMT student is asked: What is the umbilical cord's primary function?",
+        "accepted_answers": [
+            "Carry blood between the fetus and placenta"
+        ],
+        "explanation": "The umbilical cord contains vessels that carry blood between the fetus and placenta.",
+        "active": true
+    },
+    {
+        "id": 318,
+        "question": "An EMT student is asked: What is postpartum hemorrhage?",
+        "accepted_answers": [
+            "Excessive bleeding after delivery"
+        ],
+        "explanation": "Postpartum hemorrhage is excessive bleeding after childbirth and can rapidly cause shock.",
+        "active": true
+    },
+    {
+        "id": 319,
+        "question": "An EMT student is asked: What is a breech presentation?",
+        "accepted_answers": [
+            "The buttocks or feet present first"
+        ],
+        "explanation": "In a breech presentation, the fetal buttocks or feet enter the birth canal before the head.",
+        "active": true
+    },
+    {
+        "id": 320,
+        "question": "An EMT student is asked: What does gravida refer to in an obstetric history?",
+        "accepted_answers": [
+            "The number of times a patient has been pregnant"
+        ],
+        "explanation": "Gravida describes the total number of pregnancies, regardless of outcome.",
+        "active": true
+    },
+    {
+        "id": 321,
+        "question": "An EMT student is asked: What does para refer to in an obstetric history?",
+        "accepted_answers": [
+            "The number of pregnancies carried to viable gestational age"
+        ],
+        "explanation": "Para describes pregnancies carried to a viable gestational age, with exact definitions depending on the documentation system used.",
+        "active": true
+    },
+    {
+        "id": 430,
+        "question": "In a patient-care scenario, what is crowning during childbirth?",
+        "accepted_answers": [
+            "The fetal head is visible at the vaginal opening"
+        ],
+        "explanation": "Crowning occurs when the fetal head remains visible at the vaginal opening during labor.",
+        "active": true
+    },
+    {
+        "id": 431,
+        "question": "In a patient-care scenario, what does a prolapsed umbilical cord mean?",
+        "accepted_answers": [
+            "The umbilical cord presents before the baby"
+        ],
+        "explanation": "A prolapsed cord occurs when the cord descends through the birth canal ahead of the fetus and can become compressed.",
+        "active": true
+    },
+    {
+        "id": 432,
+        "question": "In a patient-care scenario, what position may help reduce pressure on a prolapsed umbilical cord while preparing for rapid transport?",
+        "accepted_answers": [
+            "Knee-chest position"
+        ],
+        "explanation": "Positioning can help reduce compression of a prolapsed cord while urgent transport and definitive care are arranged.",
+        "active": true
+    },
+    {
+        "id": 433,
+        "question": "In a patient-care scenario, what is meconium?",
+        "accepted_answers": [
+            "The newborn's first stool"
+        ],
+        "explanation": "Meconium is the dark green first stool produced by a newborn and may be present in amniotic fluid.",
+        "active": true
+    },
+    {
+        "id": 434,
+        "question": "In a patient-care scenario, what is the first priority immediately after a normal newborn is delivered?",
+        "accepted_answers": [
+            "Warm, dry, and stimulate the newborn while assessing breathing"
+        ],
+        "explanation": "Newborn care begins with temperature control, drying, stimulation, and assessment of respirations and tone.",
+        "active": true
+    },
+    {
+        "id": 435,
+        "question": "In a patient-care scenario, what should an EMT do if the amniotic sac is still covering the newborn's face after delivery?",
+        "accepted_answers": [
+            "Open the sac away from the face"
+        ],
+        "explanation": "The membrane should be cleared from the newborn's face so the airway is not obstructed.",
+        "active": true
+    },
+    {
+        "id": 436,
+        "question": "In a patient-care scenario, what is the placenta?",
+        "accepted_answers": [
+            "The organ that exchanges oxygen and nutrients between mother and fetus"
+        ],
+        "explanation": "The placenta supports fetal gas, nutrient, and waste exchange during pregnancy.",
+        "active": true
+    },
+    {
+        "id": 437,
+        "question": "In a patient-care scenario, what is the umbilical cord's primary function?",
+        "accepted_answers": [
+            "Carry blood between the fetus and placenta"
+        ],
+        "explanation": "The umbilical cord contains vessels that carry blood between the fetus and placenta.",
+        "active": true
+    },
+    {
+        "id": 438,
+        "question": "In a patient-care scenario, what is postpartum hemorrhage?",
+        "accepted_answers": [
+            "Excessive bleeding after delivery"
+        ],
+        "explanation": "Postpartum hemorrhage is excessive bleeding after childbirth and can rapidly cause shock.",
+        "active": true
+    },
+    {
+        "id": 439,
+        "question": "In a patient-care scenario, what is a breech presentation?",
+        "accepted_answers": [
+            "The buttocks or feet present first"
+        ],
+        "explanation": "In a breech presentation, the fetal buttocks or feet enter the birth canal before the head.",
+        "active": true
+    },
+    {
+        "id": 440,
+        "question": "In a patient-care scenario, what does gravida refer to in an obstetric history?",
+        "accepted_answers": [
+            "The number of times a patient has been pregnant"
+        ],
+        "explanation": "Gravida describes the total number of pregnancies, regardless of outcome.",
+        "active": true
+    },
+    {
+        "id": 441,
+        "question": "In a patient-care scenario, what does para refer to in an obstetric history?",
+        "accepted_answers": [
+            "The number of pregnancies carried to viable gestational age"
+        ],
+        "explanation": "Para describes pregnancies carried to a viable gestational age, with exact definitions depending on the documentation system used.",
+        "active": true
+    }
+]

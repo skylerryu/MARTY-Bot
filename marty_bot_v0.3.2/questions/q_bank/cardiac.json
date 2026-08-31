@@ -1,0 +1,443 @@
+[
+    {
+        "id": 3,
+        "question": "A 58-year-old patient has crushing substernal chest pressure, diaphoresis, and nausea. What condition should you suspect?",
+        "accepted_answers": [
+            "Acute coronary syndrome"
+        ],
+        "explanation": "Chest pressure accompanied by diaphoresis and nausea is highly concerning for acute coronary syndrome, which includes myocardial infarction and unstable angina.",
+        "active": true
+    },
+    {
+        "id": 32,
+        "question": "What medication may an EMT assist with for a patient with suspected acute coronary syndrome when it is not contraindicated?",
+        "accepted_answers": [
+            "Aspirin"
+        ],
+        "explanation": "Aspirin reduces platelet aggregation and is commonly indicated for suspected acute coronary syndrome when no contraindication exists.",
+        "active": true
+    },
+    {
+        "id": 33,
+        "question": "What is the main purpose of an AED?",
+        "accepted_answers": [
+            "Analyze the heart rhythm and deliver a shock when indicated"
+        ],
+        "explanation": "An AED analyzes the cardiac rhythm and advises or delivers defibrillation for shockable rhythms.",
+        "active": true
+    },
+    {
+        "id": 34,
+        "question": "What should be minimized during CPR to improve coronary and cerebral perfusion?",
+        "accepted_answers": [
+            "Interruptions in chest compressions"
+        ],
+        "explanation": "Minimizing pauses in chest compressions helps maintain blood flow to the heart and brain.",
+        "active": true
+    },
+    {
+        "id": 35,
+        "question": "What does the term bradycardia mean?",
+        "accepted_answers": [
+            "An abnormally slow heart rate"
+        ],
+        "explanation": "Bradycardia refers to a heart rate that is slower than expected for the patient's age and condition.",
+        "active": true
+    },
+    {
+        "id": 36,
+        "question": "What does the term tachycardia mean?",
+        "accepted_answers": [
+            "An abnormally fast heart rate"
+        ],
+        "explanation": "Tachycardia refers to a heart rate that is faster than expected for the patient's age and condition.",
+        "active": true
+    },
+    {
+        "id": 37,
+        "question": "What pulse is commonly checked in an unresponsive adult during a BLS assessment?",
+        "accepted_answers": [
+            "Carotid pulse"
+        ],
+        "explanation": "The carotid pulse is commonly checked when assessing circulation in an unresponsive adult.",
+        "active": true
+    },
+    {
+        "id": 38,
+        "question": "What condition should be suspected when chest discomfort is accompanied by pressure, diaphoresis, nausea, or shortness of breath?",
+        "accepted_answers": [
+            "Acute coronary syndrome"
+        ],
+        "explanation": "These findings are concerning for myocardial ischemia and acute coronary syndrome.",
+        "active": true
+    },
+    {
+        "id": 39,
+        "question": "What is syncope?",
+        "accepted_answers": [
+            "A temporary loss of consciousness caused by reduced cerebral perfusion"
+        ],
+        "explanation": "Syncope is a brief loss of consciousness typically caused by a transient decrease in blood flow to the brain.",
+        "active": true
+    },
+    {
+        "id": 40,
+        "question": "What is the major immediate threat in cardiac arrest?",
+        "accepted_answers": [
+            "Absence of effective circulation"
+        ],
+        "explanation": "Cardiac arrest results in the loss of effective circulation and rapid loss of perfusion to vital organs.",
+        "active": true
+    },
+    {
+        "id": 41,
+        "question": "What should happen immediately after an AED delivers a shock?",
+        "accepted_answers": [
+            "Resume CPR"
+        ],
+        "explanation": "CPR should resume immediately after a shock to minimize interruptions in perfusion.",
+        "active": true
+    },
+    {
+        "id": 42,
+        "question": "What condition involves inadequate blood flow to the body's tissues despite the heart still beating?",
+        "accepted_answers": [
+            "Shock"
+        ],
+        "explanation": "Shock is a state of inadequate tissue perfusion and can occur even when a pulse is present.",
+        "active": true
+    },
+    {
+        "id": 43,
+        "question": "What is the key concern with a patient who has chest pain and becomes pale, cool, and diaphoretic?",
+        "accepted_answers": [
+            "Poor perfusion"
+        ],
+        "explanation": "Pale, cool, diaphoretic skin can indicate sympathetic activation and inadequate tissue perfusion.",
+        "active": true
+    },
+    {
+        "id": 152,
+        "question": "During EMT review, what medication may an EMT assist with for a patient with suspected acute coronary syndrome when it is not contraindicated?",
+        "accepted_answers": [
+            "Aspirin"
+        ],
+        "explanation": "Aspirin reduces platelet aggregation and is commonly indicated for suspected acute coronary syndrome when no contraindication exists.",
+        "active": true
+    },
+    {
+        "id": 153,
+        "question": "During EMT review, what is the main purpose of an AED?",
+        "accepted_answers": [
+            "Analyze the heart rhythm and deliver a shock when indicated"
+        ],
+        "explanation": "An AED analyzes the cardiac rhythm and advises or delivers defibrillation for shockable rhythms.",
+        "active": true
+    },
+    {
+        "id": 154,
+        "question": "During EMT review, what should be minimized during CPR to improve coronary and cerebral perfusion?",
+        "accepted_answers": [
+            "Interruptions in chest compressions"
+        ],
+        "explanation": "Minimizing pauses in chest compressions helps maintain blood flow to the heart and brain.",
+        "active": true
+    },
+    {
+        "id": 155,
+        "question": "During EMT review, what does the term bradycardia mean?",
+        "accepted_answers": [
+            "An abnormally slow heart rate"
+        ],
+        "explanation": "Bradycardia refers to a heart rate that is slower than expected for the patient's age and condition.",
+        "active": true
+    },
+    {
+        "id": 156,
+        "question": "During EMT review, what does the term tachycardia mean?",
+        "accepted_answers": [
+            "An abnormally fast heart rate"
+        ],
+        "explanation": "Tachycardia refers to a heart rate that is faster than expected for the patient's age and condition.",
+        "active": true
+    },
+    {
+        "id": 157,
+        "question": "During EMT review, what pulse is commonly checked in an unresponsive adult during a BLS assessment?",
+        "accepted_answers": [
+            "Carotid pulse"
+        ],
+        "explanation": "The carotid pulse is commonly checked when assessing circulation in an unresponsive adult.",
+        "active": true
+    },
+    {
+        "id": 158,
+        "question": "During EMT review, what condition should be suspected when chest discomfort is accompanied by pressure, diaphoresis, nausea, or shortness of breath?",
+        "accepted_answers": [
+            "Acute coronary syndrome"
+        ],
+        "explanation": "These findings are concerning for myocardial ischemia and acute coronary syndrome.",
+        "active": true
+    },
+    {
+        "id": 159,
+        "question": "During EMT review, what is syncope?",
+        "accepted_answers": [
+            "A temporary loss of consciousness caused by reduced cerebral perfusion"
+        ],
+        "explanation": "Syncope is a brief loss of consciousness typically caused by a transient decrease in blood flow to the brain.",
+        "active": true
+    },
+    {
+        "id": 160,
+        "question": "During EMT review, what is the major immediate threat in cardiac arrest?",
+        "accepted_answers": [
+            "Absence of effective circulation"
+        ],
+        "explanation": "Cardiac arrest results in the loss of effective circulation and rapid loss of perfusion to vital organs.",
+        "active": true
+    },
+    {
+        "id": 161,
+        "question": "During EMT review, what should happen immediately after an AED delivers a shock?",
+        "accepted_answers": [
+            "Resume CPR"
+        ],
+        "explanation": "CPR should resume immediately after a shock to minimize interruptions in perfusion.",
+        "active": true
+    },
+    {
+        "id": 162,
+        "question": "During EMT review, what condition involves inadequate blood flow to the body's tissues despite the heart still beating?",
+        "accepted_answers": [
+            "Shock"
+        ],
+        "explanation": "Shock is a state of inadequate tissue perfusion and can occur even when a pulse is present.",
+        "active": true
+    },
+    {
+        "id": 163,
+        "question": "During EMT review, what is the key concern with a patient who has chest pain and becomes pale, cool, and diaphoretic?",
+        "accepted_answers": [
+            "Poor perfusion"
+        ],
+        "explanation": "Pale, cool, diaphoretic skin can indicate sympathetic activation and inadequate tissue perfusion.",
+        "active": true
+    },
+    {
+        "id": 272,
+        "question": "An EMT student is asked: What medication may an EMT assist with for a patient with suspected acute coronary syndrome when it is not contraindicated?",
+        "accepted_answers": [
+            "Aspirin"
+        ],
+        "explanation": "Aspirin reduces platelet aggregation and is commonly indicated for suspected acute coronary syndrome when no contraindication exists.",
+        "active": true
+    },
+    {
+        "id": 273,
+        "question": "An EMT student is asked: What is the main purpose of an AED?",
+        "accepted_answers": [
+            "Analyze the heart rhythm and deliver a shock when indicated"
+        ],
+        "explanation": "An AED analyzes the cardiac rhythm and advises or delivers defibrillation for shockable rhythms.",
+        "active": true
+    },
+    {
+        "id": 274,
+        "question": "An EMT student is asked: What should be minimized during CPR to improve coronary and cerebral perfusion?",
+        "accepted_answers": [
+            "Interruptions in chest compressions"
+        ],
+        "explanation": "Minimizing pauses in chest compressions helps maintain blood flow to the heart and brain.",
+        "active": true
+    },
+    {
+        "id": 275,
+        "question": "An EMT student is asked: What does the term bradycardia mean?",
+        "accepted_answers": [
+            "An abnormally slow heart rate"
+        ],
+        "explanation": "Bradycardia refers to a heart rate that is slower than expected for the patient's age and condition.",
+        "active": true
+    },
+    {
+        "id": 276,
+        "question": "An EMT student is asked: What does the term tachycardia mean?",
+        "accepted_answers": [
+            "An abnormally fast heart rate"
+        ],
+        "explanation": "Tachycardia refers to a heart rate that is faster than expected for the patient's age and condition.",
+        "active": true
+    },
+    {
+        "id": 277,
+        "question": "An EMT student is asked: What pulse is commonly checked in an unresponsive adult during a BLS assessment?",
+        "accepted_answers": [
+            "Carotid pulse"
+        ],
+        "explanation": "The carotid pulse is commonly checked when assessing circulation in an unresponsive adult.",
+        "active": true
+    },
+    {
+        "id": 278,
+        "question": "An EMT student is asked: What condition should be suspected when chest discomfort is accompanied by pressure, diaphoresis, nausea, or shortness of breath?",
+        "accepted_answers": [
+            "Acute coronary syndrome"
+        ],
+        "explanation": "These findings are concerning for myocardial ischemia and acute coronary syndrome.",
+        "active": true
+    },
+    {
+        "id": 279,
+        "question": "An EMT student is asked: What is syncope?",
+        "accepted_answers": [
+            "A temporary loss of consciousness caused by reduced cerebral perfusion"
+        ],
+        "explanation": "Syncope is a brief loss of consciousness typically caused by a transient decrease in blood flow to the brain.",
+        "active": true
+    },
+    {
+        "id": 280,
+        "question": "An EMT student is asked: What is the major immediate threat in cardiac arrest?",
+        "accepted_answers": [
+            "Absence of effective circulation"
+        ],
+        "explanation": "Cardiac arrest results in the loss of effective circulation and rapid loss of perfusion to vital organs.",
+        "active": true
+    },
+    {
+        "id": 281,
+        "question": "An EMT student is asked: What should happen immediately after an AED delivers a shock?",
+        "accepted_answers": [
+            "Resume CPR"
+        ],
+        "explanation": "CPR should resume immediately after a shock to minimize interruptions in perfusion.",
+        "active": true
+    },
+    {
+        "id": 282,
+        "question": "An EMT student is asked: What condition involves inadequate blood flow to the body's tissues despite the heart still beating?",
+        "accepted_answers": [
+            "Shock"
+        ],
+        "explanation": "Shock is a state of inadequate tissue perfusion and can occur even when a pulse is present.",
+        "active": true
+    },
+    {
+        "id": 283,
+        "question": "An EMT student is asked: What is the key concern with a patient who has chest pain and becomes pale, cool, and diaphoretic?",
+        "accepted_answers": [
+            "Poor perfusion"
+        ],
+        "explanation": "Pale, cool, diaphoretic skin can indicate sympathetic activation and inadequate tissue perfusion.",
+        "active": true
+    },
+    {
+        "id": 392,
+        "question": "In a patient-care scenario, what medication may an EMT assist with for a patient with suspected acute coronary syndrome when it is not contraindicated?",
+        "accepted_answers": [
+            "Aspirin"
+        ],
+        "explanation": "Aspirin reduces platelet aggregation and is commonly indicated for suspected acute coronary syndrome when no contraindication exists.",
+        "active": true
+    },
+    {
+        "id": 393,
+        "question": "In a patient-care scenario, what is the main purpose of an AED?",
+        "accepted_answers": [
+            "Analyze the heart rhythm and deliver a shock when indicated"
+        ],
+        "explanation": "An AED analyzes the cardiac rhythm and advises or delivers defibrillation for shockable rhythms.",
+        "active": true
+    },
+    {
+        "id": 394,
+        "question": "In a patient-care scenario, what should be minimized during CPR to improve coronary and cerebral perfusion?",
+        "accepted_answers": [
+            "Interruptions in chest compressions"
+        ],
+        "explanation": "Minimizing pauses in chest compressions helps maintain blood flow to the heart and brain.",
+        "active": true
+    },
+    {
+        "id": 395,
+        "question": "In a patient-care scenario, what does the term bradycardia mean?",
+        "accepted_answers": [
+            "An abnormally slow heart rate"
+        ],
+        "explanation": "Bradycardia refers to a heart rate that is slower than expected for the patient's age and condition.",
+        "active": true
+    },
+    {
+        "id": 396,
+        "question": "In a patient-care scenario, what does the term tachycardia mean?",
+        "accepted_answers": [
+            "An abnormally fast heart rate"
+        ],
+        "explanation": "Tachycardia refers to a heart rate that is faster than expected for the patient's age and condition.",
+        "active": true
+    },
+    {
+        "id": 397,
+        "question": "In a patient-care scenario, what pulse is commonly checked in an unresponsive adult during a BLS assessment?",
+        "accepted_answers": [
+            "Carotid pulse"
+        ],
+        "explanation": "The carotid pulse is commonly checked when assessing circulation in an unresponsive adult.",
+        "active": true
+    },
+    {
+        "id": 398,
+        "question": "In a patient-care scenario, what condition should be suspected when chest discomfort is accompanied by pressure, diaphoresis, nausea, or shortness of breath?",
+        "accepted_answers": [
+            "Acute coronary syndrome"
+        ],
+        "explanation": "These findings are concerning for myocardial ischemia and acute coronary syndrome.",
+        "active": true
+    },
+    {
+        "id": 399,
+        "question": "In a patient-care scenario, what is syncope?",
+        "accepted_answers": [
+            "A temporary loss of consciousness caused by reduced cerebral perfusion"
+        ],
+        "explanation": "Syncope is a brief loss of consciousness typically caused by a transient decrease in blood flow to the brain.",
+        "active": true
+    },
+    {
+        "id": 400,
+        "question": "In a patient-care scenario, what is the major immediate threat in cardiac arrest?",
+        "accepted_answers": [
+            "Absence of effective circulation"
+        ],
+        "explanation": "Cardiac arrest results in the loss of effective circulation and rapid loss of perfusion to vital organs.",
+        "active": true
+    },
+    {
+        "id": 401,
+        "question": "In a patient-care scenario, what should happen immediately after an AED delivers a shock?",
+        "accepted_answers": [
+            "Resume CPR"
+        ],
+        "explanation": "CPR should resume immediately after a shock to minimize interruptions in perfusion.",
+        "active": true
+    },
+    {
+        "id": 402,
+        "question": "In a patient-care scenario, what condition involves inadequate blood flow to the body's tissues despite the heart still beating?",
+        "accepted_answers": [
+            "Shock"
+        ],
+        "explanation": "Shock is a state of inadequate tissue perfusion and can occur even when a pulse is present.",
+        "active": true
+    },
+    {
+        "id": 403,
+        "question": "In a patient-care scenario, what is the key concern with a patient who has chest pain and becomes pale, cool, and diaphoretic?",
+        "accepted_answers": [
+            "Poor perfusion"
+        ],
+        "explanation": "Pale, cool, diaphoretic skin can indicate sympathetic activation and inadequate tissue perfusion.",
+        "active": true
+    }
+]

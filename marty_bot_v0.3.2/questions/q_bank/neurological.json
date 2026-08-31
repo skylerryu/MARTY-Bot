@@ -1,0 +1,380 @@
+[
+    {
+        "id": 4,
+        "question": "A patient suddenly develops facial droop, arm weakness, and slurred speech. What condition should you suspect?",
+        "accepted_answers": [
+            "Stroke"
+        ],
+        "explanation": "Sudden facial droop, arm weakness, and speech difficulty are classic findings associated with an acute stroke.",
+        "active": true
+    },
+    {
+        "id": 5,
+        "question": "A diabetic patient is confused, pale, and diaphoretic. What should you assess early in your evaluation?",
+        "accepted_answers": [
+            "Blood glucose level"
+        ],
+        "explanation": "Altered mental status with diaphoresis in a diabetic patient may indicate hypoglycemia, so blood glucose should be assessed early when available.",
+        "active": true
+    },
+    {
+        "id": 44,
+        "question": "What does the FAST stroke assessment commonly evaluate?",
+        "accepted_answers": [
+            "Facial droop, arm weakness, and speech abnormalities"
+        ],
+        "explanation": "FAST is used to rapidly screen for common stroke findings involving the face, arms, and speech.",
+        "active": true
+    },
+    {
+        "id": 45,
+        "question": "Why is the last known well time important in a suspected stroke?",
+        "accepted_answers": [
+            "It helps determine the time of symptom onset"
+        ],
+        "explanation": "The last known well time helps establish when stroke symptoms began and may affect hospital treatment options.",
+        "active": true
+    },
+    {
+        "id": 46,
+        "question": "What is a seizure?",
+        "accepted_answers": [
+            "Abnormal electrical activity in the brain"
+        ],
+        "explanation": "A seizure results from abnormal, excessive electrical activity in the brain.",
+        "active": true
+    },
+    {
+        "id": 47,
+        "question": "What phase commonly follows a generalized seizure and may include confusion or drowsiness?",
+        "accepted_answers": [
+            "Postictal phase"
+        ],
+        "explanation": "The postictal phase follows a seizure and often includes altered mental status, fatigue, or confusion.",
+        "active": true
+    },
+    {
+        "id": 48,
+        "question": "What is the first priority for a patient actively having a generalized seizure?",
+        "accepted_answers": [
+            "Protect the patient from injury and maintain the airway"
+        ],
+        "explanation": "During a seizure, the EMT should protect the patient from injury while addressing airway and breathing as soon as possible.",
+        "active": true
+    },
+    {
+        "id": 49,
+        "question": "Should an EMT place an object in the mouth of a patient who is actively seizing?",
+        "accepted_answers": [
+            "No"
+        ],
+        "explanation": "Objects should not be placed in the mouth of a patient during a seizure because they can cause injury or obstruct the airway.",
+        "active": true
+    },
+    {
+        "id": 50,
+        "question": "What reversible cause should be considered early in an altered diabetic patient?",
+        "accepted_answers": [
+            "Hypoglycemia"
+        ],
+        "explanation": "Low blood glucose is a common reversible cause of altered mental status in diabetic patients.",
+        "active": true
+    },
+    {
+        "id": 51,
+        "question": "What does unilateral weakness mean?",
+        "accepted_answers": [
+            "Weakness on one side of the body"
+        ],
+        "explanation": "Unilateral weakness affects one side of the body and can be an important neurological finding.",
+        "active": true
+    },
+    {
+        "id": 52,
+        "question": "What neurological emergency should be suspected with sudden severe headache, vomiting, and altered mental status?",
+        "accepted_answers": [
+            "Stroke"
+        ],
+        "explanation": "Sudden severe neurological symptoms can be associated with hemorrhagic or other forms of acute stroke.",
+        "active": true
+    },
+    {
+        "id": 53,
+        "question": "What is aphasia?",
+        "accepted_answers": [
+            "Impairment of language"
+        ],
+        "explanation": "Aphasia is an impairment in producing or understanding language and can occur with stroke.",
+        "active": true
+    },
+    {
+        "id": 164,
+        "question": "During EMT review, what does the FAST stroke assessment commonly evaluate?",
+        "accepted_answers": [
+            "Facial droop, arm weakness, and speech abnormalities"
+        ],
+        "explanation": "FAST is used to rapidly screen for common stroke findings involving the face, arms, and speech.",
+        "active": true
+    },
+    {
+        "id": 165,
+        "question": "During EMT review, why is the last known well time important in a suspected stroke?",
+        "accepted_answers": [
+            "It helps determine the time of symptom onset"
+        ],
+        "explanation": "The last known well time helps establish when stroke symptoms began and may affect hospital treatment options.",
+        "active": true
+    },
+    {
+        "id": 166,
+        "question": "During EMT review, what is a seizure?",
+        "accepted_answers": [
+            "Abnormal electrical activity in the brain"
+        ],
+        "explanation": "A seizure results from abnormal, excessive electrical activity in the brain.",
+        "active": true
+    },
+    {
+        "id": 167,
+        "question": "During EMT review, what phase commonly follows a generalized seizure and may include confusion or drowsiness?",
+        "accepted_answers": [
+            "Postictal phase"
+        ],
+        "explanation": "The postictal phase follows a seizure and often includes altered mental status, fatigue, or confusion.",
+        "active": true
+    },
+    {
+        "id": 168,
+        "question": "During EMT review, what is the first priority for a patient actively having a generalized seizure?",
+        "accepted_answers": [
+            "Protect the patient from injury and maintain the airway"
+        ],
+        "explanation": "During a seizure, the EMT should protect the patient from injury while addressing airway and breathing as soon as possible.",
+        "active": true
+    },
+    {
+        "id": 169,
+        "question": "During EMT review, should an EMT place an object in the mouth of a patient who is actively seizing?",
+        "accepted_answers": [
+            "No"
+        ],
+        "explanation": "Objects should not be placed in the mouth of a patient during a seizure because they can cause injury or obstruct the airway.",
+        "active": true
+    },
+    {
+        "id": 170,
+        "question": "During EMT review, what reversible cause should be considered early in an altered diabetic patient?",
+        "accepted_answers": [
+            "Hypoglycemia"
+        ],
+        "explanation": "Low blood glucose is a common reversible cause of altered mental status in diabetic patients.",
+        "active": true
+    },
+    {
+        "id": 171,
+        "question": "During EMT review, what does unilateral weakness mean?",
+        "accepted_answers": [
+            "Weakness on one side of the body"
+        ],
+        "explanation": "Unilateral weakness affects one side of the body and can be an important neurological finding.",
+        "active": true
+    },
+    {
+        "id": 172,
+        "question": "During EMT review, what neurological emergency should be suspected with sudden severe headache, vomiting, and altered mental status?",
+        "accepted_answers": [
+            "Stroke"
+        ],
+        "explanation": "Sudden severe neurological symptoms can be associated with hemorrhagic or other forms of acute stroke.",
+        "active": true
+    },
+    {
+        "id": 173,
+        "question": "During EMT review, what is aphasia?",
+        "accepted_answers": [
+            "Impairment of language"
+        ],
+        "explanation": "Aphasia is an impairment in producing or understanding language and can occur with stroke.",
+        "active": true
+    },
+    {
+        "id": 284,
+        "question": "An EMT student is asked: What does the FAST stroke assessment commonly evaluate?",
+        "accepted_answers": [
+            "Facial droop, arm weakness, and speech abnormalities"
+        ],
+        "explanation": "FAST is used to rapidly screen for common stroke findings involving the face, arms, and speech.",
+        "active": true
+    },
+    {
+        "id": 285,
+        "question": "An EMT student is asked: Why is the last known well time important in a suspected stroke?",
+        "accepted_answers": [
+            "It helps determine the time of symptom onset"
+        ],
+        "explanation": "The last known well time helps establish when stroke symptoms began and may affect hospital treatment options.",
+        "active": true
+    },
+    {
+        "id": 286,
+        "question": "An EMT student is asked: What is a seizure?",
+        "accepted_answers": [
+            "Abnormal electrical activity in the brain"
+        ],
+        "explanation": "A seizure results from abnormal, excessive electrical activity in the brain.",
+        "active": true
+    },
+    {
+        "id": 287,
+        "question": "An EMT student is asked: What phase commonly follows a generalized seizure and may include confusion or drowsiness?",
+        "accepted_answers": [
+            "Postictal phase"
+        ],
+        "explanation": "The postictal phase follows a seizure and often includes altered mental status, fatigue, or confusion.",
+        "active": true
+    },
+    {
+        "id": 288,
+        "question": "An EMT student is asked: What is the first priority for a patient actively having a generalized seizure?",
+        "accepted_answers": [
+            "Protect the patient from injury and maintain the airway"
+        ],
+        "explanation": "During a seizure, the EMT should protect the patient from injury while addressing airway and breathing as soon as possible.",
+        "active": true
+    },
+    {
+        "id": 289,
+        "question": "An EMT student is asked: Should an EMT place an object in the mouth of a patient who is actively seizing?",
+        "accepted_answers": [
+            "No"
+        ],
+        "explanation": "Objects should not be placed in the mouth of a patient during a seizure because they can cause injury or obstruct the airway.",
+        "active": true
+    },
+    {
+        "id": 290,
+        "question": "An EMT student is asked: What reversible cause should be considered early in an altered diabetic patient?",
+        "accepted_answers": [
+            "Hypoglycemia"
+        ],
+        "explanation": "Low blood glucose is a common reversible cause of altered mental status in diabetic patients.",
+        "active": true
+    },
+    {
+        "id": 291,
+        "question": "An EMT student is asked: What does unilateral weakness mean?",
+        "accepted_answers": [
+            "Weakness on one side of the body"
+        ],
+        "explanation": "Unilateral weakness affects one side of the body and can be an important neurological finding.",
+        "active": true
+    },
+    {
+        "id": 292,
+        "question": "An EMT student is asked: What neurological emergency should be suspected with sudden severe headache, vomiting, and altered mental status?",
+        "accepted_answers": [
+            "Stroke"
+        ],
+        "explanation": "Sudden severe neurological symptoms can be associated with hemorrhagic or other forms of acute stroke.",
+        "active": true
+    },
+    {
+        "id": 293,
+        "question": "An EMT student is asked: What is aphasia?",
+        "accepted_answers": [
+            "Impairment of language"
+        ],
+        "explanation": "Aphasia is an impairment in producing or understanding language and can occur with stroke.",
+        "active": true
+    },
+    {
+        "id": 404,
+        "question": "In a patient-care scenario, what does the FAST stroke assessment commonly evaluate?",
+        "accepted_answers": [
+            "Facial droop, arm weakness, and speech abnormalities"
+        ],
+        "explanation": "FAST is used to rapidly screen for common stroke findings involving the face, arms, and speech.",
+        "active": true
+    },
+    {
+        "id": 405,
+        "question": "In a patient-care scenario, why is the last known well time important in a suspected stroke?",
+        "accepted_answers": [
+            "It helps determine the time of symptom onset"
+        ],
+        "explanation": "The last known well time helps establish when stroke symptoms began and may affect hospital treatment options.",
+        "active": true
+    },
+    {
+        "id": 406,
+        "question": "In a patient-care scenario, what is a seizure?",
+        "accepted_answers": [
+            "Abnormal electrical activity in the brain"
+        ],
+        "explanation": "A seizure results from abnormal, excessive electrical activity in the brain.",
+        "active": true
+    },
+    {
+        "id": 407,
+        "question": "In a patient-care scenario, what phase commonly follows a generalized seizure and may include confusion or drowsiness?",
+        "accepted_answers": [
+            "Postictal phase"
+        ],
+        "explanation": "The postictal phase follows a seizure and often includes altered mental status, fatigue, or confusion.",
+        "active": true
+    },
+    {
+        "id": 408,
+        "question": "In a patient-care scenario, what is the first priority for a patient actively having a generalized seizure?",
+        "accepted_answers": [
+            "Protect the patient from injury and maintain the airway"
+        ],
+        "explanation": "During a seizure, the EMT should protect the patient from injury while addressing airway and breathing as soon as possible.",
+        "active": true
+    },
+    {
+        "id": 409,
+        "question": "In a patient-care scenario, should an EMT place an object in the mouth of a patient who is actively seizing?",
+        "accepted_answers": [
+            "No"
+        ],
+        "explanation": "Objects should not be placed in the mouth of a patient during a seizure because they can cause injury or obstruct the airway.",
+        "active": true
+    },
+    {
+        "id": 410,
+        "question": "In a patient-care scenario, what reversible cause should be considered early in an altered diabetic patient?",
+        "accepted_answers": [
+            "Hypoglycemia"
+        ],
+        "explanation": "Low blood glucose is a common reversible cause of altered mental status in diabetic patients.",
+        "active": true
+    },
+    {
+        "id": 411,
+        "question": "In a patient-care scenario, what does unilateral weakness mean?",
+        "accepted_answers": [
+            "Weakness on one side of the body"
+        ],
+        "explanation": "Unilateral weakness affects one side of the body and can be an important neurological finding.",
+        "active": true
+    },
+    {
+        "id": 412,
+        "question": "In a patient-care scenario, what neurological emergency should be suspected with sudden severe headache, vomiting, and altered mental status?",
+        "accepted_answers": [
+            "Stroke"
+        ],
+        "explanation": "Sudden severe neurological symptoms can be associated with hemorrhagic or other forms of acute stroke.",
+        "active": true
+    },
+    {
+        "id": 413,
+        "question": "In a patient-care scenario, what is aphasia?",
+        "accepted_answers": [
+            "Impairment of language"
+        ],
+        "explanation": "Aphasia is an impairment in producing or understanding language and can occur with stroke.",
+        "active": true
+    }
+]
