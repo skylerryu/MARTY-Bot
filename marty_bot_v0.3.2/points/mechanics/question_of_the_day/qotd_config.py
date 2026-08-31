@@ -29,6 +29,28 @@ QOTD_POST_MINUTE = 0
 
 
 # ==================================================
+# VISIBLE QOTD MESSAGES
+# ==================================================
+#
+# Number of QoTD Discord messages MARTY should
+# keep visible in the QoTD channel.
+#
+# 1:
+#     Only the current QoTD remains visible.
+#
+# 3:
+#     Current QoTD + previous 2 QoTDs remain.
+#
+# Old database records are NEVER deleted by this
+# setting. Only their Discord messages are removed.
+#
+# ==================================================
+
+
+QOTD_VISIBLE_MESSAGE_COUNT = 1
+
+
+# ==================================================
 # LLM GRADING
 # ==================================================
 
@@ -63,6 +85,15 @@ QOTD_STREAK_MAX_BONUS_DAY = 7
 
 # ==================================================
 # PERSISTENT VIEWS
+# ==================================================
+#
+# This is only the maximum number of QoTD button
+# views MARTY will restore after a bot restart.
+#
+# Because deleted QoTD messages have their
+# message_id cleared, only retained messages will
+# normally need to be restored.
+#
 # ==================================================
 
 

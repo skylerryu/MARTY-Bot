@@ -66,6 +66,10 @@ from points.mechanics.random_speed_questions.rsq_scheduler import (
     RsqScheduler,
 )
 
+from setup import (
+    configure_qotd_channel,
+)
+
 
 # ==================================================
 # DISCORD INTENTS
@@ -251,11 +255,18 @@ class MartyBot(
 
 
         # ==================================================
-        # START SCHEDULERS
+        # START RSQ SCHEDULER
+        # ==================================================
+        #
+        # RSQ does not require the QoTD channel
+        # configuration step, so it can start here.
+        #
+        # The QoTD scheduler is started in on_ready()
+        # AFTER the QoTD channel permissions have
+        # been checked.
+        #
         # ==================================================
 
-
-        self.qotd_scheduler.start()
 
         self.rsq_scheduler.start()
 
@@ -328,6 +339,67 @@ class MartyBot(
             "M.A.R.T.Y. is online as "
             f"{self.user}"
         )
+
+
+        # ==================================================
+        # CONFIGURE QOTD CHANNEL
+        # ==================================================
+        #
+        # on_ready() runs after Discord has populated
+        # the guild/channel cache.
+        #
+        # Every time MARTY becomes ready, it checks
+        # the configured QOTD_CHANNEL_ID.
+        #
+        # If you change the ID in .env and restart
+        # MARTY, the new channel will automatically
+        # receive the QoTD permission configuration.
+        #
+        # ==================================================
+
+
+        try:
+
+            configured = (
+                await configure_qotd_channel(
+                    bot=self,
+                    guild_id=(
+                        DEV_GUILD_ID
+                    ),
+                    channel_id=(
+                        QOTD_CHANNEL_ID
+                    ),
+                )
+            )
+
+            if not configured:
+
+                print(
+                    "QoTD channel setup did not "
+                    "complete successfully."
+                )
+
+        except Exception as error:
+
+            print(
+                "QoTD channel setup error: "
+                f"{error!r}"
+            )
+
+
+        # ==================================================
+        # START QOTD SCHEDULER
+        # ==================================================
+        #
+        # QotdScheduler.start() already checks whether
+        # its loops are running, so this is safe even
+        # if Discord fires on_ready() again after a
+        # reconnect.
+        #
+        # ==================================================
+
+
+        self.qotd_scheduler.start()
 
 
     # ==================================================

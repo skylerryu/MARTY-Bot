@@ -403,6 +403,16 @@ async def get_used_qotd_question_bank_ids(
 async def get_expired_posted_qotds(
     guild_id: int,
 ) -> list[dict]:
+    """
+    Return expired QoTDs that still have an
+    associated Discord message.
+
+    Results are newest first.
+
+    This ordering is important for message
+    retention because MARTY keeps the newest
+    expired messages and removes older ones.
+    """
 
     now_utc = (
         datetime.now(
@@ -470,8 +480,16 @@ async def get_expired_posted_qotds(
 
 async def set_qotd_message_id(
     qotd_id: int,
-    message_id: int,
+    message_id: int | None,
 ):
+    """
+    Store the Discord message associated with a
+    QoTD.
+
+    Passing None means the Discord message no
+    longer exists, while preserving the historical
+    QoTD database record.
+    """
 
     async with aiosqlite.connect(
         SYSTEM_DB_PATH
