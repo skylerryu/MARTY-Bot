@@ -1,4 +1,3 @@
-import math
 import random
 
 from datetime import (
@@ -24,12 +23,10 @@ from data.system_db import (
     SYSTEM_DB_PATH,
 )
 
-from questions.q_manager import (
-    get_all_questions,
-)
-
 from points.mechanics.random_speed_questions.rsq import (
     SpeedQuestionTooSoonError,
+    choose_speed_question,
+    get_latest_rsq_post,
     post_speed_question,
 )
 
@@ -45,12 +42,23 @@ from points.mechanics.random_speed_questions.rsq_config import (
     RSQ_ABSOLUTE_MIN_DAILY,
     RSQ_ABSOLUTE_MAX_DAILY,
     RSQ_TIMING_RANDOMNESS,
+    RSQ_DISTRIBUTION_SMOOTHING,
     RSQ_MIN_INTERVAL_MINUTES,
     RSQ_MISSED_SLOT_GRACE_MINUTES,
-    RSQ_RECENT_QUESTION_AVOID_COUNT,
-    RSQ_EXCLUDED_CATEGORIES,
     RSQ_SCHEDULER_POLL_SECONDS,
 )
+
+
+# ==================================================
+# SLOT STATUSES
+# ==================================================
+
+
+RSQ_SLOT_PENDING = "pending"
+RSQ_SLOT_POSTED = "posted"
+RSQ_SLOT_MISSED = "missed"
+RSQ_SLOT_SKIPPED_COOLDOWN = "skipped_cooldown"
+RSQ_SLOT_SKIPPED_NO_QUESTION = "skipped_no_question"
 
 
 # ==================================================
@@ -64,7 +72,7 @@ RSQ_ZONE = ZoneInfo(
 
 
 # ==================================================
-# DATETIME HELPERS
+# TIME HELPERS
 # ==================================================
 
 
@@ -126,9 +134,20 @@ def _window_for_date(
     )
 
 
-def _parse_utc(
+def _parse_datetime(
     value: str,
 ) -> datetime:
+
+    value = str(
+        value
+    ).strip()
+
+    if value.endswith("Z"):
+
+        value = (
+            value[:-1]
+            + "+00:00"
+        )
 
     parsed = (
         datetime.fromisoformat(
@@ -144,11 +163,7 @@ def _parse_utc(
             )
         )
 
-    return (
-        parsed.astimezone(
-            timezone.utc
-        )
-    )
+    return parsed
 
 
 # ==================================================
@@ -157,12 +172,6 @@ def _parse_utc(
 
 
 def _generate_daily_target() -> int:
-    """
-    Draw today's target from a normal distribution.
-
-    Mean 16 / SD 2.5 means MARTY usually lands
-    around 12–20, but those are not hard limits.
-    """
 
     raw_target = (
         random.gauss(
@@ -177,290 +186,296 @@ def _generate_daily_target() -> int:
         )
     )
 
-    return max(
+    target = max(
         RSQ_ABSOLUTE_MIN_DAILY,
-        min(
-            RSQ_ABSOLUTE_MAX_DAILY,
-            target,
-        ),
+        target,
     )
 
+    target = min(
+        RSQ_ABSOLUTE_MAX_DAILY,
+        target,
+    )
+
+    return target
+
 
 # ==================================================
-# INITIAL PROCESSED SLOT ESTIMATE
+# MAXIMUM CAPACITY
 # ==================================================
 
 
-def _estimate_elapsed_slots(
-    now_local: datetime,
-    target_count: int,
+def _get_maximum_capacity(
+    start: datetime,
+    end: datetime,
 ) -> int:
-    """
-    If MARTY first starts halfway through the day,
-    do not try to cram an entire day's target into
-    the remaining hours.
 
-    We treat the approximate earlier portion of
-    today's schedule as already missed.
-    """
-
-    window_start, window_end = (
-        _window_for_date(
-            now_local.date()
-        )
-    )
-
-    if now_local <= window_start:
+    if end < start:
 
         return 0
 
-    if now_local >= window_end:
-
-        return (
-            target_count
-        )
-
-    total_seconds = (
-        window_end
-        - window_start
-    ).total_seconds()
-
-    elapsed_seconds = (
-        now_local
-        - window_start
-    ).total_seconds()
-
-    fraction = (
-        elapsed_seconds
-        / total_seconds
-    )
-
-    estimated = math.floor(
-        target_count
-        * fraction
-    )
-
-    return max(
-        0,
-        min(
-            target_count,
-            estimated,
-        ),
-    )
-
-
-# ==================================================
-# NEXT RANDOM POST TIME
-# ==================================================
-
-
-def _calculate_next_post_time(
-    reference_local: datetime,
-    target_count: int,
-    slots_processed: int,
-) -> datetime | None:
-    """
-    Calculate the next randomized posting time.
-
-    The system uses the remaining time in the day
-    and the number of remaining question slots to
-    estimate the correct average pacing.
-
-    RSQ_TIMING_RANDOMNESS then perturbs that pacing.
-
-    Randomness 0:
-        approximately even spacing.
-
-    Randomness 1:
-        significantly more variable spacing.
-    """
-
-    window_start, window_end = (
-        _window_for_date(
-            reference_local.date()
-        )
-    )
-
-    remaining_slots = (
-        target_count
-        - slots_processed
-    )
-
-    if remaining_slots <= 0:
-
-        return None
-
-    if reference_local < window_start:
-
-        reference_local = (
-            window_start
-        )
-
-    if reference_local >= window_end:
-
-        return None
-
     available_seconds = (
-        window_end
-        - reference_local
+        end
+        - start
     ).total_seconds()
-
-    if available_seconds <= 0:
-
-        return None
 
     minimum_gap_seconds = (
         RSQ_MIN_INTERVAL_MINUTES
         * 60
     )
 
-
-    # ==================================================
-    # IDEAL AVERAGE GAP
-    # ==================================================
-
-
-    average_gap_seconds = (
-        available_seconds
-        / remaining_slots
-    )
-
-    average_gap_seconds = max(
-        minimum_gap_seconds,
-        average_gap_seconds,
+    return (
+        int(
+            available_seconds
+            // minimum_gap_seconds
+        )
+        + 1
     )
 
 
+# ==================================================
+# GENERATE RANDOM SCHEDULE BETWEEN TWO TIMES
+# ==================================================
+
+
+def _generate_schedule_times_between(
+    start: datetime,
+    end: datetime,
+    target_count: int,
+) -> list[datetime]:
+    """
+    Generate randomized times between start/end.
+
+    Guarantees the configured minimum interval
+    between generated slots.
+
+    Randomness controls unpredictability.
+
+    Distribution smoothing controls how strongly
+    MARTY resists excessive clustering.
+    """
+
+    if target_count <= 0:
+
+        return []
+
+    if end < start:
+
+        return []
+
+    maximum_capacity = (
+        _get_maximum_capacity(
+            start=start,
+            end=end,
+        )
+    )
+
+    target_count = min(
+        target_count,
+        maximum_capacity,
+    )
+
+    if target_count <= 0:
+
+        return []
+
+
     # ==================================================
-    # RANDOM MULTIPLIER
+    # AVAILABLE WINDOW
+    # ==================================================
+
+
+    window_seconds = (
+        end
+        - start
+    ).total_seconds()
+
+    minimum_gap_seconds = (
+        RSQ_MIN_INTERVAL_MINUTES
+        * 60
+    )
+
+    required_gap_seconds = (
+        max(
+            0,
+            target_count - 1,
+        )
+        * minimum_gap_seconds
+    )
+
+    slack_seconds = (
+        window_seconds
+        - required_gap_seconds
+    )
+
+    if slack_seconds < 0:
+
+        return []
+
+
+    # ==================================================
+    # RANDOM FLEXIBLE SPACE
     # ==================================================
     #
-    # lognormal gives us asymmetric real-world-looking
-    # gaps:
+    # There are target_count + 1 flexible spaces:
     #
-    #     sometimes considerably shorter
-    #     sometimes considerably longer
+    #     before first slot
+    #     between slots
+    #     after final slot
     #
-    # while never producing a negative interval.
-    #
-    # The -sigma²/2 adjustment keeps the multiplier's
-    # mean approximately around 1.
+    # Minimum gaps are added separately.
     #
     # ==================================================
 
 
-    if (
-        RSQ_TIMING_RANDOMNESS
-        <= 0
-    ):
+    space_count = (
+        target_count
+        + 1
+    )
 
-        multiplier = 1.0
+    if RSQ_TIMING_RANDOMNESS <= 0:
+
+        raw_weights = [
+            1.0
+            for _ in range(
+                space_count
+            )
+        ]
 
     else:
 
-        sigma = (
+        alpha = (
+            0.35
+            + (
+                8.0
+                * RSQ_DISTRIBUTION_SMOOTHING
+            )
+            + (
+                8.0
+                * (
+                    1.0
+                    - RSQ_TIMING_RANDOMNESS
+                )
+            )
+        )
+
+        alpha = max(
+            0.10,
+            alpha,
+        )
+
+        raw_weights = [
+            random.gammavariate(
+                alpha,
+                1.0,
+            )
+            for _ in range(
+                space_count
+            )
+        ]
+
+    total_weight = sum(
+        raw_weights
+    )
+
+    if total_weight <= 0:
+
+        raw_weights = [
             1.0
-            * RSQ_TIMING_RANDOMNESS
+            for _ in range(
+                space_count
+            )
+        ]
+
+        total_weight = float(
+            space_count
         )
 
-        multiplier = (
-            random.lognormvariate(
-                (
-                    -0.5
-                    * sigma
-                    * sigma
-                ),
-                sigma,
-            )
+    extra_spaces = [
+        (
+            slack_seconds
+            * weight
+            / total_weight
         )
+        for weight
+        in raw_weights
+    ]
 
 
     # ==================================================
-    # RANDOMIZED GAP
+    # BUILD TIMES
     # ==================================================
 
 
-    randomized_gap = (
-        average_gap_seconds
-        * multiplier
+    schedule_times = []
+
+    elapsed_seconds = (
+        extra_spaces[0]
     )
 
-    randomized_gap = max(
-        minimum_gap_seconds,
-        randomized_gap,
-    )
-
-    candidate = (
-        reference_local
-        + timedelta(
-            seconds=(
-                randomized_gap
-            )
-        )
-    )
-
-
-    # ==================================================
-    # DO NOT MAKE IT IMPOSSIBLE TO FIT
-    # THE REMAINING SLOTS
-    # ==================================================
-
-
-    later_slots = (
-        remaining_slots
-        - 1
-    )
-
-    latest_reasonable_time = (
-        window_end
-        - timedelta(
-            seconds=(
-                later_slots
-                * minimum_gap_seconds
-            )
-        )
-    )
-
-    earliest_allowed_time = (
-        reference_local
-        + timedelta(
-            seconds=(
-                minimum_gap_seconds
-            )
-        )
-    )
-
-    if (
-        latest_reasonable_time
-        >= earliest_allowed_time
+    for index in range(
+        target_count
     ):
 
-        candidate = min(
-            candidate,
-            latest_reasonable_time,
+        if index > 0:
+
+            elapsed_seconds += (
+                minimum_gap_seconds
+            )
+
+            elapsed_seconds += (
+                extra_spaces[index]
+            )
+
+        scheduled_time = (
+            start
+            + timedelta(
+                seconds=(
+                    elapsed_seconds
+                )
+            )
         )
 
-    candidate = max(
-        candidate,
-        earliest_allowed_time,
+        schedule_times.append(
+            scheduled_time
+        )
+
+    return schedule_times
+
+
+# ==================================================
+# GENERATE FULL-DAY SCHEDULE
+# ==================================================
+
+
+def _generate_daily_schedule_times(
+    calendar_date: date,
+    target_count: int,
+) -> list[datetime]:
+
+    start, end = (
+        _window_for_date(
+            calendar_date
+        )
     )
 
-    if candidate > window_end:
-
-        return None
-
-    return candidate
+    return (
+        _generate_schedule_times_between(
+            start=start,
+            end=end,
+            target_count=target_count,
+        )
+    )
 
 
 # ==================================================
-# STATE DATABASE HELPERS
+# GET SCHEDULE DAY
 # ==================================================
 
 
-async def _get_daily_state(
+async def get_rsq_schedule_day(
     guild_id: int,
     channel_id: int,
-    schedule_date: date,
+    calendar_date: date,
 ) -> dict | None:
 
     async with aiosqlite.connect(
@@ -474,11 +489,11 @@ async def _get_daily_state(
         cursor = await db.execute(
             """
             SELECT
+                schedule_date,
                 target_count,
-                slots_processed,
-                next_post_at
+                generated_at
 
-            FROM rsq_daily_state
+            FROM rsq_schedule_days
 
             WHERE guild_id = ?
               AND channel_id = ?
@@ -487,43 +502,123 @@ async def _get_daily_state(
             (
                 guild_id,
                 channel_id,
-                schedule_date.isoformat(),
+                calendar_date.isoformat(),
             ),
         )
 
-        row = await cursor.fetchone()
+        row = (
+            await cursor.fetchone()
+        )
 
     if row is None:
 
         return None
 
     return {
+        "schedule_date": (
+            row["schedule_date"]
+        ),
         "target_count": (
             row["target_count"]
         ),
-        "slots_processed": (
-            row["slots_processed"]
-        ),
-        "next_post_at": (
-            row["next_post_at"]
+        "generated_at": (
+            row["generated_at"]
         ),
     }
 
 
-async def _create_daily_state(
+# ==================================================
+# GET SCHEDULE SLOTS
+# ==================================================
+
+
+async def get_rsq_schedule_slots(
     guild_id: int,
     channel_id: int,
-    now_local: datetime,
+    calendar_date: date,
+) -> list[dict]:
+
+    async with aiosqlite.connect(
+        SYSTEM_DB_PATH
+    ) as db:
+
+        db.row_factory = (
+            aiosqlite.Row
+        )
+
+        cursor = await db.execute(
+            """
+            SELECT
+                id,
+                slot_number,
+                scheduled_at,
+                status,
+                question_id,
+                message_id,
+                posted_at
+
+            FROM rsq_schedule_slots
+
+            WHERE guild_id = ?
+              AND channel_id = ?
+              AND schedule_date = ?
+
+            ORDER BY scheduled_at ASC
+            """,
+            (
+                guild_id,
+                channel_id,
+                calendar_date.isoformat(),
+            ),
+        )
+
+        rows = (
+            await cursor.fetchall()
+        )
+
+    return [
+        dict(row)
+        for row in rows
+    ]
+
+
+# ==================================================
+# CREATE DAILY SCHEDULE
+# ==================================================
+
+
+async def create_rsq_daily_schedule(
+    guild_id: int,
+    channel_id: int,
+    calendar_date: date,
 ) -> dict:
+
+    existing = (
+        await get_rsq_schedule_day(
+            guild_id=(
+                guild_id
+            ),
+            channel_id=(
+                channel_id
+            ),
+            calendar_date=(
+                calendar_date
+            ),
+        )
+    )
+
+    if existing is not None:
+
+        return existing
 
     target_count = (
         _generate_daily_target()
     )
 
-    slots_processed = (
-        _estimate_elapsed_slots(
-            now_local=(
-                now_local
+    schedule_times = (
+        _generate_daily_schedule_times(
+            calendar_date=(
+                calendar_date
             ),
             target_count=(
                 target_count
@@ -531,218 +626,345 @@ async def _create_daily_state(
         )
     )
 
-    next_local = (
-        _calculate_next_post_time(
-            reference_local=(
-                now_local
-            ),
-            target_count=(
-                target_count
-            ),
-            slots_processed=(
-                slots_processed
-            ),
-        )
+    target_count = len(
+        schedule_times
     )
-
-    if next_local is None:
-
-        next_post_at = None
-
-    else:
-
-        next_post_at = (
-            next_local.astimezone(
-                timezone.utc
-            ).isoformat()
-        )
 
     async with aiosqlite.connect(
         SYSTEM_DB_PATH
     ) as db:
 
         await db.execute(
+            "BEGIN IMMEDIATE"
+        )
+
+        cursor = await db.execute(
             """
-            INSERT OR IGNORE INTO rsq_daily_state (
-                guild_id,
-                channel_id,
-                schedule_date,
-                target_count,
-                slots_processed,
-                next_post_at
-            )
+            SELECT 1
 
-            VALUES (?, ?, ?, ?, ?, ?)
-            """,
-            (
-                guild_id,
-                channel_id,
-                now_local.date().isoformat(),
-                target_count,
-                slots_processed,
-                next_post_at,
-            ),
-        )
-
-        await db.commit()
-
-    state = await _get_daily_state(
-        guild_id=(
-            guild_id
-        ),
-        channel_id=(
-            channel_id
-        ),
-        schedule_date=(
-            now_local.date()
-        ),
-    )
-
-    if state is None:
-
-        raise RuntimeError(
-            "RSQ daily state could not "
-            "be created."
-        )
-
-    print(
-        "RSQ scheduler: "
-        f"Today's target is "
-        f"{state['target_count']} questions."
-    )
-
-    if state["next_post_at"]:
-
-        print(
-            "RSQ scheduler: "
-            "Next automatic RSQ at "
-            f"{state['next_post_at']}."
-        )
-
-    return state
-
-
-async def _save_daily_state(
-    guild_id: int,
-    channel_id: int,
-    schedule_date: date,
-    slots_processed: int,
-    next_post_at: str | None,
-):
-
-    async with aiosqlite.connect(
-        SYSTEM_DB_PATH
-    ) as db:
-
-        await db.execute(
-            """
-            UPDATE rsq_daily_state
-
-            SET
-                slots_processed = ?,
-                next_post_at = ?,
-                updated_at = CURRENT_TIMESTAMP
+            FROM rsq_schedule_days
 
             WHERE guild_id = ?
               AND channel_id = ?
               AND schedule_date = ?
             """,
             (
-                slots_processed,
-                next_post_at,
                 guild_id,
                 channel_id,
-                schedule_date.isoformat(),
+                calendar_date.isoformat(),
             ),
         )
 
-        await db.commit()
+        already_exists = (
+            await cursor.fetchone()
+        )
 
+        if already_exists is not None:
 
-# ==================================================
-# RECENT QUESTION IDS
-# ==================================================
+            await db.rollback()
 
+            result = (
+                await get_rsq_schedule_day(
+                    guild_id=(
+                        guild_id
+                    ),
+                    channel_id=(
+                        channel_id
+                    ),
+                    calendar_date=(
+                        calendar_date
+                    ),
+                )
+            )
 
-async def _get_recent_question_ids(
-    guild_id: int,
-    channel_id: int,
-) -> set[int]:
+            if result is None:
 
-    if (
-        RSQ_RECENT_QUESTION_AVOID_COUNT
-        <= 0
-    ):
+                raise RuntimeError(
+                    "Could not retrieve existing "
+                    "RSQ schedule."
+                )
 
-        return set()
+            return result
 
-    async with aiosqlite.connect(
-        SYSTEM_DB_PATH
-    ) as db:
-
-        cursor = await db.execute(
+        await db.execute(
             """
-            SELECT question_id
+            INSERT INTO rsq_schedule_days (
+                guild_id,
+                channel_id,
+                schedule_date,
+                target_count
+            )
 
-            FROM rsq_post_history
-
-            WHERE guild_id = ?
-              AND channel_id = ?
-
-            ORDER BY id DESC
-
-            LIMIT ?
+            VALUES (?, ?, ?, ?)
             """,
             (
                 guild_id,
                 channel_id,
-                (
-                    RSQ_RECENT_QUESTION_AVOID_COUNT
-                ),
+                calendar_date.isoformat(),
+                target_count,
             ),
         )
 
-        rows = await cursor.fetchall()
+        for slot_number, scheduled_local in enumerate(
+            schedule_times,
+            start=1,
+        ):
 
-    return {
-        int(row[0])
-        for row in rows
-    }
+            await db.execute(
+                """
+                INSERT INTO rsq_schedule_slots (
+                    guild_id,
+                    channel_id,
+                    schedule_date,
+                    slot_number,
+                    scheduled_at,
+                    status
+                )
 
+                VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    'pending'
+                )
+                """,
+                (
+                    guild_id,
+                    channel_id,
+                    calendar_date.isoformat(),
+                    slot_number,
+                    (
+                        scheduled_local
+                        .astimezone(
+                            timezone.utc
+                        )
+                        .isoformat()
+                    ),
+                ),
+            )
 
-# ==================================================
-# SELECT QUESTION
-# ==================================================
+        await db.commit()
 
+    print(
+        "RSQ scheduler: "
+        f"Generated {target_count} slots "
+        f"for {calendar_date.isoformat()}."
+    )
 
-async def _select_random_question(
-    guild_id: int,
-    channel_id: int,
-) -> dict | None:
+    for slot_number, scheduled_local in enumerate(
+        schedule_times,
+        start=1,
+    ):
 
-    questions = (
-        get_all_questions(
-            active_only=True
+        print(
+            "RSQ scheduler: "
+            f"Slot {slot_number}: "
+            f"{scheduled_local.isoformat()}"
+        )
+
+    result = (
+        await get_rsq_schedule_day(
+            guild_id=(
+                guild_id
+            ),
+            channel_id=(
+                channel_id
+            ),
+            calendar_date=(
+                calendar_date
+            ),
         )
     )
 
-    eligible = [
-        question
-        for question in questions
+    if result is None:
+
+        raise RuntimeError(
+            "RSQ schedule was created but "
+            "could not be retrieved."
+        )
+
+    return result
+
+
+# ==================================================
+# ENSURE SCHEDULE
+# ==================================================
+
+
+async def ensure_rsq_daily_schedule(
+    guild_id: int,
+    channel_id: int,
+    calendar_date: date,
+):
+
+    existing = (
+        await get_rsq_schedule_day(
+            guild_id=(
+                guild_id
+            ),
+            channel_id=(
+                channel_id
+            ),
+            calendar_date=(
+                calendar_date
+            ),
+        )
+    )
+
+    if existing is not None:
+
+        return existing
+
+    return (
+        await create_rsq_daily_schedule(
+            guild_id=(
+                guild_id
+            ),
+            channel_id=(
+                channel_id
+            ),
+            calendar_date=(
+                calendar_date
+            ),
+        )
+    )
+
+
+# ==================================================
+# REGENERATE REMAINING SCHEDULE
+# ==================================================
+
+
+async def regenerate_remaining_rsq_schedule(
+    guild_id: int,
+    channel_id: int,
+) -> dict:
+    """
+    Regenerate only today's REMAINING RSQ schedule.
+
+    Existing posted/missed/skipped slots remain
+    untouched for audit/history.
+
+    Existing pending slots are removed.
+
+    A fresh daily target is drawn using the current
+    rsq_config.py values.
+
+    The number of already-processed slots is
+    subtracted from that new target.
+
+    New remaining slots are scheduled from now
+    through the end of today's configured window.
+    """
+
+    now_local = (
+        _now_local()
+    )
+
+    calendar_date = (
+        now_local.date()
+    )
+
+    window_start, window_end = (
+        _window_for_date(
+            calendar_date
+        )
+    )
+
+
+    # ==================================================
+    # IF TODAY'S WINDOW IS ALREADY OVER
+    # ==================================================
+
+
+    if now_local >= window_end:
+
+        return {
+            "schedule_date": (
+                calendar_date.isoformat()
+            ),
+            "target_count": 0,
+            "processed_count": 0,
+            "remaining_count": 0,
+            "times": [],
+            "window_over": True,
+        }
+
+
+    # ==================================================
+    # GET EXISTING SLOTS
+    # ==================================================
+
+
+    existing_slots = (
+        await get_rsq_schedule_slots(
+            guild_id=(
+                guild_id
+            ),
+            channel_id=(
+                channel_id
+            ),
+            calendar_date=(
+                calendar_date
+            ),
+        )
+    )
+
+    processed_slots = [
+        slot
+        for slot
+        in existing_slots
         if (
-            question.get(
-                "category"
-            )
-            not in RSQ_EXCLUDED_CATEGORIES
+            slot["status"]
+            != RSQ_SLOT_PENDING
         )
     ]
 
-    if not eligible:
+    processed_count = len(
+        processed_slots
+    )
 
-        return None
 
-    recent_ids = (
-        await _get_recent_question_ids(
+    # ==================================================
+    # DRAW A NEW DAILY TARGET
+    # ==================================================
+
+
+    new_daily_target = (
+        _generate_daily_target()
+    )
+
+    desired_remaining = max(
+        0,
+        (
+            new_daily_target
+            - processed_count
+        ),
+    )
+
+
+    # ==================================================
+    # EARLIEST NEW SLOT
+    # ==================================================
+    #
+    # Start from "now".
+    #
+    # If an RSQ was posted recently, also respect
+    # the hard minimum interval while creating the
+    # replacement schedule.
+    #
+    # ==================================================
+
+
+    earliest_start = max(
+        now_local,
+        window_start,
+    )
+
+    latest_post = (
+        await get_latest_rsq_post(
             guild_id=(
                 guild_id
             ),
@@ -752,42 +974,458 @@ async def _select_random_question(
         )
     )
 
-    non_recent = [
-        question
-        for question in eligible
-        if (
-            int(
-                question["id"]
+    if latest_post is not None:
+
+        latest_post_datetime = (
+            _parse_datetime(
+                latest_post[
+                    "posted_at"
+                ]
             )
-            not in recent_ids
-        )
-    ]
-
-
-    # ==================================================
-    # PREFER NON-RECENT QUESTIONS
-    # ==================================================
-
-
-    if non_recent:
-
-        return random.choice(
-            non_recent
+            .astimezone(
+                RSQ_ZONE
+            )
         )
 
+        cooldown_end = (
+            latest_post_datetime
+            + timedelta(
+                minutes=(
+                    RSQ_MIN_INTERVAL_MINUTES
+                )
+            )
+        )
+
+        earliest_start = max(
+            earliest_start,
+            cooldown_end,
+        )
+
 
     # ==================================================
-    # BANK TOO SMALL — ALLOW REUSE
+    # GENERATE NEW REMAINING TIMES
     # ==================================================
 
 
-    return random.choice(
-        eligible
+    if (
+        desired_remaining <= 0
+        or earliest_start > window_end
+    ):
+
+        new_times = []
+
+    else:
+
+        new_times = (
+            _generate_schedule_times_between(
+                start=(
+                    earliest_start
+                ),
+                end=(
+                    window_end
+                ),
+                target_count=(
+                    desired_remaining
+                ),
+            )
+        )
+
+
+    # ==================================================
+    # FINAL TARGET
+    # ==================================================
+
+
+    final_target_count = (
+        processed_count
+        + len(
+            new_times
+        )
     )
 
 
+    # ==================================================
+    # NEXT SLOT NUMBER
+    # ==================================================
+
+
+    if processed_slots:
+
+        next_slot_number = (
+            max(
+                int(
+                    slot[
+                        "slot_number"
+                    ]
+                )
+                for slot
+                in processed_slots
+            )
+            + 1
+        )
+
+    else:
+
+        next_slot_number = 1
+
+
+    # ==================================================
+    # SAVE ATOMICALLY
+    # ==================================================
+
+
+    async with aiosqlite.connect(
+        SYSTEM_DB_PATH
+    ) as db:
+
+        await db.execute(
+            "BEGIN IMMEDIATE"
+        )
+
+
+        # ==================================================
+        # DELETE ONLY PENDING SLOTS
+        # ==================================================
+
+
+        await db.execute(
+            """
+            DELETE FROM rsq_schedule_slots
+
+            WHERE guild_id = ?
+              AND channel_id = ?
+              AND schedule_date = ?
+              AND status = 'pending'
+            """,
+            (
+                guild_id,
+                channel_id,
+                calendar_date.isoformat(),
+            ),
+        )
+
+
+        # ==================================================
+        # UPSERT DAY
+        # ==================================================
+
+
+        await db.execute(
+            """
+            INSERT INTO rsq_schedule_days (
+                guild_id,
+                channel_id,
+                schedule_date,
+                target_count,
+                generated_at
+            )
+
+            VALUES (
+                ?,
+                ?,
+                ?,
+                ?,
+                CURRENT_TIMESTAMP
+            )
+
+            ON CONFLICT (
+                guild_id,
+                channel_id,
+                schedule_date
+            )
+
+            DO UPDATE SET
+                target_count = excluded.target_count,
+                generated_at = CURRENT_TIMESTAMP
+            """,
+            (
+                guild_id,
+                channel_id,
+                calendar_date.isoformat(),
+                final_target_count,
+            ),
+        )
+
+
+        # ==================================================
+        # INSERT NEW PENDING SLOTS
+        # ==================================================
+
+
+        for offset, scheduled_local in enumerate(
+            new_times
+        ):
+
+            slot_number = (
+                next_slot_number
+                + offset
+            )
+
+            scheduled_utc = (
+                scheduled_local
+                .astimezone(
+                    timezone.utc
+                )
+                .isoformat()
+            )
+
+            await db.execute(
+                """
+                INSERT INTO rsq_schedule_slots (
+                    guild_id,
+                    channel_id,
+                    schedule_date,
+                    slot_number,
+                    scheduled_at,
+                    status
+                )
+
+                VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    'pending'
+                )
+                """,
+                (
+                    guild_id,
+                    channel_id,
+                    calendar_date.isoformat(),
+                    slot_number,
+                    scheduled_utc,
+                ),
+            )
+
+        await db.commit()
+
+
+    # ==================================================
+    # CONSOLE OUTPUT
+    # ==================================================
+
+
+    print(
+        "\n"
+        "========================================\n"
+        "RSQ SCHEDULE REGENERATED\n"
+        "========================================"
+    )
+
+    print(
+        "Date: "
+        f"{calendar_date.isoformat()}"
+    )
+
+    print(
+        "New daily target: "
+        f"{new_daily_target}"
+    )
+
+    print(
+        "Already processed: "
+        f"{processed_count}"
+    )
+
+    print(
+        "New remaining slots: "
+        f"{len(new_times)}"
+    )
+
+    for index, scheduled_local in enumerate(
+        new_times,
+        start=1,
+    ):
+
+        print(
+            f"New slot {index}: "
+            f"{scheduled_local.isoformat()}"
+        )
+
+    print(
+        "========================================\n"
+    )
+
+
+    # ==================================================
+    # RETURN
+    # ==================================================
+
+
+    return {
+        "schedule_date": (
+            calendar_date.isoformat()
+        ),
+        "target_count": (
+            final_target_count
+        ),
+        "drawn_target": (
+            new_daily_target
+        ),
+        "processed_count": (
+            processed_count
+        ),
+        "remaining_count": (
+            len(
+                new_times
+            )
+        ),
+        "times": [
+            (
+                scheduled_time
+                .astimezone(
+                    timezone.utc
+                )
+                .isoformat()
+            )
+            for scheduled_time
+            in new_times
+        ],
+        "window_over": False,
+    }
+
+
 # ==================================================
-# SCHEDULER
+# GET DUE SLOTS
+# ==================================================
+
+
+async def _get_due_pending_slots(
+    guild_id: int,
+    channel_id: int,
+    now_utc: datetime,
+) -> list[dict]:
+
+    async with aiosqlite.connect(
+        SYSTEM_DB_PATH
+    ) as db:
+
+        db.row_factory = (
+            aiosqlite.Row
+        )
+
+        cursor = await db.execute(
+            """
+            SELECT
+                id,
+                schedule_date,
+                slot_number,
+                scheduled_at,
+                status
+
+            FROM rsq_schedule_slots
+
+            WHERE guild_id = ?
+              AND channel_id = ?
+              AND status = 'pending'
+              AND scheduled_at <= ?
+
+            ORDER BY scheduled_at ASC
+            """,
+            (
+                guild_id,
+                channel_id,
+                now_utc.isoformat(),
+            ),
+        )
+
+        rows = (
+            await cursor.fetchall()
+        )
+
+    return [
+        dict(row)
+        for row in rows
+    ]
+
+
+# ==================================================
+# UPDATE SLOT
+# ==================================================
+
+
+async def _set_slot_status(
+    slot_id: int,
+    status: str,
+    question_id: int | None = None,
+    message_id: int | None = None,
+    posted_at: str | None = None,
+):
+
+    async with aiosqlite.connect(
+        SYSTEM_DB_PATH
+    ) as db:
+
+        await db.execute(
+            """
+            UPDATE rsq_schedule_slots
+
+            SET
+                status = ?,
+                question_id = ?,
+                message_id = ?,
+                posted_at = ?
+
+            WHERE id = ?
+            """,
+            (
+                status,
+                question_id,
+                message_id,
+                posted_at,
+                slot_id,
+            ),
+        )
+
+        await db.commit()
+
+
+# ==================================================
+# GET DISCORD CHANNEL
+# ==================================================
+
+
+async def _get_channel(
+    bot: discord.Client,
+    channel_id: int,
+):
+
+    channel = (
+        bot.get_channel(
+            channel_id
+        )
+    )
+
+    if channel is not None:
+
+        return channel
+
+    try:
+
+        return (
+            await bot.fetch_channel(
+                channel_id
+            )
+        )
+
+    except (
+        discord.Forbidden,
+        discord.NotFound,
+        discord.HTTPException,
+    ) as error:
+
+        print(
+            "RSQ scheduler could not access "
+            "the configured RSQ channel: "
+            f"{error!r}"
+        )
+
+        return None
+
+
+# ==================================================
+# RSQ SCHEDULER
 # ==================================================
 
 
@@ -800,7 +1438,9 @@ class RsqScheduler:
         channel_id: int,
     ):
 
-        self.bot = bot
+        self.bot = (
+            bot
+        )
 
         self.guild_id = (
             guild_id
@@ -808,6 +1448,95 @@ class RsqScheduler:
 
         self.channel_id = (
             channel_id
+        )
+
+
+        # ==================================================
+        # REGISTER RSQ ADMIN COMMANDS
+        # ==================================================
+        #
+        # Your current bot.py creates RsqScheduler
+        # before tree.sync(), so this lets the scheduler
+        # register its admin commands without another
+        # bot.py edit.
+        #
+        # ==================================================
+
+
+        from commands.admin_commands.rsq_admin_commands import (
+            register_rsq_admin_commands,
+        )
+
+        register_rsq_admin_commands(
+            tree=(
+                self.bot.tree
+            ),
+            guild=discord.Object(
+                id=(
+                    self.guild_id
+                )
+            ),
+            scheduler=self,
+        )
+
+
+    # ==================================================
+    # REGENERATE TODAY
+    # ==================================================
+
+
+    async def regenerate_today(
+        self,
+    ) -> dict:
+
+        return (
+            await regenerate_remaining_rsq_schedule(
+                guild_id=(
+                    self.guild_id
+                ),
+                channel_id=(
+                    self.channel_id
+                ),
+            )
+        )
+
+    async def get_schedule_day(
+        self,
+        calendar_date: date,
+    ) -> dict | None:
+
+        return (
+            await get_rsq_schedule_day(
+                guild_id=(
+                    self.guild_id
+                ),
+                channel_id=(
+                    self.channel_id
+                ),
+                calendar_date=(
+                    calendar_date
+                ),
+            )
+        )
+
+
+    async def get_schedule_slots(
+        self,
+        calendar_date: date,
+    ) -> list[dict]:
+
+        return (
+            await get_rsq_schedule_slots(
+                guild_id=(
+                    self.guild_id
+                ),
+                channel_id=(
+                    self.channel_id
+                ),
+                calendar_date=(
+                    calendar_date
+                ),
+            )
         )
 
 
@@ -823,7 +1552,7 @@ class RsqScheduler:
         if not RSQ_ENABLED:
 
             print(
-                "RSQ scheduler disabled "
+                "RSQ scheduler is disabled "
                 "in rsq_config.py."
             )
 
@@ -877,11 +1606,9 @@ class RsqScheduler:
 
         await self.bot.wait_until_ready()
 
-        await self._tick()
-
 
     # ==================================================
-    # ERROR
+    # LOOP ERROR
     # ==================================================
 
 
@@ -906,103 +1633,12 @@ class RsqScheduler:
         self,
     ):
 
+        if not RSQ_ENABLED:
+
+            return
+
         now_local = (
             _now_local()
-        )
-
-        window_start, window_end = (
-            _window_for_date(
-                now_local.date()
-            )
-        )
-
-
-        # ==================================================
-        # GET / CREATE TODAY'S STATE
-        # ==================================================
-
-
-        state = (
-            await _get_daily_state(
-                guild_id=(
-                    self.guild_id
-                ),
-                channel_id=(
-                    self.channel_id
-                ),
-                schedule_date=(
-                    now_local.date()
-                ),
-            )
-        )
-
-        if state is None:
-
-            state = (
-                await _create_daily_state(
-                    guild_id=(
-                        self.guild_id
-                    ),
-                    channel_id=(
-                        self.channel_id
-                    ),
-                    now_local=(
-                        now_local
-                    ),
-                )
-            )
-
-
-        # ==================================================
-        # OUTSIDE ACTIVE WINDOW
-        # ==================================================
-
-
-        if now_local < window_start:
-
-            return
-
-        if now_local > window_end:
-
-            return
-
-
-        # ==================================================
-        # DAY FINISHED
-        # ==================================================
-
-
-        if (
-            state["slots_processed"]
-            >= state["target_count"]
-        ):
-
-            return
-
-
-        # ==================================================
-        # NO NEXT TIME
-        # ==================================================
-
-
-        next_post_at = (
-            state["next_post_at"]
-        )
-
-        if next_post_at is None:
-
-            return
-
-
-        # ==================================================
-        # NOT DUE YET
-        # ==================================================
-
-
-        next_post_utc = (
-            _parse_utc(
-                next_post_at
-            )
         )
 
         now_utc = (
@@ -1011,19 +1647,85 @@ class RsqScheduler:
             )
         )
 
-        if now_utc < next_post_utc:
+
+        # ==================================================
+        # ENSURE TODAY'S SCHEDULE
+        # ==================================================
+
+
+        await ensure_rsq_daily_schedule(
+            guild_id=(
+                self.guild_id
+            ),
+            channel_id=(
+                self.channel_id
+            ),
+            calendar_date=(
+                now_local.date()
+            ),
+        )
+
+
+        # ==================================================
+        # GET DUE SLOTS
+        # ==================================================
+
+
+        due_slots = (
+            await _get_due_pending_slots(
+                guild_id=(
+                    self.guild_id
+                ),
+                channel_id=(
+                    self.channel_id
+                ),
+                now_utc=(
+                    now_utc
+                ),
+            )
+        )
+
+        if not due_slots:
 
             return
 
+        for slot in due_slots:
 
-        # ==================================================
-        # TOO OLD / BOT WAS OFFLINE
-        # ==================================================
+            await self._process_slot(
+                slot=slot,
+                now_utc=(
+                    datetime.now(
+                        timezone.utc
+                    )
+                ),
+            )
 
+
+    # ==================================================
+    # PROCESS SLOT
+    # ==================================================
+
+
+    async def _process_slot(
+        self,
+        slot: dict,
+        now_utc: datetime,
+    ):
+
+        scheduled_at = (
+            _parse_datetime(
+                slot[
+                    "scheduled_at"
+                ]
+            )
+            .astimezone(
+                timezone.utc
+            )
+        )
 
         lateness_seconds = (
             now_utc
-            - next_post_utc
+            - scheduled_at
         ).total_seconds()
 
         grace_seconds = (
@@ -1031,64 +1733,87 @@ class RsqScheduler:
             * 60
         )
 
+
+        # ==================================================
+        # MISSED
+        # ==================================================
+
+
         if (
             lateness_seconds
             > grace_seconds
         ):
 
-            await self._skip_missed_slot(
-                state=state,
-                now_local=(
-                    now_local
+            await _set_slot_status(
+                slot_id=(
+                    slot[
+                        "id"
+                    ]
                 ),
+                status=(
+                    RSQ_SLOT_MISSED
+                ),
+            )
+
+            print(
+                "RSQ scheduler: "
+                f"Slot {slot['slot_number']} "
+                "was missed."
             )
 
             return
 
 
         # ==================================================
-        # GET CHANNEL
-        # ==================================================
-
-
-        channel = self.bot.get_channel(
-            self.channel_id
-        )
-
-        if channel is None:
-
-            try:
-
-                channel = (
-                    await self.bot.fetch_channel(
-                        self.channel_id
-                    )
-                )
-
-            except (
-                discord.Forbidden,
-                discord.NotFound,
-                discord.HTTPException,
-            ) as error:
-
-                print(
-                    "RSQ scheduler could not "
-                    "access channel: "
-                    f"{error!r}"
-                )
-
-                return
-
-
-        # ==================================================
-        # SELECT QUESTION
+        # SELECT QUESTION AT POST TIME
         # ==================================================
 
 
         question = (
-            await _select_random_question(
+            await choose_speed_question(
                 guild_id=(
                     self.guild_id
+                ),
+                channel_id=(
+                    self.channel_id
+                ),
+                category=None,
+                automatic=True,
+            )
+        )
+
+        if question is None:
+
+            await _set_slot_status(
+                slot_id=(
+                    slot[
+                        "id"
+                    ]
+                ),
+                status=(
+                    RSQ_SLOT_SKIPPED_NO_QUESTION
+                ),
+            )
+
+            print(
+                "RSQ scheduler: "
+                f"Slot {slot['slot_number']} "
+                "skipped because no eligible "
+                "question was available."
+            )
+
+            return
+
+
+        # ==================================================
+        # CHANNEL
+        # ==================================================
+
+
+        channel = (
+            await _get_channel(
+                bot=(
+                    self.bot
                 ),
                 channel_id=(
                     self.channel_id
@@ -1096,12 +1821,7 @@ class RsqScheduler:
             )
         )
 
-        if question is None:
-
-            print(
-                "RSQ scheduler: "
-                "No eligible question exists."
-            )
+        if channel is None:
 
             return
 
@@ -1128,25 +1848,22 @@ class RsqScheduler:
 
         except SpeedQuestionTooSoonError:
 
-            # A manual RSQ or another posting
-            # happened within the last 15 minutes.
-            #
-            # Treat this automatic slot as used
-            # instead of crowding another question
-            # immediately afterward.
+            await _set_slot_status(
+                slot_id=(
+                    slot[
+                        "id"
+                    ]
+                ),
+                status=(
+                    RSQ_SLOT_SKIPPED_COOLDOWN
+                ),
+            )
 
             print(
                 "RSQ scheduler: "
-                "Skipped automatic slot because "
-                "another RSQ was posted within "
-                "the minimum interval."
-            )
-
-            await self._advance_state(
-                state=state,
-                now_local=(
-                    now_local
-                ),
+                f"Slot {slot['slot_number']} "
+                "skipped because another RSQ "
+                "was posted too recently."
             )
 
             return
@@ -1157,8 +1874,16 @@ class RsqScheduler:
         ) as error:
 
             print(
-                "RSQ scheduler could not "
-                "post question: "
+                "RSQ scheduler Discord error: "
+                f"{error!r}"
+            )
+
+            return
+
+        except Exception as error:
+
+            print(
+                "RSQ scheduler posting error: "
                 f"{error!r}"
             )
 
@@ -1166,189 +1891,40 @@ class RsqScheduler:
 
 
         # ==================================================
-        # SUCCESS
+        # POSTED
         # ==================================================
 
 
-        print(
-            "RSQ scheduler: "
-            f"Posted QBank "
-            f"#{result['question_id']}."
-        )
-
-        await self._advance_state(
-            state=state,
-            now_local=(
-                now_local
-            ),
-        )
-
-
-    # ==================================================
-    # ADVANCE ONE SLOT
-    # ==================================================
-
-
-    async def _advance_state(
-        self,
-        state: dict,
-        now_local: datetime,
-    ):
-
-        new_processed = (
-            state["slots_processed"]
-            + 1
-        )
-
-        next_local = (
-            _calculate_next_post_time(
-                reference_local=(
-                    now_local
-                ),
-                target_count=(
-                    state["target_count"]
-                ),
-                slots_processed=(
-                    new_processed
-                ),
-            )
-        )
-
-        if next_local is None:
-
-            next_post_at = None
-
-        else:
-
-            next_post_at = (
-                next_local.astimezone(
-                    timezone.utc
-                ).isoformat()
-            )
-
-        await _save_daily_state(
-            guild_id=(
-                self.guild_id
-            ),
-            channel_id=(
-                self.channel_id
-            ),
-            schedule_date=(
-                now_local.date()
-            ),
-            slots_processed=(
-                new_processed
-            ),
-            next_post_at=(
-                next_post_at
-            ),
-        )
-
-        if next_local is not None:
-
-            print(
-                "RSQ scheduler: "
-                "Next automatic question at "
-                f"{next_local.isoformat()}."
-            )
-
-
-    # ==================================================
-    # SKIP OLD MISSED SLOT
-    # ==================================================
-
-
-    async def _skip_missed_slot(
-        self,
-        state: dict,
-        now_local: datetime,
-    ):
-        """
-        If the bot was offline, estimate how much
-        of today's schedule has already passed.
-
-        This prevents MARTY from trying to catch up
-        by firing questions every 15 minutes.
-        """
-
-        expected_processed = (
-            _estimate_elapsed_slots(
-                now_local=(
-                    now_local
-                ),
-                target_count=(
-                    state[
-                        "target_count"
-                    ]
-                ),
-            )
-        )
-
-        new_processed = max(
-            (
-                state[
-                    "slots_processed"
+        await _set_slot_status(
+            slot_id=(
+                slot[
+                    "id"
                 ]
-                + 1
             ),
-            expected_processed,
-        )
-
-        new_processed = min(
-            state[
-                "target_count"
-            ],
-            new_processed,
-        )
-
-        next_local = (
-            _calculate_next_post_time(
-                reference_local=(
-                    now_local
-                ),
-                target_count=(
-                    state[
-                        "target_count"
-                    ]
-                ),
-                slots_processed=(
-                    new_processed
-                ),
-            )
-        )
-
-        if next_local is None:
-
-            next_post_at = None
-
-        else:
-
-            next_post_at = (
-                next_local.astimezone(
-                    timezone.utc
-                ).isoformat()
-            )
-
-        await _save_daily_state(
-            guild_id=(
-                self.guild_id
+            status=(
+                RSQ_SLOT_POSTED
             ),
-            channel_id=(
-                self.channel_id
+            question_id=(
+                result[
+                    "question_id"
+                ]
             ),
-            schedule_date=(
-                now_local.date()
+            message_id=(
+                result[
+                    "message_id"
+                ]
             ),
-            slots_processed=(
-                new_processed
-            ),
-            next_post_at=(
-                next_post_at
+            posted_at=(
+                result[
+                    "posted_at"
+                ]
             ),
         )
 
         print(
             "RSQ scheduler: "
-            "Skipped an overdue automatic "
-            "question slot."
+            f"Posted slot "
+            f"{slot['slot_number']} "
+            f"using QBank "
+            f"#{result['question_id']}."
         )

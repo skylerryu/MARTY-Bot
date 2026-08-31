@@ -7,11 +7,15 @@ from datetime import (
     timedelta,
 )
 
-from zoneinfo import ZoneInfo
+from zoneinfo import (
+    ZoneInfo,
+)
 
 import discord
 
-from discord.ext import tasks
+from discord.ext import (
+    tasks,
+)
 
 from questions.q_manager import (
     get_all_questions,
@@ -40,6 +44,7 @@ from points.mechanics.question_of_the_day.qotd_questions import (
 
 from points.mechanics.question_of_the_day.qotd_display import (
     build_qotd_question_embed,
+    get_qotd_time_remaining_text,
 )
 
 from points.mechanics.question_of_the_day.qotd_modal import (
@@ -72,6 +77,34 @@ QOTD_POST_TIME = time(
     minute=QOTD_POST_MINUTE,
     tzinfo=QOTD_TIMEZONE_INFO,
 )
+
+
+# ==================================================
+# COUNTDOWN REFRESH
+# ==================================================
+#
+# MARTY checks frequently, but only edits the
+# Discord message when the DISPLAYED countdown
+# actually changes.
+#
+# That means:
+#
+#     hours:
+#         about once per hour
+#
+#     under 1 hour:
+#         every 15 minutes
+#
+#     under 15 minutes:
+#         every 5 minutes
+#
+#     under 1 minute:
+#         every 15 / 5 seconds
+#
+# ==================================================
+
+
+QOTD_COUNTDOWN_CHECK_SECONDS = 5
 
 
 # ==================================================
@@ -109,9 +142,15 @@ def get_next_qotd_deadline(
 
     deadline = (
         get_chicago_datetime(
-            calendar_date=now.date(),
-            hour=QOTD_POST_HOUR,
-            minute=QOTD_POST_MINUTE,
+            calendar_date=(
+                now.date()
+            ),
+            hour=(
+                QOTD_POST_HOUR
+            ),
+            minute=(
+                QOTD_POST_MINUTE
+            ),
         )
     )
 
@@ -119,7 +158,9 @@ def get_next_qotd_deadline(
 
         deadline = (
             deadline
-            + timedelta(days=1)
+            + timedelta(
+                days=1
+            )
         )
 
     return deadline
@@ -145,7 +186,9 @@ def _get_question_date_from_deadline(
 
     return (
         deadline
-        - timedelta(days=1)
+        - timedelta(
+            days=1
+        )
     ).date()
 
 
@@ -164,13 +207,19 @@ def _get_random_qotd_question(
 
     eligible_questions = [
         question
-        for question in get_all_questions(
+        for question
+        in get_all_questions(
             active_only=True
         )
         if (
-            question.get("category")
+            question.get(
+                "category"
+            )
             not in QOTD_EXCLUDED_CATEGORIES
-            and question["id"]
+
+            and question[
+                "id"
+            ]
             not in excluded_ids
         )
     ]
@@ -198,13 +247,39 @@ class QotdScheduler:
         channel_id: int,
     ):
 
-        self.bot = bot
-        self.guild_id = guild_id
-        self.channel_id = channel_id
+        self.bot = (
+            bot
+        )
+
+        self.guild_id = (
+            guild_id
+        )
+
+        self.channel_id = (
+            channel_id
+        )
 
         self._post_lock = (
             asyncio.Lock()
         )
+
+
+        # ==================================================
+        # COUNTDOWN CACHE
+        # ==================================================
+        #
+        # The refresh loop runs every few seconds.
+        #
+        # We remember what countdown text is currently
+        # displayed so Discord is only contacted when
+        # that text actually needs to change.
+        #
+        # ==================================================
+
+
+        self._countdown_qotd_id = None
+
+        self._countdown_text = None
 
 
     # ==================================================
@@ -212,11 +287,23 @@ class QotdScheduler:
     # ==================================================
 
 
-    def start(self):
+    def start(
+        self,
+    ):
 
-        if not self.daily_qotd_post.is_running():
+        if (
+            not self.daily_qotd_post
+            .is_running()
+        ):
 
             self.daily_qotd_post.start()
+
+        if (
+            not self.qotd_countdown_refresh
+            .is_running()
+        ):
+
+            self.qotd_countdown_refresh.start()
 
 
     # ==================================================
@@ -224,11 +311,23 @@ class QotdScheduler:
     # ==================================================
 
 
-    def stop(self):
+    def stop(
+        self,
+    ):
 
-        if self.daily_qotd_post.is_running():
+        if (
+            self.daily_qotd_post
+            .is_running()
+        ):
 
             self.daily_qotd_post.cancel()
+
+        if (
+            self.qotd_countdown_refresh
+            .is_running()
+        ):
+
+            self.qotd_countdown_refresh.cancel()
 
 
     # ==================================================
@@ -237,7 +336,9 @@ class QotdScheduler:
 
 
     @tasks.loop(
-        time=QOTD_POST_TIME
+        time=(
+            QOTD_POST_TIME
+        )
     )
     async def daily_qotd_post(
         self,
@@ -249,7 +350,7 @@ class QotdScheduler:
 
 
     # ==================================================
-    # STARTUP
+    # DAILY POST STARTUP
     # ==================================================
 
 
@@ -266,7 +367,7 @@ class QotdScheduler:
 
 
     # ==================================================
-    # ERROR HANDLER
+    # DAILY POST ERROR
     # ==================================================
 
 
@@ -279,6 +380,314 @@ class QotdScheduler:
         print(
             "QoTD scheduler error: "
             f"{error!r}"
+        )
+
+
+    # ==================================================
+    # COUNTDOWN REFRESH LOOP
+    # ==================================================
+
+
+    @tasks.loop(
+        seconds=(
+            QOTD_COUNTDOWN_CHECK_SECONDS
+        )
+    )
+    async def qotd_countdown_refresh(
+        self,
+    ):
+
+        await self._refresh_qotd_countdown()
+
+
+    # ==================================================
+    # COUNTDOWN STARTUP
+    # ==================================================
+
+
+    @qotd_countdown_refresh.before_loop
+    async def before_qotd_countdown_refresh(
+        self,
+    ):
+
+        await self.bot.wait_until_ready()
+
+
+    # ==================================================
+    # COUNTDOWN ERROR
+    # ==================================================
+
+
+    @qotd_countdown_refresh.error
+    async def qotd_countdown_refresh_error(
+        self,
+        error: Exception,
+    ):
+
+        print(
+            "QoTD countdown refresh error: "
+            f"{error!r}"
+        )
+
+
+    # ==================================================
+    # REFRESH COUNTDOWN
+    # ==================================================
+
+
+    async def _refresh_qotd_countdown(
+        self,
+    ):
+
+
+        # ==================================================
+        # ACTIVE QOTD
+        # ==================================================
+
+
+        qotd = (
+            await get_active_qotd(
+                guild_id=(
+                    self.guild_id
+                ),
+            )
+        )
+
+        if qotd is None:
+
+            self._countdown_qotd_id = None
+            self._countdown_text = None
+
+            return
+
+
+        # ==================================================
+        # MESSAGE MUST EXIST
+        # ==================================================
+
+
+        message_id = (
+            qotd[
+                "message_id"
+            ]
+        )
+
+        if message_id is None:
+
+            return
+
+
+        # ==================================================
+        # CURRENT DISPLAY TEXT
+        # ==================================================
+
+
+        countdown_text = (
+            get_qotd_time_remaining_text(
+                expires_at=(
+                    qotd[
+                        "expires_at"
+                    ]
+                )
+            )
+        )
+
+
+        # ==================================================
+        # NOTHING CHANGED
+        # ==================================================
+        #
+        # This is the important part.
+        #
+        # The loop may run every 5 seconds, but if:
+        #
+        #     "< 18 hrs"
+        #
+        # is still:
+        #
+        #     "< 18 hrs"
+        #
+        # MARTY does absolutely nothing.
+        #
+        # ==================================================
+
+
+        if (
+            self._countdown_qotd_id
+            == qotd["id"]
+
+            and self._countdown_text
+            == countdown_text
+        ):
+
+            return
+
+
+        # ==================================================
+        # CHANNEL
+        # ==================================================
+
+
+        channel = (
+            self.bot.get_channel(
+                qotd[
+                    "channel_id"
+                ]
+            )
+        )
+
+        if channel is None:
+
+            try:
+
+                channel = (
+                    await self.bot.fetch_channel(
+                        qotd[
+                            "channel_id"
+                        ]
+                    )
+                )
+
+            except (
+                discord.Forbidden,
+                discord.NotFound,
+                discord.HTTPException,
+            ) as error:
+
+                print(
+                    "QoTD countdown could not "
+                    "access the QoTD channel: "
+                    f"{error!r}"
+                )
+
+                return
+
+
+        # ==================================================
+        # MESSAGE
+        # ==================================================
+
+
+        try:
+
+            message = (
+                await channel.fetch_message(
+                    message_id
+                )
+            )
+
+        except discord.NotFound:
+
+            # Prevent MARTY from repeatedly trying
+            # to fetch a message that no longer exists
+            # every 5 seconds.
+
+            self._countdown_qotd_id = (
+                qotd[
+                    "id"
+                ]
+            )
+
+            self._countdown_text = (
+                countdown_text
+            )
+
+            return
+
+        except discord.Forbidden as error:
+
+            print(
+                "QoTD countdown cannot access "
+                "the QoTD message: "
+                f"{error!r}"
+            )
+
+            return
+
+        except discord.HTTPException:
+
+            # Temporary Discord problem.
+            #
+            # Do not update the cache so MARTY
+            # automatically retries shortly.
+
+            return
+
+
+        # ==================================================
+        # UPDATE EMBED
+        # ==================================================
+
+
+        try:
+
+            await message.edit(
+                embed=(
+                    build_qotd_question_embed(
+                        question_text=(
+                            qotd[
+                                "question_text"
+                            ]
+                        ),
+                        question_date=(
+                            qotd[
+                                "question_date"
+                            ]
+                        ),
+                        expires_at=(
+                            qotd[
+                                "expires_at"
+                            ]
+                        ),
+                    )
+                )
+            )
+
+        except discord.NotFound:
+
+            self._countdown_qotd_id = (
+                qotd[
+                    "id"
+                ]
+            )
+
+            self._countdown_text = (
+                countdown_text
+            )
+
+            return
+
+        except discord.Forbidden as error:
+
+            print(
+                "QoTD countdown cannot edit "
+                "the QoTD message: "
+                f"{error!r}"
+            )
+
+            return
+
+        except discord.HTTPException:
+
+            # Retry automatically on the next
+            # countdown check.
+
+            return
+
+
+        # ==================================================
+        # SAVE DISPLAY STATE
+        # ==================================================
+
+
+        self._countdown_qotd_id = (
+            qotd[
+                "id"
+            ]
+        )
+
+        self._countdown_text = (
+            countdown_text
         )
 
 
@@ -302,6 +711,7 @@ class QotdScheduler:
 
             if (
                 require_post_time
+
                 and not self._post_time_has_arrived()
             ):
 
@@ -313,7 +723,9 @@ class QotdScheduler:
             # ==================================================
 
 
-            await self._remove_expired_qotd_buttons()
+            await (
+                self._remove_expired_qotd_buttons()
+            )
 
 
             # ==================================================
@@ -323,13 +735,20 @@ class QotdScheduler:
 
             qotd = (
                 await get_active_qotd(
-                    guild_id=self.guild_id,
+                    guild_id=(
+                        self.guild_id
+                    ),
                 )
             )
 
             if qotd is not None:
 
-                if qotd["message_id"] is not None:
+                if (
+                    qotd[
+                        "message_id"
+                    ]
+                    is not None
+                ):
 
                     return False
 
@@ -355,8 +774,12 @@ class QotdScheduler:
             # ==================================================
 
 
-            channel = self.bot.get_channel(
-                qotd["channel_id"]
+            channel = (
+                self.bot.get_channel(
+                    qotd[
+                        "channel_id"
+                    ]
+                )
             )
 
             if channel is None:
@@ -365,7 +788,9 @@ class QotdScheduler:
 
                     channel = (
                         await self.bot.fetch_channel(
-                            qotd["channel_id"]
+                            qotd[
+                                "channel_id"
+                            ]
                         )
                     )
 
@@ -391,21 +816,37 @@ class QotdScheduler:
 
             try:
 
-                message = await channel.send(
-                    embed=build_qotd_question_embed(
-                        question_text=(
-                            qotd["question_text"]
+                message = (
+                    await channel.send(
+                        embed=(
+                            build_qotd_question_embed(
+                                question_text=(
+                                    qotd[
+                                        "question_text"
+                                    ]
+                                ),
+                                question_date=(
+                                    qotd[
+                                        "question_date"
+                                    ]
+                                ),
+                                expires_at=(
+                                    qotd[
+                                        "expires_at"
+                                    ]
+                                ),
+                            )
                         ),
-                        question_date=(
-                            qotd["question_date"]
+                        view=(
+                            QotdAnswerView(
+                                qotd_id=(
+                                    qotd[
+                                        "id"
+                                    ]
+                                )
+                            )
                         ),
-                        expires_at=(
-                            qotd["expires_at"]
-                        ),
-                    ),
-                    view=QotdAnswerView(
-                        qotd_id=qotd["id"]
-                    ),
+                    )
                 )
 
             except (
@@ -430,8 +871,14 @@ class QotdScheduler:
             try:
 
                 await set_qotd_message_id(
-                    qotd_id=qotd["id"],
-                    message_id=message.id,
+                    qotd_id=(
+                        qotd[
+                            "id"
+                        ]
+                    ),
+                    message_id=(
+                        message.id
+                    ),
                 )
 
             except Exception:
@@ -448,6 +895,34 @@ class QotdScheduler:
                     pass
 
                 raise
+
+
+            # ==================================================
+            # COUNTDOWN CACHE
+            # ==================================================
+            #
+            # We just posted the correct countdown,
+            # so tell the refresh loop what Discord
+            # currently displays.
+            #
+            # ==================================================
+
+
+            self._countdown_qotd_id = (
+                qotd[
+                    "id"
+                ]
+            )
+
+            self._countdown_text = (
+                get_qotd_time_remaining_text(
+                    expires_at=(
+                        qotd[
+                            "expires_at"
+                        ]
+                    )
+                )
+            )
 
 
             # ==================================================
@@ -488,7 +963,9 @@ class QotdScheduler:
 
         used_question_ids = (
             await get_used_qotd_question_bank_ids(
-                guild_id=self.guild_id,
+                guild_id=(
+                    self.guild_id
+                ),
             )
         )
 
@@ -500,7 +977,9 @@ class QotdScheduler:
 
         question = (
             _get_random_qotd_question(
-                excluded_ids=used_question_ids
+                excluded_ids=(
+                    used_question_ids
+                )
             )
         )
 
@@ -542,38 +1021,57 @@ class QotdScheduler:
 
         try:
 
-            qotd = await create_qotd(
-                guild_id=self.guild_id,
-                channel_id=self.channel_id,
-                question_date=question_date,
-                expires_at=deadline,
-                question_bank_id=(
-                    question["id"]
-                ),
-                question_text=(
-                    question["question"]
-                ),
-                accepted_answers=(
-                    question["accepted_answers"]
-                ),
-                explanation=(
-                    question.get(
-                        "explanation"
-                    )
-                ),
+            qotd = (
+                await create_qotd(
+                    guild_id=(
+                        self.guild_id
+                    ),
+                    channel_id=(
+                        self.channel_id
+                    ),
+                    question_date=(
+                        question_date
+                    ),
+                    expires_at=(
+                        deadline
+                    ),
+                    question_bank_id=(
+                        question[
+                            "id"
+                        ]
+                    ),
+                    question_text=(
+                        question[
+                            "question"
+                        ]
+                    ),
+                    accepted_answers=(
+                        question[
+                            "accepted_answers"
+                        ]
+                    ),
+                    explanation=(
+                        question.get(
+                            "explanation"
+                        )
+                    ),
+                )
             )
 
         except QotdAlreadyExistsError:
 
             existing = (
                 await get_qotd_for_date(
-                    guild_id=self.guild_id,
-                    question_date=question_date,
+                    guild_id=(
+                        self.guild_id
+                    ),
+                    question_date=(
+                        question_date
+                    ),
                 )
             )
 
             return existing
-
 
         print(
             "QoTD scheduler: "
@@ -596,14 +1094,20 @@ class QotdScheduler:
 
         expired_qotds = (
             await get_expired_posted_qotds(
-                guild_id=self.guild_id,
+                guild_id=(
+                    self.guild_id
+                ),
             )
         )
 
         for old_qotd in expired_qotds:
 
-            channel = self.bot.get_channel(
-                old_qotd["channel_id"]
+            channel = (
+                self.bot.get_channel(
+                    old_qotd[
+                        "channel_id"
+                    ]
+                )
             )
 
             if channel is None:
@@ -612,7 +1116,9 @@ class QotdScheduler:
 
                     channel = (
                         await self.bot.fetch_channel(
-                            old_qotd["channel_id"]
+                            old_qotd[
+                                "channel_id"
+                            ]
                         )
                     )
 
@@ -628,7 +1134,9 @@ class QotdScheduler:
 
                 message = (
                     await channel.fetch_message(
-                        old_qotd["message_id"]
+                        old_qotd[
+                            "message_id"
+                        ]
                     )
                 )
 
@@ -646,8 +1154,9 @@ class QotdScheduler:
             ) as error:
 
                 print(
-                    "QoTD scheduler could not remove "
-                    "an expired Answer Question button: "
+                    "QoTD scheduler could not "
+                    "remove an expired Answer "
+                    "Question button: "
                     f"{error!r}"
                 )
 

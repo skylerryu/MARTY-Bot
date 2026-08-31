@@ -45,7 +45,7 @@ RSQ_TIMEZONE = "America/Chicago"
 # ==================================================
 
 
-RSQ_WINDOW_START_HOUR = 8
+RSQ_WINDOW_START_HOUR = 0
 RSQ_WINDOW_START_MINUTE = 0
 
 RSQ_WINDOW_END_HOUR = 23
