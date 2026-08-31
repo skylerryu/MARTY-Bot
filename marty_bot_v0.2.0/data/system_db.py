@@ -39,10 +39,6 @@ async def _ensure_column(
     column_name: str,
     column_definition: str,
 ):
-    """
-    Add a column to an existing table if the
-    column does not already exist.
-    """
 
     cursor = await db.execute(
         f"PRAGMA table_info({table_name})"
@@ -75,15 +71,6 @@ async def _ensure_column(
 async def _backfill_qotd_expirations(
     db: aiosqlite.Connection,
 ):
-    """
-    Give older QoTD records an expires_at value.
-
-    Older records used:
-
-        question_date + next posting time
-
-    so this preserves their original behavior.
-    """
 
     cursor = await db.execute(
         """
@@ -147,9 +134,6 @@ async def _backfill_qotd_expirations(
 
 
 async def init_system_db():
-    """
-    Initialize MARTY's persistent system database.
-    """
 
     async with aiosqlite.connect(
         SYSTEM_DB_PATH
@@ -317,8 +301,15 @@ async def init_system_db():
                 question_bank_id INTEGER NOT NULL,
                 user_id INTEGER NOT NULL,
 
-                source TEXT NOT NULL,
+                source TEXT NOT NULL
+                    DEFAULT 'question',
+
+                context_key TEXT,
+
                 reason TEXT NOT NULL,
+
+                attempted_answers TEXT NOT NULL
+                    DEFAULT '[]',
 
                 status TEXT NOT NULL
                     DEFAULT 'open',
@@ -331,6 +322,22 @@ async def init_system_db():
                 resolution_note TEXT
             )
             """
+        )
+
+        await _ensure_column(
+            db=db,
+            table_name="question_flags",
+            column_name="context_key",
+            column_definition="TEXT",
+        )
+
+        await _ensure_column(
+            db=db,
+            table_name="question_flags",
+            column_name="attempted_answers",
+            column_definition=(
+                "TEXT NOT NULL DEFAULT '[]'"
+            ),
         )
 
         await db.execute(
@@ -369,6 +376,45 @@ async def init_system_db():
             )
 
             WHERE status = 'open'
+            """
+        )
+
+
+        # ==================================================
+        # QUESTION EDIT QUEUE
+        # ==================================================
+
+
+        await db.execute(
+            """
+            CREATE TABLE IF NOT EXISTS question_edit_queue (
+                question_bank_id INTEGER PRIMARY KEY,
+
+                status TEXT NOT NULL
+                    DEFAULT 'needs_edit',
+
+                marked_at TEXT NOT NULL
+                    DEFAULT CURRENT_TIMESTAMP,
+
+                marked_by INTEGER NOT NULL,
+
+                source_flag_id INTEGER,
+
+                resolved_at TEXT,
+                resolved_by INTEGER
+            )
+            """
+        )
+
+        await db.execute(
+            """
+            CREATE INDEX IF NOT EXISTS
+            idx_question_edit_queue_status
+
+            ON question_edit_queue (
+                status,
+                marked_at
+            )
             """
         )
 

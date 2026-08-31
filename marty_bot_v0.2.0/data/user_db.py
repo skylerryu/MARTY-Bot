@@ -87,8 +87,10 @@ async def _copy_legacy_table(
         INSERT OR IGNORE INTO "{table_name}" (
             {columns_sql}
         )
+
         SELECT
             {columns_sql}
+
         FROM legacy."{table_name}"
         """
     )
@@ -130,8 +132,6 @@ async def _migrate_legacy_user_data(
 
     finally:
 
-        # Finish any copied rows before detaching
-        # the legacy database.
         await db.commit()
 
         await db.execute(
@@ -148,10 +148,6 @@ async def init_user_db():
     """
     Create the persistent database containing
     information MARTY remembers about users.
-
-    If user.db does not yet exist and the old
-    marty.db does exist, compatible user data is
-    copied into user.db automatically.
     """
 
     database_is_new = (
@@ -405,6 +401,73 @@ async def init_user_db():
                     guild_id,
                     user_id
                 )
+            )
+            """
+        )
+
+
+        # ==================================================
+        # QUESTION ATTEMPTS
+        # ==================================================
+
+
+        await db.execute(
+            """
+            CREATE TABLE IF NOT EXISTS question_attempts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+                guild_id INTEGER NOT NULL,
+                user_id INTEGER NOT NULL,
+
+                question_bank_id INTEGER NOT NULL,
+
+                context_key TEXT NOT NULL,
+
+                answer_text TEXT NOT NULL,
+
+                result TEXT NOT NULL,
+
+                created_at TEXT NOT NULL
+                    DEFAULT CURRENT_TIMESTAMP
+            )
+            """
+        )
+
+        await db.execute(
+            """
+            CREATE INDEX IF NOT EXISTS
+            idx_question_attempts_user_question
+
+            ON question_attempts (
+                guild_id,
+                user_id,
+                question_bank_id,
+                context_key,
+                id
+            )
+            """
+        )
+
+        await db.execute(
+            """
+            CREATE INDEX IF NOT EXISTS
+            idx_question_attempts_question
+
+            ON question_attempts (
+                guild_id,
+                question_bank_id
+            )
+            """
+        )
+
+        await db.execute(
+            """
+            CREATE INDEX IF NOT EXISTS
+            idx_question_attempts_context
+
+            ON question_attempts (
+                guild_id,
+                context_key
             )
             """
         )

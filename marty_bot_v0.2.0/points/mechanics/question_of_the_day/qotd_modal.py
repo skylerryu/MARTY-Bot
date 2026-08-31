@@ -5,6 +5,14 @@ from datetime import (
 
 import discord
 
+from questions.q_attempts import (
+    record_question_attempt,
+)
+
+from questions.q_flag_ui import (
+    open_question_flag_modal,
+)
+
 from points.mechanics.question_of_the_day.qotd import (
     submit_qotd_answer,
 )
@@ -40,6 +48,20 @@ from points.progressions.ranks.rank_up_display import (
 
 
 # ==================================================
+# QOTD CONTEXT KEY
+# ==================================================
+
+
+def build_qotd_context_key(
+    qotd_id: int,
+) -> str:
+
+    return (
+        f"qotd:{qotd_id}"
+    )
+
+
+# ==================================================
 # QOTD OPEN / CLOSED
 # ==================================================
 
@@ -47,10 +69,6 @@ from points.progressions.ranks.rank_up_display import (
 def _qotd_is_open(
     expires_at: str,
 ) -> bool:
-    """
-    Return whether the QoTD's stored expiration
-    time is still in the future.
-    """
 
     expiration = (
         datetime.fromisoformat(
@@ -82,10 +100,6 @@ def _qotd_is_open(
 class QotdAnswerModal(
     discord.ui.Modal
 ):
-    """
-    Private modal used by a student to submit
-    their answer to the Question of the Day.
-    """
 
     def __init__(
         self,
@@ -96,7 +110,9 @@ class QotdAnswerModal(
             title="Question of the Day"
         )
 
-        self.qotd_id = qotd_id
+        self.qotd_id = (
+            qotd_id
+        )
 
         self.answer_input = (
             discord.ui.TextInput(
@@ -128,10 +144,6 @@ class QotdAnswerModal(
         self,
         interaction: discord.Interaction,
     ):
-        """
-        Process the answer and display all
-        results privately to the student.
-        """
 
         await interaction.response.defer(
             ephemeral=True,
@@ -140,7 +152,7 @@ class QotdAnswerModal(
 
 
         # ==================================================
-        # SERVER ONLY
+        # SERVER CHECK
         # ==================================================
 
 
@@ -158,7 +170,7 @@ class QotdAnswerModal(
 
 
         # ==================================================
-        # SUBMITTED ANSWER
+        # ANSWER
         # ==================================================
 
 
@@ -168,7 +180,17 @@ class QotdAnswerModal(
 
 
         # ==================================================
-        # PROCESS ANSWER
+        # GET QOTD
+        # ==================================================
+
+
+        qotd = await get_qotd(
+            self.qotd_id
+        )
+
+
+        # ==================================================
+        # SUBMIT
         # ==================================================
 
 
@@ -214,7 +236,7 @@ class QotdAnswerModal(
 
 
         # ==================================================
-        # RESULT STATUS
+        # STATUS
         # ==================================================
 
 
@@ -224,7 +246,57 @@ class QotdAnswerModal(
 
 
         # ==================================================
-        # QUESTION NOT FOUND
+        # RECORD ATTEMPT
+        # ==================================================
+
+
+        if (
+            status in {
+                "correct",
+                "incorrect",
+                "uncertain",
+            }
+            and qotd is not None
+            and qotd.get(
+                "question_bank_id"
+            ) is not None
+        ):
+
+            try:
+
+                await record_question_attempt(
+                    guild_id=(
+                        interaction.guild.id
+                    ),
+                    user_id=(
+                        interaction.user.id
+                    ),
+                    question_bank_id=(
+                        qotd[
+                            "question_bank_id"
+                        ]
+                    ),
+                    context_key=(
+                        build_qotd_context_key(
+                            self.qotd_id
+                        )
+                    ),
+                    answer_text=(
+                        submitted_answer
+                    ),
+                    result=status,
+                )
+
+            except Exception as error:
+
+                print(
+                    "QoTD attempt recording error: "
+                    f"{error!r}"
+                )
+
+
+        # ==================================================
+        # NOT FOUND
         # ==================================================
 
 
@@ -241,7 +313,7 @@ class QotdAnswerModal(
 
 
         # ==================================================
-        # QUESTION EXPIRED
+        # EXPIRED
         # ==================================================
 
 
@@ -275,7 +347,7 @@ class QotdAnswerModal(
 
 
         # ==================================================
-        # LLM UNCERTAIN
+        # UNCERTAIN
         # ==================================================
 
 
@@ -330,7 +402,7 @@ class QotdAnswerModal(
 
 
         # ==================================================
-        # CORRECT RESULT
+        # CORRECT
         # ==================================================
 
 
@@ -452,17 +524,13 @@ class QotdAnswerModal(
 
 
 # ==================================================
-# PERSISTENT ANSWER VIEW
+# PERSISTENT QOTD VIEW
 # ==================================================
 
 
 class QotdAnswerView(
     discord.ui.View
 ):
-    """
-    Persistent Discord view containing the
-    Answer Question button.
-    """
 
     def __init__(
         self,
@@ -473,17 +541,28 @@ class QotdAnswerView(
             timeout=None
         )
 
-        self.qotd_id = qotd_id
+        self.qotd_id = (
+            qotd_id
+        )
 
-        answer_button = discord.ui.Button(
-            label="Answer Question",
-            style=(
-                discord.ButtonStyle.primary
-            ),
-            emoji="✏️",
-            custom_id=(
-                f"qotd:answer:{qotd_id}"
-            ),
+
+        # ==================================================
+        # ANSWER BUTTON
+        # ==================================================
+
+
+        answer_button = (
+            discord.ui.Button(
+                label="Answer Question",
+                style=(
+                    discord.ButtonStyle.primary
+                ),
+                emoji="✏️",
+                custom_id=(
+                    f"qotd:answer:"
+                    f"{qotd_id}"
+                ),
+            )
         )
 
         answer_button.callback = (
@@ -492,6 +571,34 @@ class QotdAnswerView(
 
         self.add_item(
             answer_button
+        )
+
+
+        # ==================================================
+        # FLAG BUTTON
+        # ==================================================
+
+
+        flag_button = (
+            discord.ui.Button(
+                label="Flag Question",
+                style=(
+                    discord.ButtonStyle.secondary
+                ),
+                emoji="🚩",
+                custom_id=(
+                    f"qotd:flag:"
+                    f"{qotd_id}"
+                ),
+            )
+        )
+
+        flag_button.callback = (
+            self.flag_button
+        )
+
+        self.add_item(
+            flag_button
         )
 
 
@@ -504,16 +611,6 @@ class QotdAnswerView(
         self,
         interaction: discord.Interaction,
     ):
-        """
-        Check whether the student can answer
-        this QoTD and open the private modal.
-        """
-
-
-        # ==================================================
-        # SERVER ONLY
-        # ==================================================
-
 
         if interaction.guild is None:
 
@@ -529,7 +626,7 @@ class QotdAnswerView(
 
 
         # ==================================================
-        # GET QUESTION
+        # GET QOTD
         # ==================================================
 
 
@@ -570,7 +667,7 @@ class QotdAnswerView(
 
 
         # ==================================================
-        # VERIFY QOTD IS OPEN
+        # VERIFY OPEN
         # ==================================================
 
 
@@ -589,13 +686,17 @@ class QotdAnswerView(
 
 
         # ==================================================
-        # CHECK COMPLETION
+        # COMPLETION
         # ==================================================
 
 
         if await has_completed_qotd(
-            qotd_id=self.qotd_id,
-            user_id=interaction.user.id,
+            qotd_id=(
+                self.qotd_id
+            ),
+            user_id=(
+                interaction.user.id
+            ),
         ):
 
             await interaction.response.send_message(
@@ -609,12 +710,121 @@ class QotdAnswerView(
 
 
         # ==================================================
-        # OPEN MODAL
+        # OPEN ANSWER MODAL
         # ==================================================
 
 
         await interaction.response.send_modal(
             QotdAnswerModal(
-                qotd_id=self.qotd_id
+                qotd_id=(
+                    self.qotd_id
+                )
             )
+        )
+
+
+    # ==================================================
+    # FLAG BUTTON
+    # ==================================================
+
+
+    async def flag_button(
+        self,
+        interaction: discord.Interaction,
+    ):
+
+        if interaction.guild is None:
+
+            await interaction.response.send_message(
+                (
+                    "Questions can only be flagged "
+                    "inside the server."
+                ),
+                ephemeral=True,
+            )
+
+            return
+
+
+        # ==================================================
+        # GET QOTD
+        # ==================================================
+
+
+        qotd = await get_qotd(
+            self.qotd_id
+        )
+
+        if qotd is None:
+
+            await interaction.response.send_message(
+                embed=(
+                    build_qotd_unavailable_embed()
+                ),
+                ephemeral=True,
+            )
+
+            return
+
+
+        # ==================================================
+        # VERIFY SERVER
+        # ==================================================
+
+
+        if (
+            qotd["guild_id"]
+            != interaction.guild.id
+        ):
+
+            await interaction.response.send_message(
+                embed=(
+                    build_qotd_unavailable_embed()
+                ),
+                ephemeral=True,
+            )
+
+            return
+
+
+        # ==================================================
+        # QUESTION BANK ID
+        # ==================================================
+
+
+        question_bank_id = (
+            qotd.get(
+                "question_bank_id"
+            )
+        )
+
+        if question_bank_id is None:
+
+            await interaction.response.send_message(
+                (
+                    "⚠️ This Question of the Day "
+                    "does not have a question-bank "
+                    "ID and cannot be flagged."
+                ),
+                ephemeral=True,
+            )
+
+            return
+
+
+        # ==================================================
+        # GENERIC FLAG ENTRY POINT
+        # ==================================================
+
+
+        await open_question_flag_modal(
+            interaction=interaction,
+            question_bank_id=(
+                question_bank_id
+            ),
+            context_key=(
+                build_qotd_context_key(
+                    self.qotd_id
+                )
+            ),
         )

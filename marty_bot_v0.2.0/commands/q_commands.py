@@ -1,5 +1,8 @@
 import discord
-from discord import app_commands
+
+from discord import (
+    app_commands,
+)
 
 from commands.command_helpers import (
     make_command,
@@ -12,14 +15,17 @@ from questions.q_manager import (
     get_random_question,
 )
 
+from questions.q_edit_queue import (
+    is_question_marked_for_edit,
+)
+
+from questions.q_flag_ui import (
+    QuestionFlagView,
+)
+
 from points.mechanics.random_speed_questions.random_speed_questions import (
     set_active_speed_question,
 )
-
-
-# ==================================================
-# QUESTION CATEGORY CHOICES
-# ==================================================
 
 
 QUESTION_CATEGORIES = [
@@ -35,22 +41,9 @@ QUESTION_CATEGORIES = [
 ]
 
 
-# ==================================================
-# PARSE ACCEPTED ANSWERS
-# ==================================================
-
-
 def _parse_accepted_answers(
     accepted_answers: str,
 ) -> list[str]:
-    """
-    Convert pipe-separated accepted answers
-    into a list.
-
-    Example:
-
-        respiratory depression|pinpoint pupils
-    """
 
     return [
         answer.strip()
@@ -60,19 +53,10 @@ def _parse_accepted_answers(
     ]
 
 
-# ==================================================
-# REGISTER QUESTION COMMANDS
-# ==================================================
-
-
 def register_question_commands(
     tree: app_commands.CommandTree,
     guild: discord.Object,
 ):
-    """
-    Register commands for M.A.R.T.Y.'s
-    master question bank.
-    """
 
     command = make_command(
         tree=tree,
@@ -95,17 +79,6 @@ def register_question_commands(
     @app_commands.choices(
         category=QUESTION_CATEGORIES
     )
-    @app_commands.describe(
-        category="Question category.",
-        question="Question shown to students.",
-        accepted_answers=(
-            "Correct answers separated by |"
-        ),
-        explanation=(
-            "Explanation shown after "
-            "the question is answered."
-        ),
-    )
     async def addquestion(
         interaction: discord.Interaction,
         category: app_commands.Choice[str],
@@ -114,29 +87,14 @@ def register_question_commands(
         explanation: str,
     ):
 
-
-        # ==================================================
-        # SERVER CHECK
-        # ==================================================
-
-
         if interaction.guild is None:
 
             await interaction.response.send_message(
-                (
-                    "This command must be used "
-                    "inside a server."
-                ),
+                "This command must be used in a server.",
                 ephemeral=True,
             )
 
             return
-
-
-        # ==================================================
-        # ADMIN CHECK
-        # ==================================================
-
 
         if (
             not interaction.user
@@ -145,20 +103,11 @@ def register_question_commands(
         ):
 
             await interaction.response.send_message(
-                (
-                    "You do not have permission "
-                    "to add questions."
-                ),
+                "You do not have permission to add questions.",
                 ephemeral=True,
             )
 
             return
-
-
-        # ==================================================
-        # PARSE ANSWERS
-        # ==================================================
-
 
         parsed_answers = (
             _parse_accepted_answers(
@@ -169,20 +118,11 @@ def register_question_commands(
         if not parsed_answers:
 
             await interaction.response.send_message(
-                (
-                    "You must provide at least "
-                    "one accepted answer."
-                ),
+                "At least one accepted answer is required.",
                 ephemeral=True,
             )
 
             return
-
-
-        # ==================================================
-        # SAVE QUESTION
-        # ==================================================
-
 
         try:
 
@@ -193,45 +133,25 @@ def register_question_commands(
                 explanation=explanation,
             )
 
-        except ValueError as error:
+        except (
+            ValueError,
+            OSError,
+        ) as error:
 
             await interaction.response.send_message(
-                str(error),
+                f"⚠️ {error}",
                 ephemeral=True,
             )
 
             return
 
-        except OSError as error:
-
-            print(
-                "Question bank write error: "
-                f"{error!r}"
-            )
-
-            await interaction.response.send_message(
-                (
-                    "⚠️ M.A.R.T.Y. could not "
-                    "save the question."
-                ),
-                ephemeral=True,
-            )
-
-            return
-
-
-        # ==================================================
-        # SUCCESS
-        # ==================================================
-
+        question_id = (
+            new_question["id"]
+        )
 
         await interaction.response.send_message(
             (
-                f"✅ **Question #{new_question['id']} "
-                "added.**\n\n"
-                f"Category: **{category.name}**\n"
-                f"Accepted answers: "
-                f"**{len(new_question['accepted_answers'])}**"
+                f"✅ **Question #{question_id} added.**"
             ),
             ephemeral=True,
         )
@@ -251,58 +171,26 @@ def register_question_commands(
     @app_commands.choices(
         category=QUESTION_CATEGORIES
     )
-    @app_commands.describe(
-        category=(
-            "Optionally choose a question category."
-        ),
-        question_id=(
-            "Optionally post a specific question ID."
-        ),
-    )
     async def question(
         interaction: discord.Interaction,
         category: (
-            app_commands.Choice[str] | None
+            app_commands.Choice[str]
+            | None
         ) = None,
         question_id: int | None = None,
     ):
 
-
-        # ==================================================
-        # SERVER CHECK
-        # ==================================================
-
-
-        if interaction.guild is None:
+        if (
+            interaction.guild is None
+            or interaction.channel_id is None
+        ):
 
             await interaction.response.send_message(
-                (
-                    "This command must be used "
-                    "inside a server."
-                ),
+                "This command must be used in a server channel.",
                 ephemeral=True,
             )
 
             return
-
-
-        if interaction.channel_id is None:
-
-            await interaction.response.send_message(
-                (
-                    "M.A.R.T.Y. could not determine "
-                    "which channel to use."
-                ),
-                ephemeral=True,
-            )
-
-            return
-
-
-        # ==================================================
-        # DO NOT ALLOW CATEGORY + ID
-        # ==================================================
-
 
         if (
             category is not None
@@ -321,7 +209,7 @@ def register_question_commands(
 
 
         # ==================================================
-        # SPECIFIC QUESTION
+        # SPECIFIC ID
         # ==================================================
 
 
@@ -345,7 +233,6 @@ def register_question_commands(
 
                 return
 
-
             if not question_data.get(
                 "active",
                 True,
@@ -354,7 +241,24 @@ def register_question_commands(
                 await interaction.response.send_message(
                     (
                         f"Question #{question_id} "
-                        "is currently inactive."
+                        "is inactive."
+                    ),
+                    ephemeral=True,
+                )
+
+                return
+
+            if is_question_marked_for_edit(
+                question_id
+            ):
+
+                await interaction.response.send_message(
+                    (
+                        f"⚠️ **Question #{question_id} "
+                        "is currently marked for editing.**\n\n"
+                        "It cannot be posted until an "
+                        "administrator resolves it in "
+                        "`/flaggededit`."
                     ),
                     ephemeral=True,
                 )
@@ -363,7 +267,7 @@ def register_question_commands(
 
 
         # ==================================================
-        # RANDOM QUESTION
+        # RANDOM
         # ==================================================
 
 
@@ -385,9 +289,8 @@ def register_question_commands(
 
                 await interaction.response.send_message(
                     (
-                        "There are no active "
-                        "questions matching "
-                        "that selection."
+                        "There are no eligible "
+                        "questions matching that selection."
                     ),
                     ephemeral=True,
                 )
@@ -396,20 +299,16 @@ def register_question_commands(
 
 
         # ==================================================
-        # QUESTION INFORMATION
+        # POST
         # ==================================================
 
 
-        selected_question_id = (
+        selected_id = (
             question_data["id"]
         )
 
         category_code = (
             question_data["category"]
-        )
-
-        question_text = (
-            question_data["question"]
         )
 
         category_name = (
@@ -419,30 +318,35 @@ def register_question_commands(
             )
         )
 
-
-        # ==================================================
-        # MAKE QUESTION ACTIVE
-        # ==================================================
-
-
-        await set_active_speed_question(
-            guild_id=interaction.guild.id,
-            channel_id=interaction.channel_id,
-            question_id=selected_question_id,
+        context_key = (
+            await set_active_speed_question(
+                guild_id=(
+                    interaction.guild.id
+                ),
+                channel_id=(
+                    interaction.channel_id
+                ),
+                question_id=(
+                    selected_id
+                ),
+            )
         )
 
-
-        # ==================================================
-        # POST QUESTION
-        # ==================================================
-
+        view = QuestionFlagView(
+            question_bank_id=(
+                selected_id
+            ),
+            context_key=(
+                context_key
+            ),
+        )
 
         await interaction.response.send_message(
             (
                 "## 🚑 M.A.R.T.Y. Question "
-                f"#{selected_question_id}\n"
-                f"**Category:** "
-                f"{category_name}\n\n"
-                f"{question_text}"
-            )
+                f"#{selected_id}\n"
+                f"**Category:** {category_name}\n\n"
+                f"{question_data['question']}"
+            ),
+            view=view,
         )

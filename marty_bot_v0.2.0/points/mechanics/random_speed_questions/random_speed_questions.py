@@ -1,6 +1,9 @@
 import asyncio
 
-from datetime import datetime, timezone
+from datetime import (
+    datetime,
+    timezone,
+)
 
 import aiosqlite
 import discord
@@ -13,6 +16,10 @@ from questions.q_manager import (
     get_question_by_id,
 )
 
+from questions.q_attempts import (
+    record_question_attempt,
+)
+
 from points.points_operations.add_points import (
     add_points,
 )
@@ -22,11 +29,21 @@ from services.llm import (
 )
 
 
+# ==================================================
+# POINT VALUES
+# ==================================================
+
+
 SPEED_QUESTION_BASE_POINTS = 25
 
 SPEED_QUESTION_30_SECOND_BONUS = 25
 SPEED_QUESTION_1_MINUTE_BONUS = 10
 SPEED_QUESTION_3_MINUTE_BONUS = 5
+
+
+# ==================================================
+# GRADING LOCKS
+# ==================================================
 
 
 _grading_locks = {}
@@ -51,11 +68,43 @@ def _get_grading_lock(
     return _grading_locks[key]
 
 
+# ==================================================
+# SPEED QUESTION CONTEXT KEY
+# ==================================================
+
+
+def build_speed_question_context_key(
+    guild_id: int,
+    channel_id: int,
+    question_id: int,
+    posted_at: str,
+) -> str:
+    """
+    Build the generic context identifier for one
+    particular occurrence of a speed question.
+
+    Other systems treat this as an opaque string.
+    """
+
+    return (
+        f"rsq:"
+        f"{guild_id}:"
+        f"{channel_id}:"
+        f"{question_id}:"
+        f"{posted_at}"
+    )
+
+
+# ==================================================
+# SET ACTIVE SPEED QUESTION
+# ==================================================
+
+
 async def set_active_speed_question(
     guild_id: int,
     channel_id: int,
     question_id: int,
-):
+) -> str:
 
     posted_at = (
         datetime.now(
@@ -109,6 +158,24 @@ async def set_active_speed_question(
         await db.commit()
 
 
+    # ==================================================
+    # RETURN QUESTION INSTANCE CONTEXT
+    # ==================================================
+
+
+    return build_speed_question_context_key(
+        guild_id=guild_id,
+        channel_id=channel_id,
+        question_id=question_id,
+        posted_at=posted_at,
+    )
+
+
+# ==================================================
+# GET ACTIVE SPEED QUESTION
+# ==================================================
+
+
 async def get_active_speed_question(
     guild_id: int,
     channel_id: int,
@@ -148,6 +215,11 @@ async def get_active_speed_question(
         "answered_by": row[2],
         "answered_at": row[3],
     }
+
+
+# ==================================================
+# MARK ANSWERED
+# ==================================================
 
 
 async def mark_speed_question_answered(
@@ -194,6 +266,11 @@ async def mark_speed_question_answered(
         return cursor.rowcount > 0
 
 
+# ==================================================
+# ANSWER KEY
+# ==================================================
+
+
 def _build_answer_key(
     accepted_answers: list[str],
 ) -> str:
@@ -215,6 +292,11 @@ def _build_answer_key(
     )
 
 
+# ==================================================
+# ANSWER DISPLAY
+# ==================================================
+
+
 def _build_answer_display(
     accepted_answers: list[str],
 ) -> str:
@@ -228,6 +310,11 @@ def _build_answer_display(
         for answer
         in accepted_answers
     )
+
+
+# ==================================================
+# RESPONSE TIME
+# ==================================================
 
 
 def _get_response_seconds(
@@ -260,6 +347,11 @@ def _get_response_seconds(
     )
 
 
+# ==================================================
+# SPEED BONUS
+# ==================================================
+
+
 def get_speed_question_bonus(
     response_seconds: float,
 ) -> int:
@@ -285,6 +377,11 @@ def get_speed_question_bonus(
     return 0
 
 
+# ==================================================
+# REMOVE REACTION
+# ==================================================
+
+
 async def _remove_reaction(
     message: discord.Message,
     emoji: str,
@@ -306,10 +403,21 @@ async def _remove_reaction(
         pass
 
 
+# ==================================================
+# PROCESS SPEED QUESTION MESSAGE
+# ==================================================
+
+
 async def process_speed_question_message(
     message: discord.Message,
     bot_user,
 ):
+
+
+    # ==================================================
+    # BASIC CHECKS
+    # ==================================================
+
 
     if message.author.bot:
         return
@@ -331,6 +439,12 @@ async def process_speed_question_message(
 
         return
 
+
+    # ==================================================
+    # ACTIVE QUESTION
+    # ==================================================
+
+
     active_question = (
         await get_active_speed_question(
             guild_id=message.guild.id,
@@ -348,12 +462,24 @@ async def process_speed_question_message(
 
         return
 
+
+    # ==================================================
+    # GRADING LOCK
+    # ==================================================
+
+
     lock = _get_grading_lock(
         guild_id=message.guild.id,
         channel_id=message.channel.id,
     )
 
     async with lock:
+
+
+        # ==================================================
+        # RECHECK ACTIVE QUESTION
+        # ==================================================
+
 
         active_question = (
             await get_active_speed_question(
@@ -371,6 +497,12 @@ async def process_speed_question_message(
         ):
 
             return
+
+
+        # ==================================================
+        # QUESTION DATA
+        # ==================================================
+
 
         question_id = (
             active_question[
@@ -412,6 +544,37 @@ async def process_speed_question_message(
             )
         )
 
+
+        # ==================================================
+        # CONTEXT KEY
+        # ==================================================
+
+
+        context_key = (
+            build_speed_question_context_key(
+                guild_id=(
+                    message.guild.id
+                ),
+                channel_id=(
+                    message.channel.id
+                ),
+                question_id=(
+                    question_id
+                ),
+                posted_at=(
+                    active_question[
+                        "posted_at"
+                    ]
+                ),
+            )
+        )
+
+
+        # ==================================================
+        # RESPONSE TIME
+        # ==================================================
+
+
         response_seconds = (
             _get_response_seconds(
                 posted_at=(
@@ -425,6 +588,12 @@ async def process_speed_question_message(
             )
         )
 
+
+        # ==================================================
+        # GRADING INDICATOR
+        # ==================================================
+
+
         try:
 
             await message.add_reaction(
@@ -434,6 +603,12 @@ async def process_speed_question_message(
         except discord.HTTPException:
 
             pass
+
+
+        # ==================================================
+        # LLM GRADE
+        # ==================================================
+
 
         try:
 
@@ -470,6 +645,12 @@ async def process_speed_question_message(
 
             return
 
+
+        # ==================================================
+        # CONSOLE
+        # ==================================================
+
+
         print(
             "\n"
             "Speed Question Answer\n"
@@ -483,6 +664,49 @@ async def process_speed_question_message(
             f"Confidence: {grade.confidence}\n"
             f"Reason: {grade.reason}\n"
         )
+
+
+        # ==================================================
+        # RECORD ATTEMPT
+        # ==================================================
+
+
+        try:
+
+            await record_question_attempt(
+                guild_id=(
+                    message.guild.id
+                ),
+                user_id=(
+                    message.author.id
+                ),
+                question_bank_id=(
+                    question_id
+                ),
+                context_key=(
+                    context_key
+                ),
+                answer_text=content,
+                result=(
+                    "correct"
+                    if grade.correct
+                    else "incorrect"
+                ),
+            )
+
+        except Exception as error:
+
+            print(
+                "Speed question attempt "
+                "recording error: "
+                f"{error!r}"
+            )
+
+
+        # ==================================================
+        # INCORRECT
+        # ==================================================
+
 
         if not grade.correct:
 
@@ -504,6 +728,12 @@ async def process_speed_question_message(
 
             return
 
+
+        # ==================================================
+        # FIRST CORRECT ANSWER WINS
+        # ==================================================
+
+
         won = (
             await mark_speed_question_answered(
                 guild_id=message.guild.id,
@@ -522,6 +752,12 @@ async def process_speed_question_message(
             )
 
             return
+
+
+        # ==================================================
+        # POINTS
+        # ==================================================
+
 
         speed_bonus = (
             get_speed_question_bonus(
@@ -563,6 +799,12 @@ async def process_speed_question_message(
                 f"{error!r}"
             )
 
+
+        # ==================================================
+        # CORRECT REACTION
+        # ==================================================
+
+
         try:
 
             await message.add_reaction(
@@ -579,11 +821,23 @@ async def process_speed_question_message(
             bot_user=bot_user,
         )
 
+
+        # ==================================================
+        # ANSWER DISPLAY
+        # ==================================================
+
+
         answer_display = (
             _build_answer_display(
                 accepted_answers
             )
         )
+
+
+        # ==================================================
+        # WINNER EMBED
+        # ==================================================
+
 
         winner_embed = discord.Embed(
             title=(

@@ -23,12 +23,20 @@ from commands.admin_commands.qotd_admin_commands import (
     register_qotd_admin_commands,
 )
 
+from commands.admin_commands.q_flag_admin_commands import (
+    register_question_flag_admin_commands,
+)
+
 from data.user_db import (
     init_user_db,
 )
 
 from data.system_db import (
     init_system_db,
+)
+
+from setup import (
+    configure_qotd_channel,
 )
 
 from points.mechanics.activity.activity import (
@@ -120,6 +128,16 @@ class MartyBot(
         )
 
 
+        # ==================================================
+        # QOTD CHANNEL SETUP STATE
+        # ==================================================
+
+
+        self._qotd_channel_configured = (
+            False
+        )
+
+
     # ==================================================
     # SETUP
     # ==================================================
@@ -195,6 +213,11 @@ class MartyBot(
             guild=guild,
         )
 
+        register_question_flag_admin_commands(
+            tree=self.tree,
+            guild=guild,
+        )
+
 
         # ==================================================
         # SYNC COMMANDS
@@ -241,6 +264,7 @@ class MartyBot(
 
         restored_count = 0
 
+
         for qotd in qotds:
 
             qotd_id = (
@@ -255,6 +279,7 @@ class MartyBot(
 
                 continue
 
+
             self.add_view(
                 QotdAnswerView(
                     qotd_id=qotd_id
@@ -263,6 +288,7 @@ class MartyBot(
             )
 
             restored_count += 1
+
 
         print(
             "Restored "
@@ -280,6 +306,34 @@ class MartyBot(
         self,
     ):
 
+
+        # ==================================================
+        # CONFIGURE QOTD CHANNEL
+        # ==================================================
+
+
+        if not self._qotd_channel_configured:
+
+            configured = (
+                await configure_qotd_channel(
+                    bot=self,
+                    guild_id=DEV_GUILD_ID,
+                    channel_id=QOTD_CHANNEL_ID,
+                )
+            )
+
+            if configured:
+
+                self._qotd_channel_configured = (
+                    True
+                )
+
+
+        # ==================================================
+        # ONLINE
+        # ==================================================
+
+
         print(
             "M.A.R.T.Y. is online as "
             f"{self.user}"
@@ -295,6 +349,12 @@ class MartyBot(
         self,
         message: discord.Message,
     ):
+
+
+        # ==================================================
+        # IGNORE BOT MESSAGES
+        # ==================================================
+
 
         if message.author.bot:
 

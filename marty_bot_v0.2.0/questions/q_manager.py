@@ -1,7 +1,12 @@
 import json
 import random
+
 from pathlib import Path
 from threading import Lock
+
+from questions.q_edit_queue import (
+    get_question_edit_hold_ids,
+)
 
 
 # ==================================================
@@ -55,10 +60,6 @@ _q_bank_lock = Lock()
 def _get_category_path(
     category: str,
 ) -> Path:
-    """
-    Return the JSON file belonging to a
-    question category.
-    """
 
     if category not in CATEGORY_NAMES:
 
@@ -80,9 +81,6 @@ def _get_category_path(
 def _load_json_file(
     path: Path,
 ):
-    """
-    Load JSON data from disk.
-    """
 
     with path.open(
         "r",
@@ -98,13 +96,6 @@ def _save_json_file(
     path: Path,
     data,
 ):
-    """
-    Save JSON data atomically.
-
-    A temporary file is written first so an
-    interrupted write is less likely to damage
-    the real question-bank file.
-    """
 
     path.parent.mkdir(
         parents=True,
@@ -139,15 +130,11 @@ def _save_json_file(
 
 
 # ==================================================
-# QUESTION BANK SETUP
+# SETUP
 # ==================================================
 
 
 def _ensure_q_bank_exists():
-    """
-    Make sure the question-bank folder,
-    metadata file, and category files exist.
-    """
 
     Q_BANK_DIR.mkdir(
         parents=True,
@@ -185,12 +172,6 @@ def _ensure_q_bank_exists():
 
 
 def _load_metadata() -> dict:
-    """
-    Load information about the question bank.
-
-    metadata.json currently stores the next
-    permanent global question ID.
-    """
 
     _ensure_q_bank_exists()
 
@@ -220,9 +201,6 @@ def _load_metadata() -> dict:
 def _save_metadata(
     metadata: dict,
 ):
-    """
-    Save question-bank metadata.
-    """
 
     _save_json_file(
         METADATA_PATH,
@@ -238,23 +216,17 @@ def _save_metadata(
 def _load_category_questions(
     category: str,
 ) -> list[dict]:
-    """
-    Load all questions in one category.
-
-    The category is represented by the filename,
-    so it is added to each question in memory.
-    """
 
     _ensure_q_bank_exists()
 
-    category_path = (
+    path = (
         _get_category_path(
             category
         )
     )
 
     questions = _load_json_file(
-        category_path
+        path
     )
 
     if not isinstance(
@@ -263,11 +235,11 @@ def _load_category_questions(
     ):
 
         raise ValueError(
-            f"{category_path.name} must "
-            "contain a JSON list."
+            f"{path.name} must contain "
+            "a JSON list."
         )
 
-    loaded_questions = []
+    loaded = []
 
     for question in questions:
 
@@ -277,107 +249,92 @@ def _load_category_questions(
         ):
 
             raise ValueError(
-                f"{category_path.name} contains "
+                f"{path.name} contains "
                 "an invalid question."
             )
 
-        loaded_question = dict(
+        item = dict(
             question
         )
 
-        loaded_question["category"] = (
+        item["category"] = (
             category
         )
 
-        loaded_questions.append(
-            loaded_question
+        loaded.append(
+            item
         )
 
-    return loaded_questions
+    return loaded
 
 
 def _save_category_questions(
     category: str,
     questions: list[dict],
 ):
-    """
-    Save all questions in one category.
 
-    The category field is removed from the
-    stored JSON because the filename already
-    identifies the category.
-    """
-
-    category_path = (
-        _get_category_path(
-            category
-        )
-    )
-
-    questions_to_save = []
+    stored_questions = []
 
     for question in questions:
 
-        stored_question = dict(
+        stored = dict(
             question
         )
 
-        stored_question.pop(
+        stored.pop(
             "category",
             None,
         )
 
-        questions_to_save.append(
-            stored_question
+        stored_questions.append(
+            stored
         )
 
     _save_json_file(
-        category_path,
-        questions_to_save,
+        _get_category_path(
+            category
+        ),
+        stored_questions,
     )
 
 
 # ==================================================
-# CLEAN ACCEPTED ANSWERS
+# CLEAN ANSWERS
 # ==================================================
 
 
 def _clean_accepted_answers(
     accepted_answers: list[str],
 ) -> list[str]:
-    """
-    Remove blank and duplicate accepted
-    answers.
-    """
 
-    cleaned_answers = []
-    seen_answers = set()
+    cleaned = []
+    seen = set()
 
     for answer in accepted_answers:
 
-        cleaned_answer = (
+        value = (
             answer.strip()
         )
 
-        if not cleaned_answer:
+        if not value:
             continue
 
-        comparison_answer = (
-            cleaned_answer.casefold()
+        comparison = (
+            value.casefold()
         )
 
-        if comparison_answer in seen_answers:
+        if comparison in seen:
             continue
 
-        seen_answers.add(
-            comparison_answer
+        seen.add(
+            comparison
         )
 
-        cleaned_answers.append(
-            cleaned_answer
+        cleaned.append(
+            value
         )
 
-    return cleaned_answers
+    return cleaned
 
 
 # ==================================================
@@ -386,15 +343,8 @@ def _clean_accepted_answers(
 
 
 def _get_highest_question_id() -> int:
-    """
-    Return the highest permanent question ID
-    currently stored in the entire bank.
 
-    This protects against metadata.json becoming
-    accidentally lower than an existing ID.
-    """
-
-    highest_id = 0
+    highest = 0
 
     for category in CATEGORY_NAMES:
 
@@ -406,16 +356,14 @@ def _get_highest_question_id() -> int:
 
         for question in questions:
 
-            question_id = int(
-                question["id"]
+            highest = max(
+                highest,
+                int(
+                    question["id"]
+                ),
             )
 
-            highest_id = max(
-                highest_id,
-                question_id,
-            )
-
-    return highest_id
+    return highest
 
 
 # ==================================================
@@ -429,14 +377,6 @@ def add_question(
     accepted_answers: list[str],
     explanation: str,
 ) -> dict:
-    """
-    Add a new question to the permanent
-    M.A.R.T.Y. question bank.
-
-    The question is written to its category
-    file and receives a globally unique
-    permanent numeric ID.
-    """
 
     category = (
         category.strip()
@@ -455,12 +395,6 @@ def add_question(
             accepted_answers
         )
     )
-
-
-    # ==================================================
-    # VALIDATION
-    # ==================================================
-
 
     if category not in CATEGORY_NAMES:
 
@@ -487,27 +421,17 @@ def add_question(
             "Explanation cannot be empty."
         )
 
-
-    # ==================================================
-    # SAVE QUESTION
-    # ==================================================
-
-
     with _q_bank_lock:
 
         metadata = (
             _load_metadata()
         )
 
-        highest_question_id = (
-            _get_highest_question_id()
-        )
-
         question_id = max(
             int(
                 metadata["next_id"]
             ),
-            highest_question_id + 1,
+            _get_highest_question_id() + 1,
         )
 
         new_question = {
@@ -519,19 +443,19 @@ def add_question(
             "active": True,
         }
 
-        category_questions = (
+        questions = (
             _load_category_questions(
                 category
             )
         )
 
-        category_questions.append(
+        questions.append(
             new_question
         )
 
         _save_category_questions(
             category=category,
-            questions=category_questions,
+            questions=questions,
         )
 
         metadata["next_id"] = (
@@ -546,6 +470,91 @@ def add_question(
 
 
 # ==================================================
+# UPDATE QUESTION
+# ==================================================
+
+
+def update_question(
+    question_id: int,
+    question_text: str,
+    accepted_answers: list[str],
+) -> dict:
+
+    question_text = (
+        question_text.strip()
+    )
+
+    cleaned_answers = (
+        _clean_accepted_answers(
+            accepted_answers
+        )
+    )
+
+    if not question_text:
+
+        raise ValueError(
+            "Question text cannot be empty."
+        )
+
+    if not cleaned_answers:
+
+        raise ValueError(
+            "At least one accepted answer "
+            "must be provided."
+        )
+
+    with _q_bank_lock:
+
+        for category in CATEGORY_NAMES:
+
+            questions = (
+                _load_category_questions(
+                    category
+                )
+            )
+
+            for index, question in enumerate(
+                questions
+            ):
+
+                if (
+                    int(
+                        question["id"]
+                    )
+                    != question_id
+                ):
+                    continue
+
+                updated = dict(
+                    question
+                )
+
+                updated["question"] = (
+                    question_text
+                )
+
+                updated[
+                    "accepted_answers"
+                ] = cleaned_answers
+
+                questions[index] = (
+                    updated
+                )
+
+                _save_category_questions(
+                    category=category,
+                    questions=questions,
+                )
+
+                return updated
+
+    raise ValueError(
+        f"Question #{question_id} "
+        "was not found."
+    )
+
+
+# ==================================================
 # GET QUESTION BY ID
 # ==================================================
 
@@ -554,8 +563,11 @@ def get_question_by_id(
     question_id: int,
 ) -> dict | None:
     """
-    Retrieve a question using its permanent
-    question ID.
+    Direct retrieval still returns a quarantined
+    question.
+
+    Admin interfaces need to be able to see and
+    edit questions that are being held.
     """
 
     for category in CATEGORY_NAMES:
@@ -569,7 +581,9 @@ def get_question_by_id(
         for question in questions:
 
             if (
-                question["id"]
+                int(
+                    question["id"]
+                )
                 == question_id
             ):
 
@@ -587,10 +601,8 @@ def get_all_questions(
     active_only: bool = True,
 ) -> list[dict]:
     """
-    Return questions from every category.
-
-    By default, inactive questions are not
-    returned.
+    When active_only=True, questions currently
+    in the edit queue are automatically excluded.
     """
 
     all_questions = []
@@ -607,12 +619,22 @@ def get_all_questions(
 
         return all_questions
 
+    held_ids = (
+        get_question_edit_hold_ids()
+    )
+
     return [
         question
         for question in all_questions
-        if question.get(
-            "active",
-            True,
+        if (
+            question.get(
+                "active",
+                True,
+            )
+            and int(
+                question["id"]
+            )
+            not in held_ids
         )
     ]
 
@@ -626,24 +648,18 @@ def get_random_question(
     category: str | None = None,
     excluded_ids: set[int] | None = None,
 ) -> dict | None:
-    """
-    Select a random active question.
-
-    category can restrict selection to one
-    category.
-
-    excluded_ids can prevent reserved questions
-    from being selected.
-    """
 
     if excluded_ids is None:
         excluded_ids = set()
 
+    held_ids = (
+        get_question_edit_hold_ids()
+    )
 
-    # ==================================================
-    # LOAD QUESTIONS
-    # ==================================================
-
+    excluded_ids = (
+        set(excluded_ids)
+        | held_ids
+    )
 
     if category is not None:
 
@@ -667,13 +683,7 @@ def get_random_question(
             )
         )
 
-
-    # ==================================================
-    # FILTER
-    # ==================================================
-
-
-    eligible_questions = []
+    eligible = []
 
     for question in questions:
 
@@ -684,35 +694,33 @@ def get_random_question(
             continue
 
         if (
-            question["id"]
+            int(
+                question["id"]
+            )
             in excluded_ids
         ):
             continue
 
-        eligible_questions.append(
+        eligible.append(
             question
         )
 
-    if not eligible_questions:
+    if not eligible:
         return None
 
     return random.choice(
-        eligible_questions
+        eligible
     )
 
 
 # ==================================================
-# GET QUESTION COUNT
+# COUNT
 # ==================================================
 
 
 def get_question_count(
     active_only: bool = True,
 ) -> int:
-    """
-    Return the number of questions currently
-    stored across all categories.
-    """
 
     return len(
         get_all_questions(
