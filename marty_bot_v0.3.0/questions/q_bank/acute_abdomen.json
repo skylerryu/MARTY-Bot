@@ -1,0 +1,290 @@
+[
+    {
+        "id": 62,
+        "question": "What does guarding of the abdomen mean?",
+        "accepted_answers": [
+            "Tensing of the abdominal muscles to protect a painful area"
+        ],
+        "explanation": "Guarding is involuntary or voluntary abdominal muscle tension associated with pain or irritation.",
+        "active": true
+    },
+    {
+        "id": 63,
+        "question": "What does abdominal rigidity suggest?",
+        "accepted_answers": [
+            "Peritoneal irritation"
+        ],
+        "explanation": "A rigid or board-like abdomen can suggest irritation of the peritoneum and a potentially serious abdominal process.",
+        "active": true
+    },
+    {
+        "id": 64,
+        "question": "What is hematemesis?",
+        "accepted_answers": [
+            "Vomiting blood"
+        ],
+        "explanation": "Hematemesis means vomiting blood and may indicate upper gastrointestinal bleeding.",
+        "active": true
+    },
+    {
+        "id": 65,
+        "question": "What is melena?",
+        "accepted_answers": [
+            "Black tarry stool caused by digested blood"
+        ],
+        "explanation": "Melena is dark, tarry stool commonly associated with digested blood from gastrointestinal bleeding.",
+        "active": true
+    },
+    {
+        "id": 66,
+        "question": "What is the primary prehospital concern with significant gastrointestinal bleeding?",
+        "accepted_answers": [
+            "Shock"
+        ],
+        "explanation": "Major gastrointestinal bleeding can cause substantial blood loss and hypovolemic shock.",
+        "active": true
+    },
+    {
+        "id": 67,
+        "question": "Why should an EMT avoid giving food or drink to a patient with a potentially serious acute abdomen?",
+        "accepted_answers": [
+            "The patient may require surgery or other urgent procedures"
+        ],
+        "explanation": "Patients with a serious acute abdomen may need anesthesia or procedures, so oral intake is generally avoided unless specifically indicated by protocol.",
+        "active": true
+    },
+    {
+        "id": 68,
+        "question": "What does rebound tenderness suggest?",
+        "accepted_answers": [
+            "Peritoneal irritation"
+        ],
+        "explanation": "Pain that worsens when pressure is released can be associated with irritation of the peritoneum.",
+        "active": true
+    },
+    {
+        "id": 69,
+        "question": "What life-threatening vascular condition may present with abdominal or back pain and signs of shock?",
+        "accepted_answers": [
+            "Abdominal aortic aneurysm"
+        ],
+        "explanation": "A leaking or ruptured abdominal aortic aneurysm can cause severe abdominal or back pain with internal bleeding and shock.",
+        "active": true
+    },
+    {
+        "id": 182,
+        "question": "During EMT review, what does guarding of the abdomen mean?",
+        "accepted_answers": [
+            "Tensing of the abdominal muscles to protect a painful area"
+        ],
+        "explanation": "Guarding is involuntary or voluntary abdominal muscle tension associated with pain or irritation.",
+        "active": true
+    },
+    {
+        "id": 183,
+        "question": "During EMT review, what does abdominal rigidity suggest?",
+        "accepted_answers": [
+            "Peritoneal irritation"
+        ],
+        "explanation": "A rigid or board-like abdomen can suggest irritation of the peritoneum and a potentially serious abdominal process.",
+        "active": true
+    },
+    {
+        "id": 184,
+        "question": "During EMT review, what is hematemesis?",
+        "accepted_answers": [
+            "Vomiting blood"
+        ],
+        "explanation": "Hematemesis means vomiting blood and may indicate upper gastrointestinal bleeding.",
+        "active": true
+    },
+    {
+        "id": 185,
+        "question": "During EMT review, what is melena?",
+        "accepted_answers": [
+            "Black tarry stool caused by digested blood"
+        ],
+        "explanation": "Melena is dark, tarry stool commonly associated with digested blood from gastrointestinal bleeding.",
+        "active": true
+    },
+    {
+        "id": 186,
+        "question": "During EMT review, what is the primary prehospital concern with significant gastrointestinal bleeding?",
+        "accepted_answers": [
+            "Shock"
+        ],
+        "explanation": "Major gastrointestinal bleeding can cause substantial blood loss and hypovolemic shock.",
+        "active": true
+    },
+    {
+        "id": 187,
+        "question": "During EMT review, why should an EMT avoid giving food or drink to a patient with a potentially serious acute abdomen?",
+        "accepted_answers": [
+            "The patient may require surgery or other urgent procedures"
+        ],
+        "explanation": "Patients with a serious acute abdomen may need anesthesia or procedures, so oral intake is generally avoided unless specifically indicated by protocol.",
+        "active": true
+    },
+    {
+        "id": 188,
+        "question": "During EMT review, what does rebound tenderness suggest?",
+        "accepted_answers": [
+            "Peritoneal irritation"
+        ],
+        "explanation": "Pain that worsens when pressure is released can be associated with irritation of the peritoneum.",
+        "active": true
+    },
+    {
+        "id": 189,
+        "question": "During EMT review, what life-threatening vascular condition may present with abdominal or back pain and signs of shock?",
+        "accepted_answers": [
+            "Abdominal aortic aneurysm"
+        ],
+        "explanation": "A leaking or ruptured abdominal aortic aneurysm can cause severe abdominal or back pain with internal bleeding and shock.",
+        "active": true
+    },
+    {
+        "id": 302,
+        "question": "An EMT student is asked: What does guarding of the abdomen mean?",
+        "accepted_answers": [
+            "Tensing of the abdominal muscles to protect a painful area"
+        ],
+        "explanation": "Guarding is involuntary or voluntary abdominal muscle tension associated with pain or irritation.",
+        "active": true
+    },
+    {
+        "id": 303,
+        "question": "An EMT student is asked: What does abdominal rigidity suggest?",
+        "accepted_answers": [
+            "Peritoneal irritation"
+        ],
+        "explanation": "A rigid or board-like abdomen can suggest irritation of the peritoneum and a potentially serious abdominal process.",
+        "active": true
+    },
+    {
+        "id": 304,
+        "question": "An EMT student is asked: What is hematemesis?",
+        "accepted_answers": [
+            "Vomiting blood"
+        ],
+        "explanation": "Hematemesis means vomiting blood and may indicate upper gastrointestinal bleeding.",
+        "active": true
+    },
+    {
+        "id": 305,
+        "question": "An EMT student is asked: What is melena?",
+        "accepted_answers": [
+            "Black tarry stool caused by digested blood"
+        ],
+        "explanation": "Melena is dark, tarry stool commonly associated with digested blood from gastrointestinal bleeding.",
+        "active": true
+    },
+    {
+        "id": 306,
+        "question": "An EMT student is asked: What is the primary prehospital concern with significant gastrointestinal bleeding?",
+        "accepted_answers": [
+            "Shock"
+        ],
+        "explanation": "Major gastrointestinal bleeding can cause substantial blood loss and hypovolemic shock.",
+        "active": true
+    },
+    {
+        "id": 307,
+        "question": "An EMT student is asked: Why should an EMT avoid giving food or drink to a patient with a potentially serious acute abdomen?",
+        "accepted_answers": [
+            "The patient may require surgery or other urgent procedures"
+        ],
+        "explanation": "Patients with a serious acute abdomen may need anesthesia or procedures, so oral intake is generally avoided unless specifically indicated by protocol.",
+        "active": true
+    },
+    {
+        "id": 308,
+        "question": "An EMT student is asked: What does rebound tenderness suggest?",
+        "accepted_answers": [
+            "Peritoneal irritation"
+        ],
+        "explanation": "Pain that worsens when pressure is released can be associated with irritation of the peritoneum.",
+        "active": true
+    },
+    {
+        "id": 309,
+        "question": "An EMT student is asked: What life-threatening vascular condition may present with abdominal or back pain and signs of shock?",
+        "accepted_answers": [
+            "Abdominal aortic aneurysm"
+        ],
+        "explanation": "A leaking or ruptured abdominal aortic aneurysm can cause severe abdominal or back pain with internal bleeding and shock.",
+        "active": true
+    },
+    {
+        "id": 422,
+        "question": "In a patient-care scenario, what does guarding of the abdomen mean?",
+        "accepted_answers": [
+            "Tensing of the abdominal muscles to protect a painful area"
+        ],
+        "explanation": "Guarding is involuntary or voluntary abdominal muscle tension associated with pain or irritation.",
+        "active": true
+    },
+    {
+        "id": 423,
+        "question": "In a patient-care scenario, what does abdominal rigidity suggest?",
+        "accepted_answers": [
+            "Peritoneal irritation"
+        ],
+        "explanation": "A rigid or board-like abdomen can suggest irritation of the peritoneum and a potentially serious abdominal process.",
+        "active": true
+    },
+    {
+        "id": 424,
+        "question": "In a patient-care scenario, what is hematemesis?",
+        "accepted_answers": [
+            "Vomiting blood"
+        ],
+        "explanation": "Hematemesis means vomiting blood and may indicate upper gastrointestinal bleeding.",
+        "active": true
+    },
+    {
+        "id": 425,
+        "question": "In a patient-care scenario, what is melena?",
+        "accepted_answers": [
+            "Black tarry stool caused by digested blood"
+        ],
+        "explanation": "Melena is dark, tarry stool commonly associated with digested blood from gastrointestinal bleeding.",
+        "active": true
+    },
+    {
+        "id": 426,
+        "question": "In a patient-care scenario, what is the primary prehospital concern with significant gastrointestinal bleeding?",
+        "accepted_answers": [
+            "Shock"
+        ],
+        "explanation": "Major gastrointestinal bleeding can cause substantial blood loss and hypovolemic shock.",
+        "active": true
+    },
+    {
+        "id": 427,
+        "question": "In a patient-care scenario, why should an EMT avoid giving food or drink to a patient with a potentially serious acute abdomen?",
+        "accepted_answers": [
+            "The patient may require surgery or other urgent procedures"
+        ],
+        "explanation": "Patients with a serious acute abdomen may need anesthesia or procedures, so oral intake is generally avoided unless specifically indicated by protocol.",
+        "active": true
+    },
+    {
+        "id": 428,
+        "question": "In a patient-care scenario, what does rebound tenderness suggest?",
+        "accepted_answers": [
+            "Peritoneal irritation"
+        ],
+        "explanation": "Pain that worsens when pressure is released can be associated with irritation of the peritoneum.",
+        "active": true
+    },
+    {
+        "id": 429,
+        "question": "In a patient-care scenario, what life-threatening vascular condition may present with abdominal or back pain and signs of shock?",
+        "accepted_answers": [
+            "Abdominal aortic aneurysm"
+        ],
+        "explanation": "A leaking or ruptured abdominal aortic aneurysm can cause severe abdominal or back pain with internal bleeding and shock.",
+        "active": true
+    }
+]

@@ -186,21 +186,28 @@ class QotdAnswerModal(
             )
         )
 
-
         try:
 
             try:
 
-                result = await submit_qotd_answer(
-                    qotd_id=self.qotd_id,
-                    guild_id=interaction.guild.id,
-                    user_id=interaction.user.id,
-                    username=(
-                        interaction.user.display_name
-                    ),
-                    submitted_answer=(
-                        submitted_answer
-                    ),
+                result = (
+                    await submit_qotd_answer(
+                        qotd_id=(
+                            self.qotd_id
+                        ),
+                        guild_id=(
+                            interaction.guild.id
+                        ),
+                        user_id=(
+                            interaction.user.id
+                        ),
+                        username=(
+                            interaction.user.display_name
+                        ),
+                        submitted_answer=(
+                            submitted_answer
+                        ),
+                    )
                 )
 
             except Exception as error:
@@ -345,27 +352,6 @@ class QotdAnswerModal(
 
 
         # ==================================================
-        # GET QOTD BANK ANSWER(S)
-        # ==================================================
-
-
-        qotd = await get_qotd(
-            self.qotd_id
-        )
-
-        if qotd is None:
-
-            await interaction.followup.send(
-                embed=(
-                    build_qotd_unavailable_embed()
-                ),
-                ephemeral=True,
-            )
-
-            return
-
-
-        # ==================================================
         # DISPLAY CORRECT RESULT
         # ==================================================
 
@@ -374,22 +360,34 @@ class QotdAnswerModal(
             embed=(
                 build_qotd_correct_embed(
                     accepted_answers=(
-                        qotd["accepted_answers"]
+                        result[
+                            "accepted_answers"
+                        ]
                     ),
                     submitted_answer=(
-                        submitted_answer
+                        result[
+                            "submitted_answer"
+                        ]
                     ),
                     base_points=(
-                        result["base_points"]
+                        result[
+                            "base_points"
+                        ]
                     ),
                     streak_bonus=(
-                        result["streak_bonus"]
+                        result[
+                            "streak_bonus"
+                        ]
                     ),
                     streak_days=(
-                        result["streak_days"]
+                        result[
+                            "streak_days"
+                        ]
                     ),
                     explanation=(
-                        result["explanation"]
+                        result[
+                            "explanation"
+                        ]
                     ),
                 )
             ),

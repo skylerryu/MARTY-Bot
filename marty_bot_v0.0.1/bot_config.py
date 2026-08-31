@@ -68,3 +68,12 @@ OFF_DUTY_NAME = (
 # ==================================================
 
 ACTIVITY_COOLDOWN = 90
+
+# ==================================================
+# QUESTION CATEGORIES
+# ==================================================
+
+CATEGORY_NAMES = {
+    "cpr_airway": "CPR / Airway",
+    "cardiac": "Cardiac",
+}
