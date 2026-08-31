@@ -14,7 +14,7 @@ from commands.qotd_commands import (
     register_qotd_commands,
 )
 
-from commands.question_commands import (
+from commands.q_commands import (
     register_question_commands,
 )
 
