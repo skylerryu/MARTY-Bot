@@ -3,4 +3,4 @@ python-dotenv
 aiosqlite
 tzdata
 openai
-pydantic
+pydanticpython3 -m venv .venv
