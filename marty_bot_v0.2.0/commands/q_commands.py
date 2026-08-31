@@ -5,7 +5,7 @@ from commands.command_helpers import (
     make_command,
 )
 
-from data.questions.q_manager import (
+from questions.q_manager import (
     CATEGORY_NAMES,
     add_question,
     get_question_by_id,

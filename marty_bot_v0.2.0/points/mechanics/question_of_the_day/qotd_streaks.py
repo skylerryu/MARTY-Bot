@@ -2,7 +2,9 @@ from datetime import date, timedelta
 
 import aiosqlite
 
-from data.database import DB_PATH
+from data.user_db import (
+    USER_DB_PATH,
+)
 
 from points.mechanics.question_of_the_day.qotd_config import (
     QOTD_STREAK_DAY_1_BONUS,
@@ -31,7 +33,7 @@ async def get_qotd_streak(
     """
 
     async with aiosqlite.connect(
-        DB_PATH
+        USER_DB_PATH
     ) as db:
 
         cursor = await db.execute(
@@ -86,20 +88,6 @@ def calculate_next_qotd_streak(
     """
     Calculate the streak that should result
     from completing a QoTD on completion_date.
-
-    Rules:
-
-    - First completion:
-        streak = 1
-
-    - Last completion was yesterday:
-        streak increases by 1
-
-    - Last completion was today:
-        streak does not increase
-
-    - One or more calendar days were missed:
-        streak resets to 1
     """
 
     if last_completion_date is None:
@@ -133,22 +121,6 @@ def calculate_next_qotd_streak(
 def get_qotd_streak_bonus(
     streak_days: int,
 ) -> int:
-    """
-    Return the point bonus associated with
-    the current QoTD streak.
-
-    Day 1:
-        +1
-
-    Days 2-3:
-        +2
-
-    Days 4-6:
-        +5
-
-    Day 7+:
-        +10
-    """
 
     if streak_days <= 0:
         return 0
@@ -184,15 +156,9 @@ async def update_qotd_streak(
     streak_days: int,
     completion_date: date,
 ):
-    """
-    Save a user's current QoTD streak.
-
-    Creates a streak record for new users or
-    updates the existing record.
-    """
 
     async with aiosqlite.connect(
-        DB_PATH
+        USER_DB_PATH
     ) as db:
 
         await db.execute(

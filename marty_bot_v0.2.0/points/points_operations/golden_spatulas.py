@@ -1,7 +1,7 @@
 import aiosqlite
 
-from data.database import (
-    DB_PATH,
+from data.user_db import (
+    USER_DB_PATH,
 )
 
 from points.points_operations.operations_helpers import (
@@ -24,7 +24,7 @@ async def award_golden_spatula(
     """
 
     async with aiosqlite.connect(
-        DB_PATH
+        USER_DB_PATH
     ) as db:
 
         if username is not None:
@@ -68,7 +68,7 @@ async def get_golden_spatulas(
     """
 
     async with aiosqlite.connect(
-        DB_PATH
+        USER_DB_PATH
     ) as db:
 
         cursor = await db.execute(

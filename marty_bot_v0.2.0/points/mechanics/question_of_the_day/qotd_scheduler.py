@@ -1,17 +1,25 @@
 import asyncio
 import random
-from datetime import time
+
+from datetime import (
+    datetime,
+    time,
+    timedelta,
+)
+
 from zoneinfo import ZoneInfo
 
 import discord
+
 from discord.ext import tasks
 
-from data.questions.q_manager import (
+from questions.q_manager import (
     get_all_questions,
 )
 
 from points.time_helpers import (
-    get_current_chicago_date,
+    get_chicago_datetime,
+    get_current_chicago_datetime,
 )
 
 from points.mechanics.question_of_the_day.qotd_config import (
@@ -23,9 +31,10 @@ from points.mechanics.question_of_the_day.qotd_config import (
 from points.mechanics.question_of_the_day.qotd_questions import (
     QotdAlreadyExistsError,
     create_qotd,
+    get_active_qotd,
     get_qotd_for_date,
     get_used_qotd_question_bank_ids,
-    get_older_posted_qotds,
+    get_expired_posted_qotds,
     set_qotd_message_id,
 )
 
@@ -66,25 +75,92 @@ QOTD_POST_TIME = time(
 
 
 # ==================================================
-# QOTD QUESTION SELECTION
+# NEXT QOTD DEADLINE
+# ==================================================
+
+
+def get_next_qotd_deadline(
+    now: datetime | None = None,
+) -> datetime:
+    """
+    Return the next upcoming configured QoTD
+    posting time.
+
+    Example with a 6:00 AM posting time:
+
+    12:30 AM today
+        -> today at 6:00 AM
+
+    5:59 AM today
+        -> today at 6:00 AM
+
+    6:00 AM today
+        -> tomorrow at 6:00 AM
+
+    4:00 PM today
+        -> tomorrow at 6:00 AM
+    """
+
+    if now is None:
+
+        now = (
+            get_current_chicago_datetime()
+        )
+
+    deadline = (
+        get_chicago_datetime(
+            calendar_date=now.date(),
+            hour=QOTD_POST_HOUR,
+            minute=QOTD_POST_MINUTE,
+        )
+    )
+
+    if now >= deadline:
+
+        deadline = (
+            deadline
+            + timedelta(days=1)
+        )
+
+    return deadline
+
+
+# ==================================================
+# LOGICAL QOTD DATE
+# ==================================================
+
+
+def _get_question_date_from_deadline(
+    deadline: datetime,
+):
+    """
+    Return the logical date for the QoTD period.
+
+    This is used for streaks and the displayed
+    QoTD date.
+
+    The actual expiration is always controlled
+    directly by expires_at.
+    """
+
+    return (
+        deadline
+        - timedelta(days=1)
+    ).date()
+
+
+# ==================================================
+# QUESTION SELECTION
 # ==================================================
 
 
 def _get_random_qotd_question(
     excluded_ids: set[int] | None = None,
 ) -> dict | None:
-    """
-    Select a random active question that is
-    eligible for Question of the Day.
-
-    CET Fun Facts are intentionally excluded
-    from QoTD selection.
-    """
 
     if excluded_ids is None:
 
         excluded_ids = set()
-
 
     eligible_questions = [
         question
@@ -99,11 +175,9 @@ def _get_random_qotd_question(
         )
     ]
 
-
     if not eligible_questions:
 
         return None
-
 
     return random.choice(
         eligible_questions
@@ -128,7 +202,9 @@ class QotdScheduler:
         self.guild_id = guild_id
         self.channel_id = channel_id
 
-        self._post_lock = asyncio.Lock()
+        self._post_lock = (
+            asyncio.Lock()
+        )
 
 
     # ==================================================
@@ -207,7 +283,7 @@ class QotdScheduler:
 
 
     # ==================================================
-    # ENSURE TODAY'S QOTD IS POSTED
+    # ENSURE QOTD IS POSTED
     # ==================================================
 
 
@@ -220,7 +296,7 @@ class QotdScheduler:
 
 
             # ==================================================
-            # POSTING TIME CHECK
+            # STARTUP TIME CHECK
             # ==================================================
 
 
@@ -233,56 +309,45 @@ class QotdScheduler:
 
 
             # ==================================================
-            # TODAY
+            # REMOVE EXPIRED BUTTONS
             # ==================================================
 
 
-            current_date = (
-                get_current_chicago_date()
+            await self._remove_expired_qotd_buttons()
+
+
+            # ==================================================
+            # EXISTING ACTIVE QOTD
+            # ==================================================
+
+
+            qotd = (
+                await get_active_qotd(
+                    guild_id=self.guild_id,
+                )
             )
 
+            if qotd is not None:
 
-            # ==================================================
-            # GET EXISTING QOTD
-            # ==================================================
+                if qotd["message_id"] is not None:
 
-
-            qotd = await get_qotd_for_date(
-                guild_id=self.guild_id,
-                question_date=current_date,
-            )
+                    return False
 
 
             # ==================================================
-            # CREATE TODAY'S QOTD
+            # CREATE NEW QOTD
             # ==================================================
 
 
             if qotd is None:
 
                 qotd = (
-                    await self._create_today_qotd(
-                        current_date=current_date,
-                    )
+                    await self._create_qotd()
                 )
 
                 if qotd is None:
 
                     return False
-
-
-            # ==================================================
-            # ALREADY POSTED
-            # ==================================================
-
-
-            if qotd["message_id"] is not None:
-
-                await self._remove_old_qotd_buttons(
-                    current_date=current_date,
-                )
-
-                return False
 
 
             # ==================================================
@@ -334,6 +399,9 @@ class QotdScheduler:
                         question_date=(
                             qotd["question_date"]
                         ),
+                        expires_at=(
+                            qotd["expires_at"]
+                        ),
                     ),
                     view=QotdAnswerView(
                         qotd_id=qotd["id"]
@@ -347,7 +415,7 @@ class QotdScheduler:
 
                 print(
                     "QoTD scheduler could not "
-                    "post today's question: "
+                    "post the question: "
                     f"{error!r}"
                 )
 
@@ -383,16 +451,6 @@ class QotdScheduler:
 
 
             # ==================================================
-            # REMOVE OLD BUTTONS
-            # ==================================================
-
-
-            await self._remove_old_qotd_buttons(
-                current_date=current_date,
-            )
-
-
-            # ==================================================
             # SUCCESS
             # ==================================================
 
@@ -400,7 +458,8 @@ class QotdScheduler:
             print(
                 "QoTD scheduler: "
                 f"Posted QoTD #{qotd['id']} "
-                f"for {current_date.isoformat()} "
+                f"with deadline "
+                f"{qotd['expires_at']} "
                 f"using bank question "
                 f"#{qotd['question_bank_id']}."
             )
@@ -409,14 +468,23 @@ class QotdScheduler:
 
 
     # ==================================================
-    # CREATE TODAY'S QOTD
+    # CREATE QOTD
     # ==================================================
 
 
-    async def _create_today_qotd(
+    async def _create_qotd(
         self,
-        current_date,
     ) -> dict | None:
+
+        deadline = (
+            get_next_qotd_deadline()
+        )
+
+        question_date = (
+            _get_question_date_from_deadline(
+                deadline
+            )
+        )
 
         used_question_ids = (
             await get_used_qotd_question_bank_ids(
@@ -426,7 +494,7 @@ class QotdScheduler:
 
 
         # ==================================================
-        # SELECT UNUSED ELIGIBLE QUESTION
+        # SELECT QUESTION
         # ==================================================
 
 
@@ -438,7 +506,7 @@ class QotdScheduler:
 
 
         # ==================================================
-        # START NEW CYCLE
+        # START NEW CYCLE IF NEEDED
         # ==================================================
 
 
@@ -461,8 +529,8 @@ class QotdScheduler:
 
             print(
                 "QoTD scheduler: "
-                "All active QoTD-eligible questions "
-                "have already been used. "
+                "All eligible questions have "
+                "already been used. "
                 "Starting a new cycle."
             )
 
@@ -477,9 +545,14 @@ class QotdScheduler:
             qotd = await create_qotd(
                 guild_id=self.guild_id,
                 channel_id=self.channel_id,
-                question_date=current_date,
-                question_bank_id=question["id"],
-                question_text=question["question"],
+                question_date=question_date,
+                expires_at=deadline,
+                question_bank_id=(
+                    question["id"]
+                ),
+                question_text=(
+                    question["question"]
+                ),
                 accepted_answers=(
                     question["accepted_answers"]
                 ),
@@ -492,46 +565,42 @@ class QotdScheduler:
 
         except QotdAlreadyExistsError:
 
-            return await get_qotd_for_date(
-                guild_id=self.guild_id,
-                question_date=current_date,
+            existing = (
+                await get_qotd_for_date(
+                    guild_id=self.guild_id,
+                    question_date=question_date,
+                )
             )
+
+            return existing
 
 
         print(
             "QoTD scheduler: "
             f"Selected bank question "
-            f"#{question['id']} for "
-            f"{current_date.isoformat()}."
+            f"#{question['id']} with deadline "
+            f"{deadline.isoformat()}."
         )
 
         return qotd
 
 
     # ==================================================
-    # REMOVE OLD QOTD BUTTONS
+    # REMOVE EXPIRED BUTTONS
     # ==================================================
 
 
-    async def _remove_old_qotd_buttons(
+    async def _remove_expired_qotd_buttons(
         self,
-        current_date,
     ):
-        """
-        Remove the Answer Question button from
-        every QoTD older than today's question.
 
-        The old message itself remains visible.
-        """
-
-        old_qotds = (
-            await get_older_posted_qotds(
+        expired_qotds = (
+            await get_expired_posted_qotds(
                 guild_id=self.guild_id,
-                before_date=current_date,
             )
         )
 
-        for old_qotd in old_qotds:
+        for old_qotd in expired_qotds:
 
             channel = self.bot.get_channel(
                 old_qotd["channel_id"]
@@ -555,7 +624,6 @@ class QotdScheduler:
 
                     continue
 
-
             try:
 
                 message = (
@@ -568,11 +636,9 @@ class QotdScheduler:
                     view=None
                 )
 
-
             except discord.NotFound:
 
                 continue
-
 
             except (
                 discord.Forbidden,
@@ -581,7 +647,7 @@ class QotdScheduler:
 
                 print(
                     "QoTD scheduler could not remove "
-                    "an old Answer Question button: "
+                    "an expired Answer Question button: "
                     f"{error!r}"
                 )
 
@@ -595,10 +661,8 @@ class QotdScheduler:
         self,
     ) -> bool:
 
-        from datetime import datetime
-
-        now = datetime.now(
-            QOTD_TIMEZONE_INFO
+        now = (
+            get_current_chicago_datetime()
         )
 
         return (

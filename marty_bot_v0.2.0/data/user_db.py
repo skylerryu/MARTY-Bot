@@ -4,72 +4,162 @@ import aiosqlite
 
 
 # ==================================================
-# DATABASE PATH
+# DATABASE PATHS
 # ==================================================
 
 
-DB_PATH = Path(__file__).with_name(
+USER_DB_PATH = Path(__file__).with_name(
+    "user.db"
+)
+
+LEGACY_DB_PATH = Path(__file__).with_name(
     "marty.db"
 )
 
 
 # ==================================================
-# DATABASE MIGRATION HELPER
+# LEGACY MIGRATION
 # ==================================================
 
 
-async def _ensure_column(
+async def _copy_legacy_table(
     db: aiosqlite.Connection,
     table_name: str,
-    column_name: str,
-    column_definition: str,
 ):
     """
-    Add a column to an existing table if the
-    column does not already exist.
+    Copy compatible columns from the old marty.db
+    table into user.db.
 
-    This lets M.A.R.T.Y. upgrade an older
-    database without deleting it.
+    This is only used the first time user.db is
+    created. The old marty.db is never modified.
     """
 
     cursor = await db.execute(
-        f"PRAGMA table_info({table_name})"
+        """
+        SELECT 1
+        FROM legacy.sqlite_master
+        WHERE type = 'table'
+          AND name = ?
+        LIMIT 1
+        """,
+        (
+            table_name,
+        ),
     )
 
-    rows = await cursor.fetchall()
+    if await cursor.fetchone() is None:
+        return
 
-    existing_columns = {
+    target_cursor = await db.execute(
+        f"PRAGMA main.table_info({table_name})"
+    )
+
+    legacy_cursor = await db.execute(
+        f"PRAGMA legacy.table_info({table_name})"
+    )
+
+    target_columns = [
         row[1]
-        for row in rows
+        for row in await target_cursor.fetchall()
+    ]
+
+    legacy_columns = {
+        row[1]
+        for row in await legacy_cursor.fetchall()
     }
 
-    if column_name in existing_columns:
+    common_columns = [
+        column
+        for column in target_columns
+        if column in legacy_columns
+    ]
+
+    if not common_columns:
         return
+
+    columns_sql = ", ".join(
+        f'"{column}"'
+        for column in common_columns
+    )
 
     await db.execute(
         f"""
-        ALTER TABLE {table_name}
-        ADD COLUMN {column_name}
-        {column_definition}
+        INSERT OR IGNORE INTO "{table_name}" (
+            {columns_sql}
+        )
+        SELECT
+            {columns_sql}
+        FROM legacy."{table_name}"
         """
     )
 
 
-# ==================================================
-# INITIALIZE DATABASE
-# ==================================================
-
-
-async def init_db():
+async def _migrate_legacy_user_data(
+    db: aiosqlite.Connection,
+):
     """
-    Create all persistent M.A.R.T.Y. tables
-    and indexes.
-
-    Existing data is preserved.
+    Copy user-related data from the old marty.db
+    into a newly created user.db.
     """
+
+    if not LEGACY_DB_PATH.exists():
+        return
+
+    await db.execute(
+        "ATTACH DATABASE ? AS legacy",
+        (
+            str(LEGACY_DB_PATH),
+        ),
+    )
+
+    try:
+
+        for table_name in (
+            "users",
+            "point_transactions",
+            "golden_spatulas",
+            "activity_streaks",
+            "qotd_completions",
+            "qotd_streaks",
+        ):
+
+            await _copy_legacy_table(
+                db=db,
+                table_name=table_name,
+            )
+
+    finally:
+
+        # Finish any copied rows before detaching
+        # the legacy database.
+        await db.commit()
+
+        await db.execute(
+            "DETACH DATABASE legacy"
+        )
+
+
+# ==================================================
+# INITIALIZE USER DATABASE
+# ==================================================
+
+
+async def init_user_db():
+    """
+    Create the persistent database containing
+    information MARTY remembers about users.
+
+    If user.db does not yet exist and the old
+    marty.db does exist, compatible user data is
+    copied into user.db automatically.
+    """
+
+    database_is_new = (
+        not USER_DB_PATH.exists()
+    )
 
     async with aiosqlite.connect(
-        DB_PATH
+        USER_DB_PATH
     ) as db:
 
         await db.execute(
@@ -125,25 +215,6 @@ async def init_db():
             """
         )
 
-
-        # ==================================================
-        # POINT TRANSACTION MIGRATIONS
-        # ==================================================
-
-
-        await _ensure_column(
-            db=db,
-            table_name="point_transactions",
-            column_name="source_key",
-            column_definition="TEXT",
-        )
-
-
-        # ==================================================
-        # POINT TRANSACTION INDEXES
-        # ==================================================
-
-
         await db.execute(
             """
             CREATE INDEX IF NOT EXISTS
@@ -180,12 +251,6 @@ async def init_db():
             )
             """
         )
-
-
-        # ==================================================
-        # UNIQUE POINT SOURCE
-        # ==================================================
-
 
         await db.execute(
             """
@@ -232,7 +297,6 @@ async def init_db():
             """
         )
 
-
         await db.execute(
             """
             CREATE INDEX IF NOT EXISTS
@@ -275,97 +339,6 @@ async def init_db():
 
 
         # ==================================================
-        # QOTD QUESTIONS
-        # ==================================================
-
-
-        await db.execute(
-            """
-            CREATE TABLE IF NOT EXISTS qotd_questions (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-                guild_id INTEGER NOT NULL,
-                channel_id INTEGER NOT NULL,
-
-                message_id INTEGER,
-
-                question_date TEXT NOT NULL,
-
-                question_bank_id INTEGER,
-
-                question_text TEXT NOT NULL,
-
-                accepted_answers TEXT NOT NULL,
-
-                explanation TEXT,
-
-                created_at TEXT NOT NULL
-                    DEFAULT CURRENT_TIMESTAMP,
-
-                UNIQUE (
-                    guild_id,
-                    question_date
-                )
-            )
-            """
-        )
-
-
-        # ==================================================
-        # QOTD QUESTION MIGRATIONS
-        # ==================================================
-
-
-        await _ensure_column(
-            db=db,
-            table_name="qotd_questions",
-            column_name="question_bank_id",
-            column_definition="INTEGER",
-        )
-
-
-        # ==================================================
-        # QOTD QUESTION INDEXES
-        # ==================================================
-
-
-        await db.execute(
-            """
-            CREATE INDEX IF NOT EXISTS
-            idx_qotd_questions_date
-
-            ON qotd_questions (
-                guild_id,
-                question_date
-            )
-            """
-        )
-
-        await db.execute(
-            """
-            CREATE INDEX IF NOT EXISTS
-            idx_qotd_questions_message
-
-            ON qotd_questions (
-                message_id
-            )
-            """
-        )
-
-        await db.execute(
-            """
-            CREATE INDEX IF NOT EXISTS
-            idx_qotd_questions_bank_id
-
-            ON qotd_questions (
-                guild_id,
-                question_bank_id
-            )
-            """
-        )
-
-
-        # ==================================================
         # QOTD COMPLETIONS
         # ==================================================
 
@@ -388,12 +361,6 @@ async def init_db():
             )
             """
         )
-
-
-        # ==================================================
-        # QOTD COMPLETION INDEXES
-        # ==================================================
-
 
         await db.execute(
             """
@@ -444,49 +411,15 @@ async def init_db():
 
 
         # ==================================================
-        # ACTIVE SPEED QUESTIONS
+        # LEGACY MIGRATION
         # ==================================================
 
 
-        await db.execute(
-            """
-            CREATE TABLE IF NOT EXISTS
-            active_speed_questions (
-                guild_id INTEGER NOT NULL,
-                channel_id INTEGER NOT NULL,
+        if database_is_new:
 
-                question_id INTEGER NOT NULL,
-
-                posted_at TEXT NOT NULL
-                    DEFAULT CURRENT_TIMESTAMP,
-
-                answered_by INTEGER,
-                answered_at TEXT,
-
-                PRIMARY KEY (
-                    guild_id,
-                    channel_id
-                )
+            await _migrate_legacy_user_data(
+                db
             )
-            """
-        )
-
-
-        # ==================================================
-        # ACTIVE SPEED QUESTION INDEX
-        # ==================================================
-
-
-        await db.execute(
-            """
-            CREATE INDEX IF NOT EXISTS
-            idx_active_speed_questions_question
-
-            ON active_speed_questions (
-                question_id
-            )
-            """
-        )
 
 
         # ==================================================
@@ -507,10 +440,10 @@ if __name__ == "__main__":
     import asyncio
 
     asyncio.run(
-        init_db()
+        init_user_db()
     )
 
     print(
-        "M.A.R.T.Y. database initialized at: "
-        f"{DB_PATH}"
+        "M.A.R.T.Y. user database initialized at: "
+        f"{USER_DB_PATH}"
     )

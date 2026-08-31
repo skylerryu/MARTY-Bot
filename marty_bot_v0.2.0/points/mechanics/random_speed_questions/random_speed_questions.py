@@ -5,9 +5,11 @@ from datetime import datetime, timezone
 import aiosqlite
 import discord
 
-from data.database import DB_PATH
+from data.system_db import (
+    SYSTEM_DB_PATH,
+)
 
-from data.questions.q_manager import (
+from questions.q_manager import (
     get_question_by_id,
 )
 
@@ -20,21 +22,11 @@ from services.llm import (
 )
 
 
-# ==================================================
-# SPEED QUESTION POINTS
-# ==================================================
-
-
 SPEED_QUESTION_BASE_POINTS = 25
 
 SPEED_QUESTION_30_SECOND_BONUS = 25
 SPEED_QUESTION_1_MINUTE_BONUS = 10
 SPEED_QUESTION_3_MINUTE_BONUS = 5
-
-
-# ==================================================
-# GRADING LOCKS
-# ==================================================
 
 
 _grading_locks = {}
@@ -44,10 +36,6 @@ def _get_grading_lock(
     guild_id: int,
     channel_id: int,
 ) -> asyncio.Lock:
-    """
-    Return the grading lock for a particular
-    Discord channel.
-    """
 
     key = (
         guild_id,
@@ -63,20 +51,11 @@ def _get_grading_lock(
     return _grading_locks[key]
 
 
-# ==================================================
-# SET ACTIVE QUESTION
-# ==================================================
-
-
 async def set_active_speed_question(
     guild_id: int,
     channel_id: int,
     question_id: int,
 ):
-    """
-    Set the currently active speed question
-    for a Discord channel.
-    """
 
     posted_at = (
         datetime.now(
@@ -85,7 +64,7 @@ async def set_active_speed_question(
     )
 
     async with aiosqlite.connect(
-        DB_PATH
+        SYSTEM_DB_PATH
     ) as db:
 
         await db.execute(
@@ -130,22 +109,13 @@ async def set_active_speed_question(
         await db.commit()
 
 
-# ==================================================
-# GET ACTIVE QUESTION
-# ==================================================
-
-
 async def get_active_speed_question(
     guild_id: int,
     channel_id: int,
 ) -> dict | None:
-    """
-    Return the active speed question for a
-    Discord channel.
-    """
 
     async with aiosqlite.connect(
-        DB_PATH
+        SYSTEM_DB_PATH
     ) as db:
 
         cursor = await db.execute(
@@ -180,21 +150,12 @@ async def get_active_speed_question(
     }
 
 
-# ==================================================
-# MARK QUESTION ANSWERED
-# ==================================================
-
-
 async def mark_speed_question_answered(
     guild_id: int,
     channel_id: int,
     question_id: int,
     user_id: int,
 ) -> bool:
-    """
-    Attempt to claim the active question for
-    the first student who answers correctly.
-    """
 
     answered_at = (
         datetime.now(
@@ -203,7 +164,7 @@ async def mark_speed_question_answered(
     )
 
     async with aiosqlite.connect(
-        DB_PATH
+        SYSTEM_DB_PATH
     ) as db:
 
         cursor = await db.execute(
@@ -233,11 +194,6 @@ async def mark_speed_question_answered(
         return cursor.rowcount > 0
 
 
-# ==================================================
-# BUILD LLM ANSWER KEY
-# ==================================================
-
-
 def _build_answer_key(
     accepted_answers: list[str],
 ) -> str:
@@ -259,11 +215,6 @@ def _build_answer_key(
     )
 
 
-# ==================================================
-# BUILD ANSWER DISPLAY
-# ==================================================
-
-
 def _build_answer_display(
     accepted_answers: list[str],
 ) -> str:
@@ -277,11 +228,6 @@ def _build_answer_display(
         for answer
         in accepted_answers
     )
-
-
-# ==================================================
-# RESPONSE TIME
-# ==================================================
 
 
 def _get_response_seconds(
@@ -314,11 +260,6 @@ def _get_response_seconds(
     )
 
 
-# ==================================================
-# SPEED BONUS
-# ==================================================
-
-
 def get_speed_question_bonus(
     response_seconds: float,
 ) -> int:
@@ -344,11 +285,6 @@ def get_speed_question_bonus(
     return 0
 
 
-# ==================================================
-# REMOVE REACTION
-# ==================================================
-
-
 async def _remove_reaction(
     message: discord.Message,
     emoji: str,
@@ -370,36 +306,16 @@ async def _remove_reaction(
         pass
 
 
-# ==================================================
-# PROCESS SPEED QUESTION MESSAGE
-# ==================================================
-
-
 async def process_speed_question_message(
     message: discord.Message,
     bot_user,
 ):
 
-
-    # ==================================================
-    # IGNORE BOT MESSAGES
-    # ==================================================
-
     if message.author.bot:
         return
 
-
-    # ==================================================
-    # IGNORE DIRECT MESSAGES
-    # ==================================================
-
     if message.guild is None:
         return
-
-
-    # ==================================================
-    # MESSAGE CONTENT
-    # ==================================================
 
     content = (
         message.content.strip()
@@ -414,11 +330,6 @@ async def process_speed_question_message(
     ):
 
         return
-
-
-    # ==================================================
-    # CHECK ACTIVE QUESTION
-    # ==================================================
 
     active_question = (
         await get_active_speed_question(
@@ -437,23 +348,12 @@ async def process_speed_question_message(
 
         return
 
-
-    # ==================================================
-    # GRADING QUEUE
-    # ==================================================
-
     lock = _get_grading_lock(
         guild_id=message.guild.id,
         channel_id=message.channel.id,
     )
 
-
     async with lock:
-
-
-        # ==================================================
-        # RE-CHECK ACTIVE QUESTION
-        # ==================================================
 
         active_question = (
             await get_active_speed_question(
@@ -472,17 +372,11 @@ async def process_speed_question_message(
 
             return
 
-
         question_id = (
             active_question[
                 "question_id"
             ]
         )
-
-
-        # ==================================================
-        # GET QUESTION
-        # ==================================================
 
         question_data = (
             get_question_by_id(
@@ -492,7 +386,6 @@ async def process_speed_question_message(
 
         if question_data is None:
             return
-
 
         question_text = (
             question_data[
@@ -513,17 +406,11 @@ async def process_speed_question_message(
             )
         )
 
-
         correct_answer = (
             _build_answer_key(
                 accepted_answers
             )
         )
-
-
-        # ==================================================
-        # RESPONSE TIME
-        # ==================================================
 
         response_seconds = (
             _get_response_seconds(
@@ -538,11 +425,6 @@ async def process_speed_question_message(
             )
         )
 
-
-        # ==================================================
-        # GRADING REACTION
-        # ==================================================
-
         try:
 
             await message.add_reaction(
@@ -552,11 +434,6 @@ async def process_speed_question_message(
         except discord.HTTPException:
 
             pass
-
-
-        # ==================================================
-        # LLM
-        # ==================================================
 
         try:
 
@@ -593,11 +470,6 @@ async def process_speed_question_message(
 
             return
 
-
-        # ==================================================
-        # DEVELOPMENT LOGGING
-        # ==================================================
-
         print(
             "\n"
             "Speed Question Answer\n"
@@ -611,11 +483,6 @@ async def process_speed_question_message(
             f"Confidence: {grade.confidence}\n"
             f"Reason: {grade.reason}\n"
         )
-
-
-        # ==================================================
-        # INCORRECT
-        # ==================================================
 
         if not grade.correct:
 
@@ -637,11 +504,6 @@ async def process_speed_question_message(
 
             return
 
-
-        # ==================================================
-        # CLAIM QUESTION
-        # ==================================================
-
         won = (
             await mark_speed_question_answered(
                 guild_id=message.guild.id,
@@ -661,11 +523,6 @@ async def process_speed_question_message(
 
             return
 
-
-        # ==================================================
-        # POINTS
-        # ==================================================
-
         speed_bonus = (
             get_speed_question_bonus(
                 response_seconds
@@ -677,22 +534,12 @@ async def process_speed_question_message(
             + speed_bonus
         )
 
-
-        # ==================================================
-        # UNIQUE SOURCE KEY
-        # ==================================================
-
         source_key = (
             "speed_question:"
             f"{message.channel.id}:"
             f"{question_id}:"
             f"{active_question['posted_at']}"
         )
-
-
-        # ==================================================
-        # AWARD POINTS
-        # ==================================================
 
         try:
 
@@ -716,11 +563,6 @@ async def process_speed_question_message(
                 f"{error!r}"
             )
 
-
-        # ==================================================
-        # WINNER REACTION
-        # ==================================================
-
         try:
 
             await message.add_reaction(
@@ -731,28 +573,17 @@ async def process_speed_question_message(
 
             pass
 
-
         await _remove_reaction(
             message=message,
             emoji="⏳",
             bot_user=bot_user,
         )
 
-
-        # ==================================================
-        # ANSWER DISPLAY
-        # ==================================================
-
         answer_display = (
             _build_answer_display(
                 accepted_answers
             )
         )
-
-
-        # ==================================================
-        # WINNER EMBED
-        # ==================================================
 
         winner_embed = discord.Embed(
             title=(
@@ -767,13 +598,11 @@ async def process_speed_question_message(
             color=discord.Color.green(),
         )
 
-
         winner_embed.add_field(
             name="💡 Answer",
             value=answer_display,
             inline=False,
         )
-
 
         winner_embed.add_field(
             name="🏆 Base",
@@ -801,17 +630,11 @@ async def process_speed_question_message(
             inline=True,
         )
 
-
         winner_embed.add_field(
             name="📚 Explanation",
             value=explanation,
             inline=False,
         )
-
-
-        # ==================================================
-        # SEND WINNER MESSAGE
-        # ==================================================
 
         await message.reply(
             embed=winner_embed

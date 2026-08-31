@@ -1,7 +1,10 @@
 import discord
 import aiosqlite
 
-from data.database import DB_PATH
+from data.user_db import (
+    USER_DB_PATH,
+)
+
 from points.time_helpers import get_current_week_start_utc
 
 
@@ -14,9 +17,6 @@ async def build_leaderboard_embed(
     guild_id: int,
     limit: int = 10,
 ) -> discord.Embed:
-    """
-    Build the embed displayed by /leaderboard.
-    """
 
     leaderboards = await get_leaderboards(
         guild_id=guild_id,
@@ -54,19 +54,10 @@ async def build_leaderboard_embed(
     return embed
 
 
-# ==================================================
-# LEADERBOARD DATA
-# ==================================================
-
-
 async def get_leaderboards(
     guild_id: int,
     limit: int = 10,
 ) -> dict:
-    """
-    Get all leaderboard information needed
-    for /leaderboard.
-    """
 
     weekly = await get_weekly_leaderboard(
         guild_id=guild_id,
@@ -90,11 +81,6 @@ async def get_leaderboards(
     }
 
 
-# ==================================================
-# WEEKLY POINTS
-# ==================================================
-
-
 async def get_weekly_leaderboard(
     guild_id: int,
     limit: int = 10,
@@ -102,7 +88,9 @@ async def get_weekly_leaderboard(
 
     week_start_utc = get_current_week_start_utc()
 
-    async with aiosqlite.connect(DB_PATH) as db:
+    async with aiosqlite.connect(
+        USER_DB_PATH
+    ) as db:
 
         cursor = await db.execute(
             """
@@ -142,17 +130,14 @@ async def get_weekly_leaderboard(
     return rows
 
 
-# ==================================================
-# ALL-TIME POINTS
-# ==================================================
-
-
 async def get_all_time_leaderboard(
     guild_id: int,
     limit: int = 10,
 ) -> list:
 
-    async with aiosqlite.connect(DB_PATH) as db:
+    async with aiosqlite.connect(
+        USER_DB_PATH
+    ) as db:
 
         cursor = await db.execute(
             """
@@ -190,17 +175,14 @@ async def get_all_time_leaderboard(
     return rows
 
 
-# ==================================================
-# GOLDEN SPATULAS
-# ==================================================
-
-
 async def get_golden_spatula_leaderboard(
     guild_id: int,
     limit: int = 10,
 ) -> list:
 
-    async with aiosqlite.connect(DB_PATH) as db:
+    async with aiosqlite.connect(
+        USER_DB_PATH
+    ) as db:
 
         cursor = await db.execute(
             """
@@ -236,11 +218,6 @@ async def get_golden_spatula_leaderboard(
         rows = await cursor.fetchall()
 
     return rows
-
-
-# ==================================================
-# FORMATTING
-# ==================================================
 
 
 def format_points_leaderboard(

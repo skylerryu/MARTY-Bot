@@ -1,12 +1,9 @@
 import asyncio
+
 from datetime import (
     date,
-    timedelta,
-)
-
-from points.time_helpers import (
-    get_chicago_datetime,
-    get_current_chicago_datetime,
+    datetime,
+    timezone,
 )
 
 from points.mechanics.question_of_the_day.qotd_questions import (
@@ -33,11 +30,6 @@ from points.mechanics.question_of_the_day.qotd_points import (
     award_qotd_points,
 )
 
-from points.mechanics.question_of_the_day.qotd_config import (
-    QOTD_POST_HOUR,
-    QOTD_POST_MINUTE,
-)
-
 
 # ==================================================
 # SUBMISSION LOCKS
@@ -51,10 +43,6 @@ def _get_submission_lock(
     qotd_id: int,
     user_id: int,
 ) -> asyncio.Lock:
-    """
-    Prevent the same user from having multiple
-    answers to the same QoTD processed at once.
-    """
 
     key = (
         qotd_id,
@@ -80,10 +68,6 @@ def _get_submission_lock(
 def _get_qotd_date(
     question_date: str,
 ) -> date:
-    """
-    Convert the stored ISO question date into
-    a date object.
-    """
 
     return date.fromisoformat(
         question_date
@@ -96,39 +80,28 @@ def _get_qotd_date(
 
 
 def _qotd_is_open(
-    question_date: str,
+    expires_at: str,
 ) -> bool:
-    """
-    A QoTD stays open until the next QoTD posting
-    time at 6:00 AM Chicago time.
 
-    Example:
-
-    Sunday QoTD
-    opens Sunday at 6:00 AM
-    closes Monday at 6:00 AM
-    """
-
-    qotd_date = (
-        _get_qotd_date(
-            question_date
+    expiration = (
+        datetime.fromisoformat(
+            expires_at
         )
     )
 
-    deadline = (
-        get_chicago_datetime(
-            calendar_date=(
-                qotd_date
-                + timedelta(days=1)
-            ),
-            hour=QOTD_POST_HOUR,
-            minute=QOTD_POST_MINUTE,
+    if expiration.tzinfo is None:
+
+        expiration = (
+            expiration.replace(
+                tzinfo=timezone.utc
+            )
         )
-    )
 
     return (
-        get_current_chicago_datetime()
-        < deadline
+        datetime.now(
+            timezone.utc
+        )
+        < expiration
     )
 
 
@@ -144,18 +117,6 @@ async def submit_qotd_answer(
     username: str,
     submitted_answer: str,
 ) -> dict:
-    """
-    Process one student's Question of the Day
-    answer.
-
-    Coordinates:
-    - question validation
-    - grading
-    - streak calculation
-    - point awards
-    - completion tracking
-    - result data for the Discord display
-    """
 
     submitted_answer = (
         submitted_answer.strip()
@@ -169,7 +130,7 @@ async def submit_qotd_answer(
 
 
     # ==================================================
-    # USER / QUESTION LOCK
+    # LOCK
     # ==================================================
 
 
@@ -218,7 +179,7 @@ async def submit_qotd_answer(
 
 
         if not _qotd_is_open(
-            qotd["question_date"]
+            qotd["expires_at"]
         ):
 
             return {
@@ -258,28 +219,19 @@ async def submit_qotd_answer(
             ),
         )
 
-        if (
-            grade["status"]
-            == "uncertain"
-        ):
+        if grade["status"] == "uncertain":
 
             return {
                 "status": "uncertain",
             }
 
-        if (
-            grade["status"]
-            == "incorrect"
-        ):
+        if grade["status"] == "incorrect":
 
             return {
                 "status": "incorrect",
             }
 
-        if (
-            grade["status"]
-            != "correct"
-        ):
+        if grade["status"] != "correct":
 
             raise RuntimeError(
                 "Unknown QoTD grading status: "
@@ -314,9 +266,7 @@ async def submit_qotd_answer(
 
         new_streak = (
             calculate_next_qotd_streak(
-                current_streak=(
-                    current_streak
-                ),
+                current_streak=current_streak,
                 last_completion_date=(
                     last_completion_date
                 ),

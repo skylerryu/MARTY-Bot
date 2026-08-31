@@ -1,7 +1,10 @@
 import discord
 import aiosqlite
 
-from data.database import DB_PATH
+from data.user_db import (
+    USER_DB_PATH,
+)
+
 from points.time_helpers import get_current_week_start_utc
 
 from points.displays.displays_helpers import (
@@ -27,9 +30,6 @@ async def build_my_points_embed(
     user_id: int,
     username: str,
 ) -> discord.Embed:
-    """
-    Build the embed displayed by /mypoints.
-    """
 
     points = await get_my_points(
         guild_id=guild_id,
@@ -69,10 +69,6 @@ async def build_my_points_embed(
         ),
     )
 
-    # --------------------------------------------------
-    # LEVEL PROGRESS
-    # --------------------------------------------------
-
     embed.add_field(
         name=(
             f"Progress to Level "
@@ -92,10 +88,6 @@ async def build_my_points_embed(
         inline=False,
     )
 
-    # --------------------------------------------------
-    # STATS
-    # --------------------------------------------------
-
     embed.add_field(
         name="Stats",
         value=(
@@ -112,19 +104,10 @@ async def build_my_points_embed(
     return embed
 
 
-# ==================================================
-# POINT DATA
-# ==================================================
-
-
 async def get_my_points(
     guild_id: int,
     user_id: int,
 ) -> dict:
-    """
-    Return all point information needed
-    for the /mypoints display.
-    """
 
     weekly_points = await get_weekly_points(
         guild_id=guild_id,
@@ -152,17 +135,13 @@ async def get_weekly_points(
     guild_id: int,
     user_id: int,
 ) -> int:
-    """
-    Return the user's points earned during
-    the current Chicago week.
-    """
 
     week_start_utc = (
         get_current_week_start_utc()
     )
 
     async with aiosqlite.connect(
-        DB_PATH
+        USER_DB_PATH
     ) as db:
 
         cursor = await db.execute(
@@ -189,12 +168,9 @@ async def get_all_time_points(
     guild_id: int,
     user_id: int,
 ) -> int:
-    """
-    Return the user's total M.A.R.T.Y. points.
-    """
 
     async with aiosqlite.connect(
-        DB_PATH
+        USER_DB_PATH
     ) as db:
 
         cursor = await db.execute(
@@ -219,13 +195,9 @@ async def get_golden_spatulas(
     guild_id: int,
     user_id: int,
 ) -> int:
-    """
-    Return the total number of Golden Spatulas
-    earned by the user.
-    """
 
     async with aiosqlite.connect(
-        DB_PATH
+        USER_DB_PATH
     ) as db:
 
         cursor = await db.execute(

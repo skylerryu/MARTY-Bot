@@ -1,19 +1,9 @@
 from datetime import (
-    date,
-    timedelta,
+    datetime,
+    timezone,
 )
 
 import discord
-
-from points.time_helpers import (
-    get_chicago_datetime,
-    get_current_chicago_datetime,
-)
-
-from points.points_operations.add_points import (
-    set_point_notification_context,
-    reset_point_notification_context,
-)
 
 from points.mechanics.question_of_the_day.qotd import (
     submit_qotd_answer,
@@ -29,8 +19,6 @@ from points.mechanics.question_of_the_day.qotd_completions import (
 
 from points.mechanics.question_of_the_day.qotd_config import (
     QOTD_ANSWER_MAX_LENGTH,
-    QOTD_POST_HOUR,
-    QOTD_POST_MINUTE,
 )
 
 from points.mechanics.question_of_the_day.qotd_display import (
@@ -42,6 +30,14 @@ from points.mechanics.question_of_the_day.qotd_display import (
     build_qotd_unavailable_embed,
 )
 
+from points.progressions.levels.level_up_display import (
+    build_level_up_embed,
+)
+
+from points.progressions.ranks.rank_up_display import (
+    build_rank_up_embed,
+)
+
 
 # ==================================================
 # QOTD OPEN / CLOSED
@@ -49,35 +45,32 @@ from points.mechanics.question_of_the_day.qotd_display import (
 
 
 def _qotd_is_open(
-    question_date: str,
+    expires_at: str,
 ) -> bool:
     """
-    A QoTD remains open until the next QoTD
-    posting time.
-
-    Example:
-
-    Sunday QoTD
-    opens Sunday at 6:00 AM
-    closes Monday at 6:00 AM
+    Return whether the QoTD's stored expiration
+    time is still in the future.
     """
 
-    qotd_date = date.fromisoformat(
-        question_date
+    expiration = (
+        datetime.fromisoformat(
+            expires_at
+        )
     )
 
-    deadline = get_chicago_datetime(
-        calendar_date=(
-            qotd_date
-            + timedelta(days=1)
-        ),
-        hour=QOTD_POST_HOUR,
-        minute=QOTD_POST_MINUTE,
-    )
+    if expiration.tzinfo is None:
+
+        expiration = (
+            expiration.replace(
+                tzinfo=timezone.utc
+            )
+        )
 
     return (
-        get_current_chicago_datetime()
-        < deadline
+        datetime.now(
+            timezone.utc
+        )
+        < expiration
     )
 
 
@@ -136,8 +129,8 @@ class QotdAnswerModal(
         interaction: discord.Interaction,
     ):
         """
-        Send the submitted answer into the QoTD
-        workflow and display the result privately.
+        Process the answer and display all
+        results privately to the student.
         """
 
         await interaction.response.defer(
@@ -175,64 +168,49 @@ class QotdAnswerModal(
 
 
         # ==================================================
-        # POINT NOTIFICATION CONTEXT
+        # PROCESS ANSWER
         # ==================================================
 
 
-        notification_token = (
-            set_point_notification_context(
-                user=interaction.user,
-                channel=interaction.channel,
-            )
-        )
-
         try:
 
-            try:
-
-                result = (
-                    await submit_qotd_answer(
-                        qotd_id=(
-                            self.qotd_id
-                        ),
-                        guild_id=(
-                            interaction.guild.id
-                        ),
-                        user_id=(
-                            interaction.user.id
-                        ),
-                        username=(
-                            interaction.user.display_name
-                        ),
-                        submitted_answer=(
-                            submitted_answer
-                        ),
-                    )
-                )
-
-            except Exception as error:
-
-                print(
-                    "QoTD submission error: "
-                    f"{error!r}"
-                )
-
-                await interaction.followup.send(
-                    (
-                        "⚠️ Something went wrong while "
-                        "processing your answer. "
-                        "Please try again."
+            result = (
+                await submit_qotd_answer(
+                    qotd_id=(
+                        self.qotd_id
                     ),
-                    ephemeral=True,
+                    guild_id=(
+                        interaction.guild.id
+                    ),
+                    user_id=(
+                        interaction.user.id
+                    ),
+                    username=(
+                        interaction.user.display_name
+                    ),
+                    submitted_answer=(
+                        submitted_answer
+                    ),
                 )
-
-                return
-
-        finally:
-
-            reset_point_notification_context(
-                notification_token
             )
+
+        except Exception as error:
+
+            print(
+                "QoTD submission error: "
+                f"{error!r}"
+            )
+
+            await interaction.followup.send(
+                (
+                    "⚠️ Something went wrong while "
+                    "processing your answer. "
+                    "Please try again."
+                ),
+                ephemeral=True,
+            )
+
+            return
 
 
         # ==================================================
@@ -240,9 +218,9 @@ class QotdAnswerModal(
         # ==================================================
 
 
-        status = result[
-            "status"
-        ]
+        status = (
+            result["status"]
+        )
 
 
         # ==================================================
@@ -339,7 +317,7 @@ class QotdAnswerModal(
 
 
         # ==================================================
-        # CORRECT
+        # UNKNOWN STATUS
         # ==================================================
 
 
@@ -352,7 +330,7 @@ class QotdAnswerModal(
 
 
         # ==================================================
-        # DISPLAY CORRECT RESULT
+        # CORRECT RESULT
         # ==================================================
 
 
@@ -393,6 +371,84 @@ class QotdAnswerModal(
             ),
             ephemeral=True,
         )
+
+
+        # ==================================================
+        # PROGRESSION
+        # ==================================================
+
+
+        progression = (
+            result.get(
+                "progression",
+                {},
+            )
+        )
+
+
+        # ==================================================
+        # LEVEL UP
+        # ==================================================
+
+
+        if progression.get(
+            "leveled_up",
+            False,
+        ):
+
+            level_up_embed = (
+                build_level_up_embed(
+                    old_level=(
+                        progression[
+                            "old_level"
+                        ]
+                    ),
+                    new_level=(
+                        progression[
+                            "new_level"
+                        ]
+                    ),
+                )
+            )
+
+            await interaction.followup.send(
+                embed=level_up_embed,
+                ephemeral=True,
+            )
+
+
+        # ==================================================
+        # RANK UP
+        # ==================================================
+
+
+        if progression.get(
+            "ranked_up",
+            False,
+        ):
+
+            rank_up_embed = (
+                build_rank_up_embed(
+                    username=(
+                        interaction.user.display_name
+                    ),
+                    new_rank=(
+                        progression[
+                            "new_rank"
+                        ]
+                    ),
+                    new_level=(
+                        progression[
+                            "new_level"
+                        ]
+                    ),
+                )
+            )
+
+            await interaction.followup.send(
+                embed=rank_up_embed,
+                ephemeral=True,
+            )
 
 
 # ==================================================
@@ -449,8 +505,8 @@ class QotdAnswerView(
         interaction: discord.Interaction,
     ):
         """
-        Check whether the user can answer this
-        QoTD and open the private answer modal.
+        Check whether the student can answer
+        this QoTD and open the private modal.
         """
 
 
@@ -514,12 +570,12 @@ class QotdAnswerView(
 
 
         # ==================================================
-        # VERIFY QOTD IS STILL OPEN
+        # VERIFY QOTD IS OPEN
         # ==================================================
 
 
         if not _qotd_is_open(
-            qotd["question_date"]
+            qotd["expires_at"]
         ):
 
             await interaction.response.send_message(

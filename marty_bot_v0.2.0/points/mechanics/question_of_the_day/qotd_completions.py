@@ -1,6 +1,8 @@
 import aiosqlite
 
-from data.database import DB_PATH
+from data.user_db import (
+    USER_DB_PATH,
+)
 
 
 # ==================================================
@@ -18,7 +20,7 @@ async def has_completed_qotd(
     """
 
     async with aiosqlite.connect(
-        DB_PATH
+        USER_DB_PATH
     ) as db:
 
         cursor = await db.execute(
@@ -60,7 +62,7 @@ async def record_qotd_completion(
     """
 
     async with aiosqlite.connect(
-        DB_PATH
+        USER_DB_PATH
     ) as db:
 
         cursor = await db.execute(

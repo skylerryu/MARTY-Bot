@@ -9,14 +9,14 @@ from threading import Lock
 # ==================================================
 
 
-QUESTION_BANK_DIR = (
+Q_BANK_DIR = (
     Path(__file__).with_name(
-        "question_bank"
+        "q_bank"
     )
 )
 
 METADATA_PATH = (
-    QUESTION_BANK_DIR
+    Q_BANK_DIR
     / "metadata.json"
 )
 
@@ -44,7 +44,7 @@ CATEGORY_NAMES = {
 # ==================================================
 
 
-_question_bank_lock = Lock()
+_q_bank_lock = Lock()
 
 
 # ==================================================
@@ -67,7 +67,7 @@ def _get_category_path(
         )
 
     return (
-        QUESTION_BANK_DIR
+        Q_BANK_DIR
         / f"{category}.json"
     )
 
@@ -143,13 +143,13 @@ def _save_json_file(
 # ==================================================
 
 
-def _ensure_question_bank_exists():
+def _ensure_q_bank_exists():
     """
     Make sure the question-bank folder,
     metadata file, and category files exist.
     """
 
-    QUESTION_BANK_DIR.mkdir(
+    Q_BANK_DIR.mkdir(
         parents=True,
         exist_ok=True,
     )
@@ -192,7 +192,7 @@ def _load_metadata() -> dict:
     permanent global question ID.
     """
 
-    _ensure_question_bank_exists()
+    _ensure_q_bank_exists()
 
     metadata = _load_json_file(
         METADATA_PATH
@@ -245,7 +245,7 @@ def _load_category_questions(
     so it is added to each question in memory.
     """
 
-    _ensure_question_bank_exists()
+    _ensure_q_bank_exists()
 
     category_path = (
         _get_category_path(
@@ -493,7 +493,7 @@ def add_question(
     # ==================================================
 
 
-    with _question_bank_lock:
+    with _q_bank_lock:
 
         metadata = (
             _load_metadata()

@@ -2,7 +2,9 @@ from datetime import date, timedelta
 
 import aiosqlite
 
-from data.database import DB_PATH
+from data.user_db import (
+    USER_DB_PATH,
+)
 
 from points.time_helpers import (
     get_current_week_start_chicago,
@@ -38,7 +40,7 @@ async def process_activity_streak(
     )
 
     async with aiosqlite.connect(
-        DB_PATH
+        USER_DB_PATH
     ) as db:
 
         cursor = await db.execute(
@@ -58,10 +60,6 @@ async def process_activity_streak(
 
         row = await cursor.fetchone()
 
-        # --------------------------------------------------
-        # EXISTING STREAK
-        # --------------------------------------------------
-
         if row is not None:
 
             current_streak = int(
@@ -74,8 +72,6 @@ async def process_activity_streak(
                 )
             )
 
-            # The streak has already been processed
-            # during the current week.
             if last_active_week == current_week:
                 return 0
 
@@ -84,27 +80,17 @@ async def process_activity_streak(
                 - timedelta(days=7)
             )
 
-            # User was active last week.
             if (
                 last_active_week
                 == previous_week
             ):
                 current_streak += 1
 
-            # User missed at least one full week.
             else:
                 current_streak = 1
 
-        # --------------------------------------------------
-        # NEW STREAK
-        # --------------------------------------------------
-
         else:
             current_streak = 1
-
-        # --------------------------------------------------
-        # CALCULATE BONUS
-        # --------------------------------------------------
 
         streak_bonus = min(
             (
@@ -113,10 +99,6 @@ async def process_activity_streak(
             ),
             ACTIVITY_STREAK_MAX_BONUS,
         )
-
-        # --------------------------------------------------
-        # SAVE STREAK
-        # --------------------------------------------------
 
         await db.execute(
             """

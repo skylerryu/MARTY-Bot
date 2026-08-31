@@ -1,7 +1,7 @@
 import aiosqlite
 
-from data.database import (
-    DB_PATH,
+from data.user_db import (
+    USER_DB_PATH,
 )
 
 from points.points_operations.operations_helpers import (
@@ -23,7 +23,7 @@ async def get_points(
     """
 
     async with aiosqlite.connect(
-        DB_PATH
+        USER_DB_PATH
     ) as db:
 
         return await get_point_total_from_db(

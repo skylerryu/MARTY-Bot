@@ -1,4 +1,5 @@
 import discord
+
 from discord import app_commands
 
 from bot_config import (
@@ -22,13 +23,12 @@ from commands.admin_commands.qotd_admin_commands import (
     register_qotd_admin_commands,
 )
 
-from data.database import (
-    init_db,
+from data.user_db import (
+    init_user_db,
 )
 
-from points.points_operations.add_points import (
-    set_point_notification_context,
-    reset_point_notification_context,
+from data.system_db import (
+    init_system_db,
 )
 
 from points.mechanics.activity.activity import (
@@ -129,12 +129,21 @@ class MartyBot(
         self,
     ):
 
+
         # ==================================================
-        # DATABASE
+        # USER DATABASE
         # ==================================================
 
 
-        await init_db()
+        await init_user_db()
+
+
+        # ==================================================
+        # SYSTEM DATABASE
+        # ==================================================
+
+
+        await init_system_db()
 
 
         # ==================================================
@@ -232,7 +241,6 @@ class MartyBot(
 
         restored_count = 0
 
-
         for qotd in qotds:
 
             qotd_id = (
@@ -247,7 +255,6 @@ class MartyBot(
 
                 continue
 
-
             self.add_view(
                 QotdAnswerView(
                     qotd_id=qotd_id
@@ -256,7 +263,6 @@ class MartyBot(
             )
 
             restored_count += 1
-
 
         print(
             "Restored "
@@ -296,67 +302,44 @@ class MartyBot(
 
 
         # ==================================================
-        # POINT NOTIFICATION CONTEXT
+        # ACTIVITY
         # ==================================================
-
-
-        notification_token = (
-            set_point_notification_context(
-                user=message.author,
-                channel=message.channel,
-            )
-        )
 
 
         try:
 
-
-            # ==================================================
-            # ACTIVITY
-            # ==================================================
-
-
-            try:
-
-                await (
-                    self.activity_tracker
-                    .process_message(
-                        message
-                    )
+            await (
+                self.activity_tracker
+                .process_message(
+                    message
                 )
+            )
 
-            except Exception as error:
+        except Exception as error:
 
-                print(
-                    "Activity processing error: "
-                    f"{error!r}"
-                )
-
-
-            # ==================================================
-            # SPEED QUESTION
-            # ==================================================
+            print(
+                "Activity processing error: "
+                f"{error!r}"
+            )
 
 
-            try:
-
-                await process_speed_question_message(
-                    message=message,
-                    bot_user=self.user,
-                )
-
-            except Exception as error:
-
-                print(
-                    "Speed question processing error: "
-                    f"{error!r}"
-                )
+        # ==================================================
+        # SPEED QUESTION
+        # ==================================================
 
 
-        finally:
+        try:
 
-            reset_point_notification_context(
-                notification_token
+            await process_speed_question_message(
+                message=message,
+                bot_user=self.user,
+            )
+
+        except Exception as error:
+
+            print(
+                "Speed question processing error: "
+                f"{error!r}"
             )
 
 

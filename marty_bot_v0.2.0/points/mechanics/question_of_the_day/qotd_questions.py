@@ -1,21 +1,28 @@
 import json
 import sqlite3
-from datetime import date
+
+from datetime import (
+    date,
+    datetime,
+    timezone,
+)
 
 import aiosqlite
 
-from data.database import DB_PATH
+from data.system_db import (
+    SYSTEM_DB_PATH,
+)
 
 
 # ==================================================
-# EXCEPTIONS
+# ERRORS
 # ==================================================
 
 
 class QotdAlreadyExistsError(Exception):
     """
-    Raised when a QoTD already exists for
-    the requested guild and date.
+    Raised when a QoTD already exists for the
+    requested logical QoTD date.
     """
 
 
@@ -42,11 +49,12 @@ def _row_to_qotd(
             row["accepted_answers"]
         ),
         "explanation": row["explanation"],
+        "expires_at": row["expires_at"],
     }
 
 
 # ==================================================
-# CREATE QUESTION
+# CREATE QOTD
 # ==================================================
 
 
@@ -54,13 +62,16 @@ async def create_qotd(
     guild_id: int,
     channel_id: int,
     question_date: date,
+    expires_at: datetime,
     question_text: str,
     accepted_answers: list[str],
     explanation: str | None = None,
     question_bank_id: int | None = None,
 ) -> dict:
 
-    question_text = question_text.strip()
+    question_text = (
+        question_text.strip()
+    )
 
     if not question_text:
 
@@ -81,14 +92,28 @@ async def create_qotd(
             "must be provided."
         )
 
-    accepted_answers_json = json.dumps(
-        cleaned_answers
+    if expires_at.tzinfo is None:
+
+        raise ValueError(
+            "expires_at must include timezone information."
+        )
+
+    expiration_utc = (
+        expires_at.astimezone(
+            timezone.utc
+        )
+    )
+
+    accepted_answers_json = (
+        json.dumps(
+            cleaned_answers
+        )
     )
 
     try:
 
         async with aiosqlite.connect(
-            DB_PATH
+            SYSTEM_DB_PATH
         ) as db:
 
             cursor = await db.execute(
@@ -100,9 +125,11 @@ async def create_qotd(
                     question_bank_id,
                     question_text,
                     accepted_answers,
-                    explanation
+                    explanation,
+                    expires_at
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     guild_id,
@@ -112,18 +139,21 @@ async def create_qotd(
                     question_text,
                     accepted_answers_json,
                     explanation,
+                    expiration_utc.isoformat(),
                 ),
             )
 
             await db.commit()
 
-            qotd_id = cursor.lastrowid
+            qotd_id = (
+                cursor.lastrowid
+            )
 
     except sqlite3.IntegrityError as error:
 
         raise QotdAlreadyExistsError(
-            "A Question of the Day already "
-            "exists for this server on this date."
+            "A Question of the Day already exists "
+            "for this QoTD period."
         ) from error
 
     if qotd_id is None:
@@ -138,16 +168,27 @@ async def create_qotd(
         "guild_id": guild_id,
         "channel_id": channel_id,
         "message_id": None,
-        "question_date": question_date.isoformat(),
-        "question_bank_id": question_bank_id,
-        "question_text": question_text,
-        "accepted_answers": cleaned_answers,
+        "question_date": (
+            question_date.isoformat()
+        ),
+        "question_bank_id": (
+            question_bank_id
+        ),
+        "question_text": (
+            question_text
+        ),
+        "accepted_answers": (
+            cleaned_answers
+        ),
         "explanation": explanation,
+        "expires_at": (
+            expiration_utc.isoformat()
+        ),
     }
 
 
 # ==================================================
-# GET QUESTION
+# GET QOTD
 # ==================================================
 
 
@@ -156,10 +197,12 @@ async def get_qotd(
 ) -> dict | None:
 
     async with aiosqlite.connect(
-        DB_PATH
+        SYSTEM_DB_PATH
     ) as db:
 
-        db.row_factory = aiosqlite.Row
+        db.row_factory = (
+            aiosqlite.Row
+        )
 
         cursor = await db.execute(
             """
@@ -172,8 +215,11 @@ async def get_qotd(
                 question_bank_id,
                 question_text,
                 accepted_answers,
-                explanation
+                explanation,
+                expires_at
+
             FROM qotd_questions
+
             WHERE id = ?
             """,
             (
@@ -184,6 +230,7 @@ async def get_qotd(
         row = await cursor.fetchone()
 
     if row is None:
+
         return None
 
     return _row_to_qotd(
@@ -192,20 +239,31 @@ async def get_qotd(
 
 
 # ==================================================
-# GET QUESTION FOR DATE
+# ACTIVE QOTD
 # ==================================================
 
 
-async def get_qotd_for_date(
+async def get_active_qotd(
     guild_id: int,
-    question_date: date,
 ) -> dict | None:
+    """
+    Return the currently unexpired QoTD for
+    a server.
+    """
+
+    now_utc = (
+        datetime.now(
+            timezone.utc
+        )
+    )
 
     async with aiosqlite.connect(
-        DB_PATH
+        SYSTEM_DB_PATH
     ) as db:
 
-        db.row_factory = aiosqlite.Row
+        db.row_factory = (
+            aiosqlite.Row
+        )
 
         cursor = await db.execute(
             """
@@ -218,8 +276,69 @@ async def get_qotd_for_date(
                 question_bank_id,
                 question_text,
                 accepted_answers,
-                explanation
+                explanation,
+                expires_at
+
             FROM qotd_questions
+
+            WHERE guild_id = ?
+              AND expires_at > ?
+
+            ORDER BY expires_at ASC
+
+            LIMIT 1
+            """,
+            (
+                guild_id,
+                now_utc.isoformat(),
+            ),
+        )
+
+        row = await cursor.fetchone()
+
+    if row is None:
+
+        return None
+
+    return _row_to_qotd(
+        row
+    )
+
+
+# ==================================================
+# GET QOTD FOR LOGICAL DATE
+# ==================================================
+
+
+async def get_qotd_for_date(
+    guild_id: int,
+    question_date: date,
+) -> dict | None:
+
+    async with aiosqlite.connect(
+        SYSTEM_DB_PATH
+    ) as db:
+
+        db.row_factory = (
+            aiosqlite.Row
+        )
+
+        cursor = await db.execute(
+            """
+            SELECT
+                id,
+                guild_id,
+                channel_id,
+                message_id,
+                question_date,
+                question_bank_id,
+                question_text,
+                accepted_answers,
+                explanation,
+                expires_at
+
+            FROM qotd_questions
+
             WHERE guild_id = ?
               AND question_date = ?
             """,
@@ -232,6 +351,7 @@ async def get_qotd_for_date(
         row = await cursor.fetchone()
 
     if row is None:
+
         return None
 
     return _row_to_qotd(
@@ -249,7 +369,7 @@ async def get_used_qotd_question_bank_ids(
 ) -> set[int]:
 
     async with aiosqlite.connect(
-        DB_PATH
+        SYSTEM_DB_PATH
     ) as db:
 
         cursor = await db.execute(
@@ -276,24 +396,27 @@ async def get_used_qotd_question_bank_ids(
 
 
 # ==================================================
-# OLDER POSTED QOTDS
+# EXPIRED POSTED QOTDS
 # ==================================================
 
 
-async def get_older_posted_qotds(
+async def get_expired_posted_qotds(
     guild_id: int,
-    before_date: date,
 ) -> list[dict]:
-    """
-    Get old QoTD messages so their buttons
-    can be removed when the next QoTD posts.
-    """
+
+    now_utc = (
+        datetime.now(
+            timezone.utc
+        )
+    )
 
     async with aiosqlite.connect(
-        DB_PATH
+        SYSTEM_DB_PATH
     ) as db:
 
-        db.row_factory = aiosqlite.Row
+        db.row_factory = (
+            aiosqlite.Row
+        )
 
         cursor = await db.execute(
             """
@@ -301,19 +424,20 @@ async def get_older_posted_qotds(
                 id,
                 channel_id,
                 message_id,
-                question_date
+                question_date,
+                expires_at
 
             FROM qotd_questions
 
             WHERE guild_id = ?
-              AND question_date < ?
               AND message_id IS NOT NULL
+              AND expires_at <= ?
 
-            ORDER BY question_date DESC
+            ORDER BY id DESC
             """,
             (
                 guild_id,
-                before_date.isoformat(),
+                now_utc.isoformat(),
             ),
         )
 
@@ -322,9 +446,18 @@ async def get_older_posted_qotds(
     return [
         {
             "id": row["id"],
-            "channel_id": row["channel_id"],
-            "message_id": row["message_id"],
-            "question_date": row["question_date"],
+            "channel_id": (
+                row["channel_id"]
+            ),
+            "message_id": (
+                row["message_id"]
+            ),
+            "question_date": (
+                row["question_date"]
+            ),
+            "expires_at": (
+                row["expires_at"]
+            ),
         }
         for row in rows
     ]
@@ -341,7 +474,7 @@ async def set_qotd_message_id(
 ):
 
     async with aiosqlite.connect(
-        DB_PATH
+        SYSTEM_DB_PATH
     ) as db:
 
         await db.execute(
@@ -362,7 +495,7 @@ async def set_qotd_message_id(
 
 
 # ==================================================
-# DELETE QUESTION
+# DELETE QOTD
 # ==================================================
 
 
@@ -371,12 +504,13 @@ async def delete_qotd(
 ):
 
     async with aiosqlite.connect(
-        DB_PATH
+        SYSTEM_DB_PATH
     ) as db:
 
         await db.execute(
             """
             DELETE FROM qotd_questions
+
             WHERE id = ?
             """,
             (
@@ -388,7 +522,7 @@ async def delete_qotd(
 
 
 # ==================================================
-# RECENT QUESTIONS
+# RECENT QOTDS FOR PERSISTENT VIEWS
 # ==================================================
 
 
@@ -397,13 +531,16 @@ async def get_recent_qotds_for_views(
 ) -> list[dict]:
 
     if limit <= 0:
+
         return []
 
     async with aiosqlite.connect(
-        DB_PATH
+        SYSTEM_DB_PATH
     ) as db:
 
-        db.row_factory = aiosqlite.Row
+        db.row_factory = (
+            aiosqlite.Row
+        )
 
         cursor = await db.execute(
             """
@@ -429,7 +566,9 @@ async def get_recent_qotds_for_views(
     return [
         {
             "id": row["id"],
-            "message_id": row["message_id"],
+            "message_id": (
+                row["message_id"]
+            ),
         }
         for row in rows
     ]

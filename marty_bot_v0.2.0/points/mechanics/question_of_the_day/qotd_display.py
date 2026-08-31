@@ -1,25 +1,16 @@
 import math
+
 from datetime import (
     date,
     datetime,
-    timedelta,
+    timezone,
 )
 
 import discord
 
-from points.time_helpers import (
-    get_chicago_datetime,
-    get_current_chicago_datetime,
-)
-
-from points.mechanics.question_of_the_day.qotd_config import (
-    QOTD_POST_HOUR,
-    QOTD_POST_MINUTE,
-)
-
 
 # ==================================================
-# QOTD DATE HELPERS
+# DATE
 # ==================================================
 
 
@@ -31,6 +22,7 @@ def _parse_question_date(
         question_date,
         date,
     ):
+
         return question_date
 
     return date.fromisoformat(
@@ -53,24 +45,39 @@ def _format_qotd_date(
     )
 
 
-def _get_qotd_expiration_datetime(
-    question_date: date | str,
+# ==================================================
+# EXPIRATION
+# ==================================================
+
+
+def _parse_expiration(
+    expires_at: datetime | str,
 ) -> datetime:
 
-    parsed_date = (
-        _parse_question_date(
-            question_date
-        )
-    )
+    if isinstance(
+        expires_at,
+        datetime,
+    ):
 
-    return get_chicago_datetime(
-        calendar_date=(
-            parsed_date
-            + timedelta(days=1)
-        ),
-        hour=QOTD_POST_HOUR,
-        minute=QOTD_POST_MINUTE,
-    )
+        expiration = expires_at
+
+    else:
+
+        expiration = (
+            datetime.fromisoformat(
+                expires_at
+            )
+        )
+
+    if expiration.tzinfo is None:
+
+        expiration = (
+            expiration.replace(
+                tzinfo=timezone.utc
+            )
+        )
+
+    return expiration
 
 
 # ==================================================
@@ -79,19 +86,19 @@ def _get_qotd_expiration_datetime(
 
 
 def get_qotd_time_remaining_text(
-    question_date: date | str,
+    expires_at: datetime | str,
     now: datetime | None = None,
 ) -> str:
 
     if now is None:
 
-        now = (
-            get_current_chicago_datetime()
+        now = datetime.now(
+            timezone.utc
         )
 
     expiration = (
-        _get_qotd_expiration_datetime(
-            question_date
+        _parse_expiration(
+            expires_at
         )
     )
 
@@ -118,7 +125,6 @@ def get_qotd_time_remaining_text(
 
     # ==================================================
     # 1 HOUR OR MORE
-    # WHOLE-HOUR WARNINGS
     # ==================================================
 
 
@@ -130,14 +136,12 @@ def get_qotd_time_remaining_text(
         )
 
         return (
-            f"< {hours} "
-            "hrs"
+            f"< {hours} hrs"
         )
 
 
     # ==================================================
-    # LESS THAN 1 HOUR
-    # 15-MINUTE WARNINGS
+    # 15 MINUTES OR MORE
     # ==================================================
 
 
@@ -157,8 +161,7 @@ def get_qotd_time_remaining_text(
 
 
     # ==================================================
-    # LESS THAN 15 MINUTES
-    # 5-MINUTE WARNINGS
+    # 1 MINUTE OR MORE
     # ==================================================
 
 
@@ -182,8 +185,7 @@ def get_qotd_time_remaining_text(
 
 
     # ==================================================
-    # LESS THAN 1 MINUTE
-    # 15-SECOND WARNINGS
+    # 30 SECONDS OR MORE
     # ==================================================
 
 
@@ -204,7 +206,6 @@ def get_qotd_time_remaining_text(
 
     # ==================================================
     # LESS THAN 30 SECONDS
-    # 5-SECOND WARNINGS
     # ==================================================
 
 
@@ -229,6 +230,7 @@ def get_qotd_time_remaining_text(
 def build_qotd_question_embed(
     question_text: str,
     question_date: date | str,
+    expires_at: datetime | str,
 ) -> discord.Embed:
 
     date_text = (
@@ -239,7 +241,7 @@ def build_qotd_question_embed(
 
     time_remaining = (
         get_qotd_time_remaining_text(
-            question_date
+            expires_at
         )
     )
 
@@ -250,7 +252,8 @@ def build_qotd_question_embed(
         ),
         description=(
             f"{question_text}\n\n"
-            f"⏳ **Time Remaining:** **{time_remaining}** ⏳"
+            f"⏳ **Time Remaining:** "
+            f"**{time_remaining}** ⏳"
         ),
         color=discord.Color.blurple(),
     )
@@ -296,12 +299,6 @@ def build_qotd_correct_embed(
         else "No explanation provided."
     )
 
-
-    # ==================================================
-    # ACCEPTED ANSWER DISPLAY
-    # ==================================================
-
-
     cleaned_answers = [
         answer.strip()
         for answer in accepted_answers
@@ -326,12 +323,6 @@ def build_qotd_correct_embed(
             f"• {answer}"
             for answer in cleaned_answers
         )
-
-
-    # ==================================================
-    # EMBED
-    # ==================================================
-
 
     return discord.Embed(
         title="✅ Correct!",
@@ -412,7 +403,7 @@ def build_qotd_completed_embed() -> discord.Embed:
 
 
 # ==================================================
-# EXPIRED QUESTION
+# EXPIRED
 # ==================================================
 
 
@@ -429,7 +420,7 @@ def build_qotd_expired_embed() -> discord.Embed:
 
 
 # ==================================================
-# UNAVAILABLE QUESTION
+# UNAVAILABLE
 # ==================================================
 
 
