@@ -1,0 +1,722 @@
+[
+    {
+        "id": 106,
+        "question": "What does SAMPLE stand for in a patient history?",
+        "accepted_answers": [
+            "Signs and symptoms, Allergies, Medications, Pertinent past history, Last oral intake, Events leading up"
+        ],
+        "explanation": "SAMPLE is a structured history mnemonic used to gather key information from a patient.",
+        "active": true
+    },
+    {
+        "id": 107,
+        "question": "What does OPQRST help an EMT assess?",
+        "accepted_answers": [
+            "A patient's pain or chief complaint"
+        ],
+        "explanation": "OPQRST structures questions about onset, provocation, quality, region, severity, and time.",
+        "active": true
+    },
+    {
+        "id": 108,
+        "question": "What is a pertinent negative?",
+        "accepted_answers": [
+            "A relevant symptom or finding that the patient denies or that is absent"
+        ],
+        "explanation": "Pertinent negatives are clinically important absent findings that help narrow the differential impression.",
+        "active": true
+    },
+    {
+        "id": 109,
+        "question": "What is the primary assessment designed to identify?",
+        "accepted_answers": [
+            "Immediate life threats"
+        ],
+        "explanation": "The primary assessment rapidly identifies and treats threats involving airway, breathing, circulation, and other urgent problems.",
+        "active": true
+    },
+    {
+        "id": 110,
+        "question": "What is the purpose of reassessment during transport?",
+        "accepted_answers": [
+            "Detect changes in the patient's condition and response to treatment"
+        ],
+        "explanation": "Reassessment identifies deterioration, improvement, or the need to modify treatment.",
+        "active": true
+    },
+    {
+        "id": 111,
+        "question": "What does the term perfusion mean?",
+        "accepted_answers": [
+            "Delivery of oxygenated blood to body tissues"
+        ],
+        "explanation": "Perfusion is the circulation of blood through tissues to deliver oxygen and nutrients and remove waste.",
+        "active": true
+    },
+    {
+        "id": 112,
+        "question": "What is shock?",
+        "accepted_answers": [
+            "Inadequate tissue perfusion"
+        ],
+        "explanation": "Shock is a state in which the circulatory system cannot adequately perfuse body tissues.",
+        "active": true
+    },
+    {
+        "id": 113,
+        "question": "What is the purpose of taking a baseline set of vital signs?",
+        "accepted_answers": [
+            "Establish a reference for detecting changes in the patient's condition"
+        ],
+        "explanation": "Baseline vital signs provide a starting point that can be compared with later reassessments.",
+        "active": true
+    },
+    {
+        "id": 114,
+        "question": "What does altered mental status mean?",
+        "accepted_answers": [
+            "A change from the patient's normal level of awareness or responsiveness"
+        ],
+        "explanation": "Altered mental status includes any change in consciousness, orientation, behavior, or responsiveness from baseline.",
+        "active": true
+    },
+    {
+        "id": 115,
+        "question": "What is the purpose of a focused secondary assessment?",
+        "accepted_answers": [
+            "Look for findings related to the patient's chief complaint or mechanism of injury"
+        ],
+        "explanation": "A focused secondary assessment targets the body systems or regions most relevant to the patient's presentation.",
+        "active": true
+    },
+    {
+        "id": 116,
+        "question": "What is the purpose of a rapid head-to-toe trauma assessment?",
+        "accepted_answers": [
+            "Identify significant injuries in a potentially unstable trauma patient"
+        ],
+        "explanation": "A rapid systematic exam helps detect life-threatening or major injuries that may not be immediately obvious.",
+        "active": true
+    },
+    {
+        "id": 117,
+        "question": "What does the term mechanism of injury refer to?",
+        "accepted_answers": [
+            "The forces or events that caused a traumatic injury"
+        ],
+        "explanation": "Mechanism of injury helps the EMT anticipate possible hidden injuries based on how the trauma occurred.",
+        "active": true
+    },
+    {
+        "id": 118,
+        "question": "What does the term nature of illness refer to?",
+        "accepted_answers": [
+            "The type of medical problem causing the patient's symptoms"
+        ],
+        "explanation": "Nature of illness describes the suspected medical process responsible for the patient's complaint.",
+        "active": true
+    },
+    {
+        "id": 119,
+        "question": "Why should scene safety be assessed before patient contact?",
+        "accepted_answers": [
+            "To prevent rescuers and patients from being exposed to additional hazards"
+        ],
+        "explanation": "An unsafe scene can create additional patients and prevent effective care.",
+        "active": true
+    },
+    {
+        "id": 120,
+        "question": "What is the purpose of standard precautions?",
+        "accepted_answers": [
+            "Reduce exposure to blood and body fluids"
+        ],
+        "explanation": "Standard precautions help protect patients and providers from communicable disease transmission.",
+        "active": true
+    },
+    {
+        "id": 121,
+        "question": "What is the purpose of determining the number of patients at a scene?",
+        "accepted_answers": [
+            "Identify resource needs and whether additional help is required"
+        ],
+        "explanation": "Knowing the patient count helps determine the need for extra ambulances, triage, or other resources.",
+        "active": true
+    },
+    {
+        "id": 122,
+        "question": "What does AVPU assess?",
+        "accepted_answers": [
+            "Level of responsiveness"
+        ],
+        "explanation": "AVPU categorizes a patient as Alert, responsive to Verbal stimuli, responsive to Pain, or Unresponsive.",
+        "active": true
+    },
+    {
+        "id": 123,
+        "question": "What does a pulse oximeter estimate?",
+        "accepted_answers": [
+            "Peripheral oxygen saturation"
+        ],
+        "explanation": "Pulse oximetry estimates the percentage of hemoglobin saturated with oxygen in peripheral arterial blood.",
+        "active": true
+    },
+    {
+        "id": 124,
+        "question": "What does capillary refill provide a rough indication of?",
+        "accepted_answers": [
+            "Peripheral perfusion"
+        ],
+        "explanation": "Capillary refill can provide a quick, limited assessment of peripheral perfusion, especially in pediatric patients.",
+        "active": true
+    },
+    {
+        "id": 125,
+        "question": "What is the main reason to obtain multiple sets of vital signs?",
+        "accepted_answers": [
+            "Identify trends"
+        ],
+        "explanation": "Trends over time are often more informative than a single set of vital signs.",
+        "active": true
+    },
+    {
+        "id": 226,
+        "question": "During EMT review, what does SAMPLE stand for in a patient history?",
+        "accepted_answers": [
+            "Signs and symptoms, Allergies, Medications, Pertinent past history, Last oral intake, Events leading up"
+        ],
+        "explanation": "SAMPLE is a structured history mnemonic used to gather key information from a patient.",
+        "active": true
+    },
+    {
+        "id": 227,
+        "question": "During EMT review, what does OPQRST help an EMT assess?",
+        "accepted_answers": [
+            "A patient's pain or chief complaint"
+        ],
+        "explanation": "OPQRST structures questions about onset, provocation, quality, region, severity, and time.",
+        "active": true
+    },
+    {
+        "id": 228,
+        "question": "During EMT review, what is a pertinent negative?",
+        "accepted_answers": [
+            "A relevant symptom or finding that the patient denies or that is absent"
+        ],
+        "explanation": "Pertinent negatives are clinically important absent findings that help narrow the differential impression.",
+        "active": true
+    },
+    {
+        "id": 229,
+        "question": "During EMT review, what is the primary assessment designed to identify?",
+        "accepted_answers": [
+            "Immediate life threats"
+        ],
+        "explanation": "The primary assessment rapidly identifies and treats threats involving airway, breathing, circulation, and other urgent problems.",
+        "active": true
+    },
+    {
+        "id": 230,
+        "question": "During EMT review, what is the purpose of reassessment during transport?",
+        "accepted_answers": [
+            "Detect changes in the patient's condition and response to treatment"
+        ],
+        "explanation": "Reassessment identifies deterioration, improvement, or the need to modify treatment.",
+        "active": true
+    },
+    {
+        "id": 231,
+        "question": "During EMT review, what does the term perfusion mean?",
+        "accepted_answers": [
+            "Delivery of oxygenated blood to body tissues"
+        ],
+        "explanation": "Perfusion is the circulation of blood through tissues to deliver oxygen and nutrients and remove waste.",
+        "active": true
+    },
+    {
+        "id": 232,
+        "question": "During EMT review, what is shock?",
+        "accepted_answers": [
+            "Inadequate tissue perfusion"
+        ],
+        "explanation": "Shock is a state in which the circulatory system cannot adequately perfuse body tissues.",
+        "active": true
+    },
+    {
+        "id": 233,
+        "question": "During EMT review, what is the purpose of taking a baseline set of vital signs?",
+        "accepted_answers": [
+            "Establish a reference for detecting changes in the patient's condition"
+        ],
+        "explanation": "Baseline vital signs provide a starting point that can be compared with later reassessments.",
+        "active": true
+    },
+    {
+        "id": 234,
+        "question": "During EMT review, what does altered mental status mean?",
+        "accepted_answers": [
+            "A change from the patient's normal level of awareness or responsiveness"
+        ],
+        "explanation": "Altered mental status includes any change in consciousness, orientation, behavior, or responsiveness from baseline.",
+        "active": true
+    },
+    {
+        "id": 235,
+        "question": "During EMT review, what is the purpose of a focused secondary assessment?",
+        "accepted_answers": [
+            "Look for findings related to the patient's chief complaint or mechanism of injury"
+        ],
+        "explanation": "A focused secondary assessment targets the body systems or regions most relevant to the patient's presentation.",
+        "active": true
+    },
+    {
+        "id": 236,
+        "question": "During EMT review, what is the purpose of a rapid head-to-toe trauma assessment?",
+        "accepted_answers": [
+            "Identify significant injuries in a potentially unstable trauma patient"
+        ],
+        "explanation": "A rapid systematic exam helps detect life-threatening or major injuries that may not be immediately obvious.",
+        "active": true
+    },
+    {
+        "id": 237,
+        "question": "During EMT review, what does the term mechanism of injury refer to?",
+        "accepted_answers": [
+            "The forces or events that caused a traumatic injury"
+        ],
+        "explanation": "Mechanism of injury helps the EMT anticipate possible hidden injuries based on how the trauma occurred.",
+        "active": true
+    },
+    {
+        "id": 238,
+        "question": "During EMT review, what does the term nature of illness refer to?",
+        "accepted_answers": [
+            "The type of medical problem causing the patient's symptoms"
+        ],
+        "explanation": "Nature of illness describes the suspected medical process responsible for the patient's complaint.",
+        "active": true
+    },
+    {
+        "id": 239,
+        "question": "During EMT review, why should scene safety be assessed before patient contact?",
+        "accepted_answers": [
+            "To prevent rescuers and patients from being exposed to additional hazards"
+        ],
+        "explanation": "An unsafe scene can create additional patients and prevent effective care.",
+        "active": true
+    },
+    {
+        "id": 240,
+        "question": "During EMT review, what is the purpose of standard precautions?",
+        "accepted_answers": [
+            "Reduce exposure to blood and body fluids"
+        ],
+        "explanation": "Standard precautions help protect patients and providers from communicable disease transmission.",
+        "active": true
+    },
+    {
+        "id": 241,
+        "question": "During EMT review, what is the purpose of determining the number of patients at a scene?",
+        "accepted_answers": [
+            "Identify resource needs and whether additional help is required"
+        ],
+        "explanation": "Knowing the patient count helps determine the need for extra ambulances, triage, or other resources.",
+        "active": true
+    },
+    {
+        "id": 242,
+        "question": "During EMT review, what does AVPU assess?",
+        "accepted_answers": [
+            "Level of responsiveness"
+        ],
+        "explanation": "AVPU categorizes a patient as Alert, responsive to Verbal stimuli, responsive to Pain, or Unresponsive.",
+        "active": true
+    },
+    {
+        "id": 243,
+        "question": "During EMT review, what does a pulse oximeter estimate?",
+        "accepted_answers": [
+            "Peripheral oxygen saturation"
+        ],
+        "explanation": "Pulse oximetry estimates the percentage of hemoglobin saturated with oxygen in peripheral arterial blood.",
+        "active": true
+    },
+    {
+        "id": 244,
+        "question": "During EMT review, what does capillary refill provide a rough indication of?",
+        "accepted_answers": [
+            "Peripheral perfusion"
+        ],
+        "explanation": "Capillary refill can provide a quick, limited assessment of peripheral perfusion, especially in pediatric patients.",
+        "active": true
+    },
+    {
+        "id": 245,
+        "question": "During EMT review, what is the main reason to obtain multiple sets of vital signs?",
+        "accepted_answers": [
+            "Identify trends"
+        ],
+        "explanation": "Trends over time are often more informative than a single set of vital signs.",
+        "active": true
+    },
+    {
+        "id": 346,
+        "question": "An EMT student is asked: What does SAMPLE stand for in a patient history?",
+        "accepted_answers": [
+            "Signs and symptoms, Allergies, Medications, Pertinent past history, Last oral intake, Events leading up"
+        ],
+        "explanation": "SAMPLE is a structured history mnemonic used to gather key information from a patient.",
+        "active": true
+    },
+    {
+        "id": 347,
+        "question": "An EMT student is asked: What does OPQRST help an EMT assess?",
+        "accepted_answers": [
+            "A patient's pain or chief complaint"
+        ],
+        "explanation": "OPQRST structures questions about onset, provocation, quality, region, severity, and time.",
+        "active": true
+    },
+    {
+        "id": 348,
+        "question": "An EMT student is asked: What is a pertinent negative?",
+        "accepted_answers": [
+            "A relevant symptom or finding that the patient denies or that is absent"
+        ],
+        "explanation": "Pertinent negatives are clinically important absent findings that help narrow the differential impression.",
+        "active": true
+    },
+    {
+        "id": 349,
+        "question": "An EMT student is asked: What is the primary assessment designed to identify?",
+        "accepted_answers": [
+            "Immediate life threats"
+        ],
+        "explanation": "The primary assessment rapidly identifies and treats threats involving airway, breathing, circulation, and other urgent problems.",
+        "active": true
+    },
+    {
+        "id": 350,
+        "question": "An EMT student is asked: What is the purpose of reassessment during transport?",
+        "accepted_answers": [
+            "Detect changes in the patient's condition and response to treatment"
+        ],
+        "explanation": "Reassessment identifies deterioration, improvement, or the need to modify treatment.",
+        "active": true
+    },
+    {
+        "id": 351,
+        "question": "An EMT student is asked: What does the term perfusion mean?",
+        "accepted_answers": [
+            "Delivery of oxygenated blood to body tissues"
+        ],
+        "explanation": "Perfusion is the circulation of blood through tissues to deliver oxygen and nutrients and remove waste.",
+        "active": true
+    },
+    {
+        "id": 352,
+        "question": "An EMT student is asked: What is shock?",
+        "accepted_answers": [
+            "Inadequate tissue perfusion"
+        ],
+        "explanation": "Shock is a state in which the circulatory system cannot adequately perfuse body tissues.",
+        "active": true
+    },
+    {
+        "id": 353,
+        "question": "An EMT student is asked: What is the purpose of taking a baseline set of vital signs?",
+        "accepted_answers": [
+            "Establish a reference for detecting changes in the patient's condition"
+        ],
+        "explanation": "Baseline vital signs provide a starting point that can be compared with later reassessments.",
+        "active": true
+    },
+    {
+        "id": 354,
+        "question": "An EMT student is asked: What does altered mental status mean?",
+        "accepted_answers": [
+            "A change from the patient's normal level of awareness or responsiveness"
+        ],
+        "explanation": "Altered mental status includes any change in consciousness, orientation, behavior, or responsiveness from baseline.",
+        "active": true
+    },
+    {
+        "id": 355,
+        "question": "An EMT student is asked: What is the purpose of a focused secondary assessment?",
+        "accepted_answers": [
+            "Look for findings related to the patient's chief complaint or mechanism of injury"
+        ],
+        "explanation": "A focused secondary assessment targets the body systems or regions most relevant to the patient's presentation.",
+        "active": true
+    },
+    {
+        "id": 356,
+        "question": "An EMT student is asked: What is the purpose of a rapid head-to-toe trauma assessment?",
+        "accepted_answers": [
+            "Identify significant injuries in a potentially unstable trauma patient"
+        ],
+        "explanation": "A rapid systematic exam helps detect life-threatening or major injuries that may not be immediately obvious.",
+        "active": true
+    },
+    {
+        "id": 357,
+        "question": "An EMT student is asked: What does the term mechanism of injury refer to?",
+        "accepted_answers": [
+            "The forces or events that caused a traumatic injury"
+        ],
+        "explanation": "Mechanism of injury helps the EMT anticipate possible hidden injuries based on how the trauma occurred.",
+        "active": true
+    },
+    {
+        "id": 358,
+        "question": "An EMT student is asked: What does the term nature of illness refer to?",
+        "accepted_answers": [
+            "The type of medical problem causing the patient's symptoms"
+        ],
+        "explanation": "Nature of illness describes the suspected medical process responsible for the patient's complaint.",
+        "active": true
+    },
+    {
+        "id": 359,
+        "question": "An EMT student is asked: Why should scene safety be assessed before patient contact?",
+        "accepted_answers": [
+            "To prevent rescuers and patients from being exposed to additional hazards"
+        ],
+        "explanation": "An unsafe scene can create additional patients and prevent effective care.",
+        "active": true
+    },
+    {
+        "id": 360,
+        "question": "An EMT student is asked: What is the purpose of standard precautions?",
+        "accepted_answers": [
+            "Reduce exposure to blood and body fluids"
+        ],
+        "explanation": "Standard precautions help protect patients and providers from communicable disease transmission.",
+        "active": true
+    },
+    {
+        "id": 361,
+        "question": "An EMT student is asked: What is the purpose of determining the number of patients at a scene?",
+        "accepted_answers": [
+            "Identify resource needs and whether additional help is required"
+        ],
+        "explanation": "Knowing the patient count helps determine the need for extra ambulances, triage, or other resources.",
+        "active": true
+    },
+    {
+        "id": 362,
+        "question": "An EMT student is asked: What does AVPU assess?",
+        "accepted_answers": [
+            "Level of responsiveness"
+        ],
+        "explanation": "AVPU categorizes a patient as Alert, responsive to Verbal stimuli, responsive to Pain, or Unresponsive.",
+        "active": true
+    },
+    {
+        "id": 363,
+        "question": "An EMT student is asked: What does a pulse oximeter estimate?",
+        "accepted_answers": [
+            "Peripheral oxygen saturation"
+        ],
+        "explanation": "Pulse oximetry estimates the percentage of hemoglobin saturated with oxygen in peripheral arterial blood.",
+        "active": true
+    },
+    {
+        "id": 364,
+        "question": "An EMT student is asked: What does capillary refill provide a rough indication of?",
+        "accepted_answers": [
+            "Peripheral perfusion"
+        ],
+        "explanation": "Capillary refill can provide a quick, limited assessment of peripheral perfusion, especially in pediatric patients.",
+        "active": true
+    },
+    {
+        "id": 365,
+        "question": "An EMT student is asked: What is the main reason to obtain multiple sets of vital signs?",
+        "accepted_answers": [
+            "Identify trends"
+        ],
+        "explanation": "Trends over time are often more informative than a single set of vital signs.",
+        "active": true
+    },
+    {
+        "id": 466,
+        "question": "In a patient-care scenario, what does SAMPLE stand for in a patient history?",
+        "accepted_answers": [
+            "Signs and symptoms, Allergies, Medications, Pertinent past history, Last oral intake, Events leading up"
+        ],
+        "explanation": "SAMPLE is a structured history mnemonic used to gather key information from a patient.",
+        "active": true
+    },
+    {
+        "id": 467,
+        "question": "In a patient-care scenario, what does OPQRST help an EMT assess?",
+        "accepted_answers": [
+            "A patient's pain or chief complaint"
+        ],
+        "explanation": "OPQRST structures questions about onset, provocation, quality, region, severity, and time.",
+        "active": true
+    },
+    {
+        "id": 468,
+        "question": "In a patient-care scenario, what is a pertinent negative?",
+        "accepted_answers": [
+            "A relevant symptom or finding that the patient denies or that is absent"
+        ],
+        "explanation": "Pertinent negatives are clinically important absent findings that help narrow the differential impression.",
+        "active": true
+    },
+    {
+        "id": 469,
+        "question": "In a patient-care scenario, what is the primary assessment designed to identify?",
+        "accepted_answers": [
+            "Immediate life threats"
+        ],
+        "explanation": "The primary assessment rapidly identifies and treats threats involving airway, breathing, circulation, and other urgent problems.",
+        "active": true
+    },
+    {
+        "id": 470,
+        "question": "In a patient-care scenario, what is the purpose of reassessment during transport?",
+        "accepted_answers": [
+            "Detect changes in the patient's condition and response to treatment"
+        ],
+        "explanation": "Reassessment identifies deterioration, improvement, or the need to modify treatment.",
+        "active": true
+    },
+    {
+        "id": 471,
+        "question": "In a patient-care scenario, what does the term perfusion mean?",
+        "accepted_answers": [
+            "Delivery of oxygenated blood to body tissues"
+        ],
+        "explanation": "Perfusion is the circulation of blood through tissues to deliver oxygen and nutrients and remove waste.",
+        "active": true
+    },
+    {
+        "id": 472,
+        "question": "In a patient-care scenario, what is shock?",
+        "accepted_answers": [
+            "Inadequate tissue perfusion"
+        ],
+        "explanation": "Shock is a state in which the circulatory system cannot adequately perfuse body tissues.",
+        "active": true
+    },
+    {
+        "id": 473,
+        "question": "In a patient-care scenario, what is the purpose of taking a baseline set of vital signs?",
+        "accepted_answers": [
+            "Establish a reference for detecting changes in the patient's condition"
+        ],
+        "explanation": "Baseline vital signs provide a starting point that can be compared with later reassessments.",
+        "active": true
+    },
+    {
+        "id": 474,
+        "question": "In a patient-care scenario, what does altered mental status mean?",
+        "accepted_answers": [
+            "A change from the patient's normal level of awareness or responsiveness"
+        ],
+        "explanation": "Altered mental status includes any change in consciousness, orientation, behavior, or responsiveness from baseline.",
+        "active": true
+    },
+    {
+        "id": 475,
+        "question": "In a patient-care scenario, what is the purpose of a focused secondary assessment?",
+        "accepted_answers": [
+            "Look for findings related to the patient's chief complaint or mechanism of injury"
+        ],
+        "explanation": "A focused secondary assessment targets the body systems or regions most relevant to the patient's presentation.",
+        "active": true
+    },
+    {
+        "id": 476,
+        "question": "In a patient-care scenario, what is the purpose of a rapid head-to-toe trauma assessment?",
+        "accepted_answers": [
+            "Identify significant injuries in a potentially unstable trauma patient"
+        ],
+        "explanation": "A rapid systematic exam helps detect life-threatening or major injuries that may not be immediately obvious.",
+        "active": true
+    },
+    {
+        "id": 477,
+        "question": "In a patient-care scenario, what does the term mechanism of injury refer to?",
+        "accepted_answers": [
+            "The forces or events that caused a traumatic injury"
+        ],
+        "explanation": "Mechanism of injury helps the EMT anticipate possible hidden injuries based on how the trauma occurred.",
+        "active": true
+    },
+    {
+        "id": 478,
+        "question": "In a patient-care scenario, what does the term nature of illness refer to?",
+        "accepted_answers": [
+            "The type of medical problem causing the patient's symptoms"
+        ],
+        "explanation": "Nature of illness describes the suspected medical process responsible for the patient's complaint.",
+        "active": true
+    },
+    {
+        "id": 479,
+        "question": "In a patient-care scenario, why should scene safety be assessed before patient contact?",
+        "accepted_answers": [
+            "To prevent rescuers and patients from being exposed to additional hazards"
+        ],
+        "explanation": "An unsafe scene can create additional patients and prevent effective care.",
+        "active": true
+    },
+    {
+        "id": 480,
+        "question": "In a patient-care scenario, what is the purpose of standard precautions?",
+        "accepted_answers": [
+            "Reduce exposure to blood and body fluids"
+        ],
+        "explanation": "Standard precautions help protect patients and providers from communicable disease transmission.",
+        "active": true
+    },
+    {
+        "id": 481,
+        "question": "In a patient-care scenario, what is the purpose of determining the number of patients at a scene?",
+        "accepted_answers": [
+            "Identify resource needs and whether additional help is required"
+        ],
+        "explanation": "Knowing the patient count helps determine the need for extra ambulances, triage, or other resources.",
+        "active": true
+    },
+    {
+        "id": 482,
+        "question": "In a patient-care scenario, what does AVPU assess?",
+        "accepted_answers": [
+            "Level of responsiveness"
+        ],
+        "explanation": "AVPU categorizes a patient as Alert, responsive to Verbal stimuli, responsive to Pain, or Unresponsive.",
+        "active": true
+    },
+    {
+        "id": 483,
+        "question": "In a patient-care scenario, what does a pulse oximeter estimate?",
+        "accepted_answers": [
+            "Peripheral oxygen saturation"
+        ],
+        "explanation": "Pulse oximetry estimates the percentage of hemoglobin saturated with oxygen in peripheral arterial blood.",
+        "active": true
+    },
+    {
+        "id": 484,
+        "question": "In a patient-care scenario, what does capillary refill provide a rough indication of?",
+        "accepted_answers": [
+            "Peripheral perfusion"
+        ],
+        "explanation": "Capillary refill can provide a quick, limited assessment of peripheral perfusion, especially in pediatric patients.",
+        "active": true
+    },
+    {
+        "id": 485,
+        "question": "In a patient-care scenario, what is the main reason to obtain multiple sets of vital signs?",
+        "accepted_answers": [
+            "Identify trends"
+        ],
+        "explanation": "Trends over time are often more informative than a single set of vital signs.",
+        "active": true
+    }
+]
